@@ -41,7 +41,7 @@ $stripeSecretKey = 'sk_live_YOUR_STRIPE_SECRET_KEY';
 The frontend JavaScript uses a test publishable key in `stripe-integration.js`:
 
 ```javascript
-this.stripe = Stripe('pk_test_51R2G3HAm1cm6I95vMj6zgoiPafIBlLBZtGpuVbp6w9nR8qFtlAQJYNIixRrZOESpd3GIrJWqUmJK3pCSZXdO4vxp00OjQCi64j');
+this.stripe = Stripe('pk_test_YOUR_STRIPE_PUBLISHABLE_KEY');
 ```
 
 **IMPORTANT**: For production, you should:
