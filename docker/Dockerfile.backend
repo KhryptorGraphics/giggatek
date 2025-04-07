@@ -1,0 +1,36 @@
+# GigGatek Backend Dockerfile
+FROM python:3.10-slim
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    default-libmysqlclient-dev \
+    pkg-config \
+    build-essential
+
+# Install Python dependencies
+COPY backend/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY backend/ .
+
+# Set environment variables
+ENV FLASK_APP=app.py
+ENV FLASK_ENV=production
+ENV DB_HOST=db
+ENV DB_PORT=3306
+ENV DB_NAME=giggatek
+ENV DB_USER=giggatek_user
+ENV DB_PASSWORD=giggatek_password
+ENV REDIS_HOST=redis
+ENV REDIS_PORT=6379
+
+# Expose the port the app runs on
+EXPOSE 5000
+
+# Command to run the application
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]

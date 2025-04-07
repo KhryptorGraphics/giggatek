@@ -1,0 +1,129 @@
+# GigGatek Prometheus Alert Rules Configuration
+
+groups:
+  - name: node_alerts
+    rules:
+      - alert: HighCPULoad
+        expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU load on {{ $labels.instance }}"
+          description: "CPU load is above 80% for 5 minutes (current value: {{ $value }}%)"
+
+      - alert: HighMemoryUsage
+        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage on {{ $labels.instance }}"
+          description: "Memory usage is above 85% for 5 minutes (current value: {{ $value }}%)"
+
+      - alert: HighDiskUsage
+        expr: 100 - ((node_filesystem_avail_bytes{mountpoint="/",fstype!="rootfs"} * 100) / node_filesystem_size_bytes{mountpoint="/",fstype!="rootfs"}) > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High disk usage on {{ $labels.instance }}"
+          description: "Disk usage is above 85% for 5 minutes (current value: {{ $value }}%)"
+
+  - name: app_alerts
+    rules:
+      - alert: HighResponseTime
+        expr: rate(http_request_duration_seconds_sum[5m]) / rate(http_request_duration_seconds_count[5m]) > 1
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High response time on {{ $labels.instance }}"
+          description: "Average response time is above 1 second for 2 minutes (current value: {{ $value }}s)"
+
+      - alert: HighErrorRate
+        expr: 100 * sum(rate(http_requests_total{status=~"5.."}[5m])) / sum(rate(http_requests_total[5m])) > 5
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High error rate on {{ $labels.instance }}"
+          description: "HTTP error rate is above 5% for 2 minutes (current value: {{ $value }}%)"
+
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service down on {{ $labels.instance }}"
+          description: "Service {{ $labels.job }} has been down for more than 1 minute"
+
+  - name: database_alerts
+    rules:
+      - alert: MySQLDown
+        expr: mysql_up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "MySQL server is down on {{ $labels.instance }}"
+          description: "MySQL server has been down for more than 1 minute"
+
+      - alert: MySQLHighConnections
+        expr: mysql_global_status_threads_connected / mysql_global_variables_max_connections * 100 > 80
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "MySQL high connections on {{ $labels.instance }}"
+          description: "MySQL connections are above 80% for 2 minutes (current value: {{ $value }}%)"
+
+      - alert: MySQLSlowQueries
+        expr: increase(mysql_global_status_slow_queries[5m]) > 10
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "MySQL slow queries on {{ $labels.instance }}"
+          description: "MySQL has more than 10 slow queries in 5 minutes (current value: {{ $value }})"
+
+  - name: redis_alerts
+    rules:
+      - alert: RedisDown
+        expr: redis_up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Redis is down on {{ $labels.instance }}"
+          description: "Redis has been down for more than 1 minute"
+
+      - alert: RedisOutOfMemory
+        expr: redis_memory_used_bytes / redis_total_system_memory_bytes * 100 > 80
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Redis out of memory on {{ $labels.instance }}"
+          description: "Redis memory usage is above 80% for 2 minutes (current value: {{ $value }}%)"
+
+  - name: container_alerts
+    rules:
+      - alert: ContainerCpuUsage
+        expr: sum(rate(container_cpu_usage_seconds_total{name!=""}[5m])) by (name) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage in container {{ $labels.name }}"
+          description: "Container {{ $labels.name }} CPU usage is above 80% for 5 minutes (current value: {{ $value }}%)"
+
+      - alert: ContainerMemoryUsage
+        expr: container_memory_usage_bytes{name!=""} / container_spec_memory_limit_bytes{name!=""} * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage in container {{ $labels.name }}"
+          description: "Container {{ $labels.name }} memory usage is above 80% for 5 minutes (current value: {{ $value }}%)"

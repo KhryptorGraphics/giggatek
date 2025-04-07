@@ -1,0 +1,46 @@
+# GigGatek Frontend Dockerfile
+FROM php:8.1-apache
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    libzip-dev \
+    zip \
+    unzip \
+    git \
+    curl
+
+# Install PHP extensions
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) gd mysqli pdo_mysql zip
+
+# Enable Apache modules
+RUN a2enmod rewrite headers expires
+
+# Set working directory
+WORKDIR /var/www/html
+
+# Copy application files
+COPY frontend/ /var/www/html/
+
+# Update Apache configuration to use the correct document root
+RUN sed -i 's!/var/www/html!/var/www/html!g' /etc/apache2/sites-available/000-default.conf
+
+# Set proper permissions
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html
+
+# Set environment variables
+ENV BACKEND_URL http://backend:5000
+ENV DB_HOST db
+ENV DB_NAME giggatek
+ENV DB_USER giggatek_user
+ENV DB_PASSWORD giggatek_password
+
+# Expose port 80
+EXPOSE 80
+
+# Apache starts automatically in this image
+CMD ["apache2-foreground"]

@@ -1,0 +1,24 @@
+# GigGatek Grafana Dashboard Configuration
+
+apiVersion: 1
+
+providers:
+  # <string> Provider name
+  - name: 'GigGatek Dashboards'
+    # <int> Org id. Default to 1
+    orgId: 1
+    # <string> Name of the directory where the dashboards are stored
+    folder: 'GigGatek'
+    # <string> Provider type
+    type: file
+    # <bool> Disable dashboard deletion
+    disableDeletion: false
+    # <bool> Enable dashboard editing
+    editable: true
+    # <int> How often to scan for changed dashboards in seconds
+    updateIntervalSeconds: 10
+    # <bool> Allow updating provisioned dashboards from the UI
+    allowUiUpdates: true
+    options:
+      # <string, required> Path to dashboard files
+      path: /etc/grafana/provisioning/dashboards/json

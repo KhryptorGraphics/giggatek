@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }} - GigGatek Admin</title>
+    <!-- Add basic styling or link to admin CSS -->
+    <style>
+        body { font-family: sans-serif; margin: 20px; }
+        nav ul { list-style: none; padding: 0; }
+        nav li { display: inline; margin-right: 10px; }
+    </style>
+</head>
+<body>
+    <h1>GigGatek Admin Panel</h1>
+    <nav>
+        <ul>
+            <li><a href="{{ url_for('admin.dashboard') }}">Dashboard</a></li>
+            <li><a href="{{ url_for('admin.manage_products') }}">Products</a></li>
+            <li><a href="{{ url_for('admin.manage_orders') }}">Orders</a></li>
+            <!-- Add links for rentals, customers, etc. -->
+        </ul>
+    </nav>
+    <hr>
+    <h2>{{ title }}</h2>
+    <p>Welcome to the admin dashboard. Key metrics will be displayed here.</p>
+    <!-- Placeholder for dashboard widgets/stats -->
+</body>
+</html>

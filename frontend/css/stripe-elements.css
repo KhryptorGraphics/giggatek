@@ -1,0 +1,124 @@
+/**
+ * GigGatek Stripe Elements Styling
+ * Styles for the Stripe card element to match GigGatek's design system
+ */
+
+/* Stripe Elements container */
+.stripe-element {
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    padding: 12px;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.stripe-element:focus-within {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Error messages from Stripe */
+#card-errors {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    min-height: 20px;
+}
+
+#card-errors.visible {
+    display: block;
+}
+
+/* Payment method icons in review and confirmation */
+.payment-icon {
+    display: inline-block;
+    width: 40px;
+    height: 26px;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+.payment-icon.visa {
+    background-image: url('../img/payment/visa.svg');
+}
+
+.payment-icon.mastercard {
+    background-image: url('../img/payment/mastercard.svg');
+}
+
+.payment-icon.amex {
+    background-image: url('../img/payment/amex.svg');
+}
+
+.payment-icon.discover {
+    background-image: url('../img/payment/discover.svg');
+}
+
+.payment-icon.paypal {
+    background-image: url('../img/payment/paypal.svg');
+}
+
+.payment-icon.add {
+    background-image: url('../img/payment/add-card.svg');
+}
+
+/* Processing state for payment button */
+#place-order:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+/* Payment confirmation animation */
+.confirmation-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    background-color: #28a745;
+    color: white;
+    font-size: 2.5rem;
+    border-radius: 50%;
+    margin: 0 auto 1.5rem;
+    animation: scaleIn 0.5s ease-out;
+}
+
+@keyframes scaleIn {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Payment security badge */
+.secure-checkout {
+    display: flex;
+    align-items: center;
+    background-color: #f8f9fa;
+    border-radius: 0.25rem;
+    padding: 1rem;
+    margin: 1.5rem 0;
+}
+
+.secure-icon {
+    font-size: 1.5rem;
+    margin-right: 0.75rem;
+}
+
+.secure-text h4 {
+    margin-bottom: 0.25rem;
+    font-size: 1rem;
+}
+
+.secure-text p {
+    margin-bottom: 0;
+    font-size: 0.875rem;
+    color: #6c757d;
+}

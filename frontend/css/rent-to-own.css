@@ -1,0 +1,1077 @@
+/**
+ * GigGatek - Rent-to-Own Styles
+ * Provides styling for the rent-to-own program page, calculator, and dashboard
+ */
+
+/* Hero section styles */
+.rent-to-own-page .hero-banner {
+    background: linear-gradient(135deg, #263238 0%, #37474f 100%);
+    color: #fff;
+    padding: 6rem 0;
+    margin-bottom: 3rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.rent-to-own-page .hero-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('../assets/hero-pattern.svg');
+    background-repeat: repeat;
+    opacity: 0.1;
+    z-index: 1;
+}
+
+.rent-to-own-page .hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 700px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.rent-to-own-page .hero-content h1 {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.rent-to-own-page .hero-subtitle {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    font-weight: 300;
+}
+
+.rent-to-own-page .hero-description {
+    font-size: 1.125rem;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+    opacity: 0.9;
+}
+
+.rent-to-own-page .hero-content .btn {
+    margin: 0 0.5rem 0.5rem;
+}
+
+/* Benefits section styles */
+.benefits-section {
+    padding: 4rem 0;
+    background-color: #f8f9fa;
+}
+
+.benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.benefit-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-align: center;
+}
+
+.benefit-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.benefit-icon {
+    background: linear-gradient(135deg, #4a7feb 0%, #2196f3 100%);
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    color: #fff;
+    font-size: 2rem;
+}
+
+.benefit-card h3 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    color: #263238;
+}
+
+.benefit-card p {
+    color: #546e7a;
+    line-height: 1.6;
+}
+
+/* How it works section styles */
+.how-it-works {
+    padding: 4rem 0;
+}
+
+.process-steps {
+    position: relative;
+    max-width: 900px;
+    margin: 2rem auto 0;
+}
+
+.process-steps::before {
+    content: '';
+    position: absolute;
+    top: 40px;
+    left: 40px;
+    width: 2px;
+    height: calc(100% - 120px);
+    background-color: #e0e0e0;
+    z-index: 1;
+}
+
+.process-step {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 2.5rem;
+    position: relative;
+    z-index: 2;
+}
+
+.process-step:last-child {
+    margin-bottom: 0;
+}
+
+.step-number {
+    background: linear-gradient(135deg, #4a7feb 0%, #2196f3 100%);
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+    margin-right: 2rem;
+    box-shadow: 0 4px 8px rgba(33, 150, 243, 0.2);
+}
+
+.step-content {
+    flex: 1;
+    padding-top: 0.5rem;
+}
+
+.step-content h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: #263238;
+}
+
+.step-content p {
+    color: #546e7a;
+    line-height: 1.6;
+}
+
+/* Payment calculator styles */
+.payment-calculator {
+    padding: 4rem 0;
+    background-color: #f8f9fa;
+}
+
+.calculator-container {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-top: 2rem;
+}
+
+.calculator-product-selection {
+    padding: 2rem;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.calculator-product-selection label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: #263238;
+}
+
+.calculator-product-selection select.form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #cfd8dc;
+    border-radius: 4px;
+    background-color: #fff;
+    font-size: 1rem;
+    color: #263238;
+    margin-bottom: 1.5rem;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url('../assets/chevron-down.svg');
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 16px;
+}
+
+.calculator-product-selection select.form-control:focus {
+    outline: none;
+    border-color: #4a7feb;
+    box-shadow: 0 0 0 3px rgba(74, 127, 235, 0.1);
+}
+
+.product-details {
+    display: flex;
+    align-items: flex-start;
+    margin-top: 1.5rem;
+}
+
+.product-image-container {
+    width: 120px;
+    margin-right: 1.5rem;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.product-image-container img {
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+    border: 1px solid #eceff1;
+}
+
+.condition-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #fff;
+    background-color: #6c757d;
+}
+
+.condition-badge.excellent {
+    background-color: #28a745;
+}
+
+.condition-badge.good {
+    background-color: #4a7feb;
+}
+
+.condition-badge.fair {
+    background-color: #ffc107;
+}
+
+.product-info {
+    flex: 1;
+}
+
+.product-info h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+    color: #263238;
+}
+
+.product-info p {
+    color: #546e7a;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+#product-specifications {
+    margin-top: 1rem;
+}
+
+.spec-row {
+    display: flex;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #eceff1;
+}
+
+.spec-row:last-child {
+    border-bottom: none;
+}
+
+.spec-name {
+    width: 40%;
+    font-weight: 600;
+    color: #263238;
+}
+
+.spec-value {
+    width: 60%;
+    color: #546e7a;
+}
+
+.calculator-controls {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 2rem;
+    border-bottom: 1px solid #e0e0e0;
+    background-color: #fafafa;
+}
+
+.term-selection {
+    width: 50%;
+    padding-right: 1.5rem;
+}
+
+.term-selection h3 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    color: #263238;
+}
+
+.term-options {
+    display: flex;
+    margin-bottom: 1.5rem;
+}
+
+.term-option {
+    flex: 1;
+    text-align: center;
+    padding: 1rem 0.5rem;
+    border: 2px solid #cfd8dc;
+    border-radius: 6px;
+    margin-right: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.term-option:last-child {
+    margin-right: 0;
+}
+
+.term-option:hover {
+    background-color: #f5f7f8;
+}
+
+.term-option.active {
+    border-color: #4a7feb;
+    background-color: rgba(74, 127, 235, 0.05);
+}
+
+.term-value {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #263238;
+    margin-bottom: 0.25rem;
+}
+
+.term-unit {
+    display: block;
+    font-size: 0.875rem;
+    color: #546e7a;
+}
+
+.term-slider-container {
+    margin-top: 1.5rem;
+}
+
+.term-slider-container label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    color: #263238;
+}
+
+.slider {
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    background: #eceff1;
+    margin-top: 0.5rem;
+}
+
+.calculation-results {
+    width: 50%;
+    padding-left: 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.result-box {
+    width: 50%;
+    padding: 0.5rem;
+}
+
+.result-label {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #546e7a;
+    margin-bottom: 0.5rem;
+}
+
+.result-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #263238;
+}
+
+.calculator-details {
+    padding: 2rem;
+}
+
+.calculator-details h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+    color: #263238;
+}
+
+.calculator-details p {
+    color: #546e7a;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.buyout-options {
+    display: flex;
+    margin-bottom: 2rem;
+}
+
+.buyout-option {
+    flex: 1;
+    text-align: center;
+    padding: 1.5rem 1rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    margin-right: 1rem;
+    background-color: #fafafa;
+}
+
+.buyout-option:last-child {
+    margin-right: 0;
+}
+
+.buyout-option h4 {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+    color: #546e7a;
+}
+
+.buyout-price {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #4a7feb;
+}
+
+.comparison-chart {
+    height: 300px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.chart-placeholder {
+    text-align: center;
+    color: #9e9e9e;
+}
+
+.comparison-table {
+    width: 100%;
+}
+
+.comparison-row {
+    display: flex;
+    border-bottom: 1px solid #eceff1;
+}
+
+.comparison-row.header {
+    font-weight: 600;
+    color: #263238;
+}
+
+.comparison-cell {
+    flex: 1;
+    padding: 0.75rem;
+}
+
+/* Featured products styles */
+.featured-products {
+    padding: 4rem 0;
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.product-card {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background-color: #fff;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+}
+
+.product-image {
+    position: relative;
+    height: 200px;
+    background-color: #f5f7f8;
+    overflow: hidden;
+}
+
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.product-details {
+    padding: 1.5rem;
+}
+
+.product-title {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    color: #263238;
+}
+
+.product-pricing {
+    margin-bottom: 1.25rem;
+}
+
+.rent-price {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #4a7feb;
+    margin-bottom: 0.25rem;
+}
+
+.buy-price {
+    font-size: 0.875rem;
+    color: #546e7a;
+}
+
+.product-actions {
+    display: flex;
+}
+
+.product-actions .btn {
+    flex: 1;
+    margin-right: 0.5rem;
+}
+
+.product-actions .btn:last-child {
+    margin-right: 0;
+}
+
+.view-all-products {
+    margin-top: 2.5rem;
+    text-align: center;
+}
+
+/* FAQ section styles */
+.faq-section {
+    padding: 4rem 0;
+    background-color: #f8f9fa;
+}
+
+.faq-container {
+    max-width: 800px;
+    margin: 2rem auto 0;
+}
+
+.faq-item {
+    background-color: #fff;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.faq-question {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    cursor: pointer;
+    font-weight: 600;
+    color: #263238;
+    transition: background-color 0.2s ease;
+}
+
+.faq-item:hover .faq-question {
+    background-color: #f5f7f8;
+}
+
+.faq-question i {
+    font-size: 1rem;
+    color: #9e9e9e;
+    transition: transform 0.3s ease;
+}
+
+.faq-item.active .faq-question i {
+    transform: rotate(180deg);
+}
+
+.faq-answer {
+    padding: 0 1.5rem;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out, padding 0.3s ease;
+}
+
+.faq-item.active .faq-answer {
+    padding: 0 1.5rem 1.5rem;
+}
+
+.faq-answer p {
+    color: #546e7a;
+    line-height: 1.6;
+}
+
+/* Call to action styles */
+.cta-section {
+    padding: 5rem 0;
+    background: linear-gradient(135deg, #263238 0%, #37474f 100%);
+    color: #fff;
+    text-align: center;
+}
+
+.cta-content {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.cta-content h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.cta-content p {
+    font-size: 1.125rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+.cta-buttons {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.cta-buttons .btn {
+    margin: 0 0.5rem 0.5rem;
+}
+
+/* Testimonials styles */
+.testimonials-section {
+    padding: 4rem 0;
+}
+
+.testimonials-slider {
+    margin-top: 2rem;
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 1.5rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: #cfd8dc #f5f7f8;
+}
+
+.testimonials-slider::-webkit-scrollbar {
+    height: 8px;
+}
+
+.testimonials-slider::-webkit-scrollbar-track {
+    background: #f5f7f8;
+    border-radius: 4px;
+}
+
+.testimonials-slider::-webkit-scrollbar-thumb {
+    background-color: #cfd8dc;
+    border-radius: 4px;
+}
+
+.testimonial {
+    flex: 0 0 auto;
+    width: 350px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 1.5rem;
+    margin-right: 1.5rem;
+    transition: transform 0.3s ease;
+}
+
+.testimonial:last-child {
+    margin-right: 0;
+}
+
+.testimonial:hover {
+    transform: translateY(-5px);
+}
+
+.testimonial-content {
+    margin-bottom: 1.5rem;
+}
+
+.testimonial-content p {
+    color: #546e7a;
+    line-height: 1.6;
+    font-style: italic;
+}
+
+.testimonial-author {
+    display: flex;
+    align-items: center;
+}
+
+.author-image {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: 1rem;
+    flex-shrink: 0;
+}
+
+.author-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.author-info h4 {
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+    color: #263238;
+}
+
+.author-info p {
+    font-size: 0.875rem;
+    color: #9e9e9e;
+}
+
+/* Loading and error states */
+.loading {
+    padding: 2rem;
+    text-align: center;
+    color: #9e9e9e;
+}
+
+.error-message {
+    padding: 1rem;
+    background-color: #ffebee;
+    border: 1px solid #ffcdd2;
+    border-radius: 4px;
+    color: #d32f2f;
+    margin-bottom: 1rem;
+}
+
+#loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.loading-spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #4a7feb;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 2s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-message {
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: #263238;
+}
+
+/* User rentals dashboard styles */
+.user-rentals {
+    margin-bottom: 3rem;
+}
+
+.no-rentals {
+    padding: 3rem;
+    text-align: center;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    margin-top: 2rem;
+}
+
+.no-rentals p {
+    font-size: 1.125rem;
+    color: #546e7a;
+    margin-bottom: 1.5rem;
+}
+
+.rentals-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.rental-card {
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease;
+    border: 1px solid #eceff1;
+}
+
+.rental-card:hover {
+    transform: translateY(-5px);
+}
+
+.rental-card.status-active {
+    border-top: 4px solid #4caf50;
+}
+
+.rental-card.status-on-hold {
+    border-top: 4px solid #ffc107;
+}
+
+.rental-card.status-completed {
+    border-top: 4px solid #4a7feb;
+}
+
+.rental-card.status-cancelled {
+    border-top: 4px solid #9e9e9e;
+}
+
+.rental-image {
+    height: 180px;
+    background-color: #f5f7f8;
+    position: relative;
+    overflow: hidden;
+}
+
+.rental-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.status-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #fff;
+    background-color: #9e9e9e;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.status-active .status-badge {
+    background-color: #4caf50;
+}
+
+.status-on-hold .status-badge {
+    background-color: #ffc107;
+    color: #263238;
+}
+
+.status-completed .status-badge {
+    background-color: #4a7feb;
+}
+
+.status-cancelled .status-badge {
+    background-color: #9e9e9e;
+}
+
+.rental-details {
+    padding: 1.5rem;
+}
+
+.rental-product-name {
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+    color: #263238;
+}
+
+.rental-period, .rental-payment {
+    margin-bottom: 1rem;
+    color: #546e7a;
+}
+
+.rental-rate {
+    font-weight: 600;
+    color: #4a7feb;
+}
+
+.rental-progress {
+    margin-top: 1.5rem;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background-color: #eceff1;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.progress-filled {
+    height: 100%;
+    background: linear-gradient(to right, #4a7feb, #2196f3);
+    border-radius: 4px;
+}
+
+.progress-text {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.875rem;
+    color: #546e7a;
+}
+
+.rental-actions {
+    padding: 1.5rem;
+    border-top: 1px solid #eceff1;
+    display: flex;
+}
+
+.rental-actions .btn {
+    flex: 1;
+    margin-right: 0.5rem;
+}
+
+.rental-actions .btn:last-child {
+    margin-right: 0;
+}
+
+/* Responsive styles */
+@media (max-width: 991px) {
+    .rent-to-own-page .hero-content h1 {
+        font-size: 3rem;
+    }
+    
+    .calculator-controls {
+        flex-direction: column;
+    }
+    
+    .term-selection, .calculation-results {
+        width: 100%;
+        padding: 0;
+    }
+    
+    .term-selection {
+        margin-bottom: 2rem;
+    }
+    
+    .buyout-options {
+        flex-direction: column;
+    }
+    
+    .buyout-option {
+        margin-right: 0;
+        margin-bottom: 1rem;
+    }
+}
+
+@media (max-width: 767px) {
+    .rent-to-own-page .hero-content h1 {
+        font-size: 2.5rem;
+    }
+    
+    .rent-to-own-page .hero-subtitle {
+        font-size: 1.25rem;
+    }
+    
+    .section-title {
+        font-size: 2rem;
+    }
+    
+    .process-steps::before {
+        display: none;
+    }
+    
+    .process-step {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .step-number {
+        margin-right: 0;
+        margin-bottom: 1rem;
+    }
+    
+    .product-details {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .product-image-container {
+        margin-right: 0;
+        margin-bottom: 1rem;
+    }
+    
+    .product-info {
+        text-align: center;
+    }
+    
+    .result-box {
+        width: 100%;
+    }
+    
+    .testimonial {
+        width: 280px;
+    }
+}
+
+@media (max-width: 575px) {
+    .rent-to-own-page .hero-content h1 {
+        font-size: 2rem;
+    }
+    
+    .rent-to-own-page .hero-banner {
+        padding: 4rem 0;
+    }
+    
+    .benefits-grid, .rentals-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .term-options {
+        flex-direction: column;
+    }
+    
+    .term-option {
+        margin-right: 0;
+        margin-bottom: 0.75rem;
+    }
+}

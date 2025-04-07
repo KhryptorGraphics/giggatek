@@ -1,0 +1,64 @@
+# GigGatek Filebeat Configuration
+
+filebeat.inputs:
+- type: container
+  paths:
+    - /var/lib/docker/containers/*/*.log
+  processors:
+    - add_docker_metadata:
+        host: "unix:///var/run/docker.sock"
+    - add_fields:
+        target: ''
+        fields:
+          app: giggatek
+          environment: ${ENVIRONMENT:production}
+
+filebeat.config:
+  modules:
+    path: ${path.config}/modules.d/*.yml
+    reload.enabled: false
+
+processors:
+  - add_host_metadata:
+      when.not.contains.tags: forwarded
+  - add_cloud_metadata: ~
+  - add_docker_metadata: ~
+  - add_kubernetes_metadata: ~
+
+# Sending to Logstash for further processing
+output.logstash:
+  hosts: ["logstash:5044"]
+  ssl.enabled: false
+
+# Alternatively can send directly to Elasticsearch
+#output.elasticsearch:
+#  hosts: ["elasticsearch:9200"]
+#  protocol: "http"
+#  indices:
+#    - index: "filebeat-%{[agent.version]}-%{+yyyy.MM.dd}"
+
+# Enable monitoring of Filebeat itself
+monitoring:
+  enabled: true
+  elasticsearch:
+    hosts: ["elasticsearch:9200"]
+
+# Configure logging
+logging.level: info
+logging.to_files: true
+logging.files:
+  path: /var/log/filebeat
+  name: filebeat
+  keepfiles: 7
+  permissions: 0644
+
+# Setup template loading
+setup.template.enabled: true
+setup.template.pattern: "filebeat-*"
+setup.template.name: "filebeat"
+setup.template.overwrite: false
+
+# Kibana connection for dashboard setup
+setup.kibana:
+  host: "kibana:5601"
+  protocol: "http"

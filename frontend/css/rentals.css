@@ -1,0 +1,418 @@
+/**
+ * GigGatek Rental Management Styles
+ * Styles for rental cards, payment progress, and rental details
+ */
+
+/* Rental Status Badges */
+.badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+/* Rental Cards */
+.rental-card {
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+    background-color: #ffffff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.rental-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.rental-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.rental-title {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #343a40;
+    margin-right: 1rem;
+    flex: 1;
+}
+
+.rental-badge {
+    background-color: #6c757d;
+    color: #ffffff;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.rental-badge.completed {
+    background-color: #28a745;
+}
+
+/* Payment Progress */
+.payment-progress {
+    margin: 1.5rem 0;
+}
+
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: #495057;
+}
+
+.progress-bar-container {
+    height: 8px;
+    background-color: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.progress-bar {
+    height: 100%;
+    background-color: #007bff;
+    border-radius: 4px;
+    transition: width 0.6s ease;
+}
+
+.progress-label {
+    position: absolute;
+    right: 0;
+    top: -1.5rem;
+    font-size: 0.75rem;
+    color: #6c757d;
+}
+
+.progress-details {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.progress-detail {
+    text-align: center;
+    padding: 0.75rem;
+    background-color: #f8f9fa;
+    border-radius: 0.25rem;
+}
+
+.progress-label {
+    display: block;
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-bottom: 0.25rem;
+}
+
+.progress-value {
+    font-weight: 600;
+    color: #343a40;
+}
+
+/* Rental Details */
+.rental-details {
+    margin-top: 1rem;
+}
+
+.rental-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.rental-row:last-child {
+    border-bottom: none;
+}
+
+.rental-row span:first-child {
+    color: #6c757d;
+}
+
+.rental-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+/* Payment Schedule Table */
+.payment-schedule {
+    width: 100%;
+    margin-top: 1.5rem;
+    border-collapse: collapse;
+}
+
+.payment-schedule th,
+.payment-schedule td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.payment-schedule th {
+    background-color: #f8f9fa;
+    color: #495057;
+    font-weight: 600;
+}
+
+.payment-schedule tr:last-child td {
+    border-bottom: none;
+}
+
+.payment-schedule .payment-status {
+    font-weight: 600;
+}
+
+.payment-schedule .status-paid {
+    color: #28a745;
+}
+
+.payment-schedule .status-pending {
+    color: #ffc107;
+}
+
+.payment-schedule .status-late {
+    color: #dc3545;
+}
+
+.payment-date {
+    white-space: nowrap;
+}
+
+/* Rental Modal Styles */
+.rental-modal .modal-body {
+    padding-bottom: 2rem;
+}
+
+.rental-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.product-details,
+.contract-details {
+    padding: 1.25rem;
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+}
+
+.product-details h4,
+.contract-details h4 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+/* Specification List */
+.specs-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.specs-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.specs-list li:last-child {
+    border-bottom: none;
+}
+
+.specs-list .spec-name {
+    color: #6c757d;
+}
+
+/* Buyout Section */
+.buyout-section {
+    margin-top: 2rem;
+    padding: 1.25rem;
+    background-color: #f0f7ff;
+    border-radius: 0.5rem;
+    border: 1px solid #d1e7ff;
+}
+
+.buyout-section h4 {
+    margin-top: 0;
+    color: #0062cc;
+}
+
+.buyout-price {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0062cc;
+    margin: 1rem 0;
+}
+
+/* Status History */
+.status-history {
+    margin-top: 2rem;
+}
+
+.history-timeline {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    position: relative;
+}
+
+.history-timeline::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 16px;
+    width: 2px;
+    background-color: #e9ecef;
+    z-index: 1;
+}
+
+.history-timeline li {
+    position: relative;
+    padding-left: 50px;
+    padding-bottom: 20px;
+}
+
+.history-timeline li:last-child {
+    padding-bottom: 0;
+}
+
+.history-badge {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 2;
+}
+
+.history-date {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-bottom: 0.25rem;
+}
+
+.history-comment {
+    margin-bottom: 0.5rem;
+}
+
+/* Responsive Styles */
+@media (max-width: 767px) {
+    .rental-details-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .progress-details {
+        grid-template-columns: 1fr;
+    }
+    
+    .rental-actions {
+        flex-direction: column;
+    }
+    
+    .rental-actions .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* Extension Request Form */
+.extension-form {
+    margin-top: 1rem;
+    padding: 1.25rem;
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+}
+
+.extension-form label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.extension-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.extension-option {
+    padding: 0.75rem;
+    text-align: center;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.extension-option:hover {
+    background-color: #e9ecef;
+}
+
+.extension-option.selected {
+    background-color: #d1e7ff;
+    border-color: #007bff;
+    color: #0062cc;
+}
+
+.extension-option .option-months {
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+}
+
+.extension-option .option-price {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+/* Loading and Error States */
+.loading-rentals,
+.error-rentals,
+.no-rentals {
+    padding: 2rem;
+    text-align: center;
+    border-radius: 0.5rem;
+    margin: 1rem 0;
+}
+
+.loading-rentals {
+    background-color: #f8f9fa;
+    color: #6c757d;
+}
+
+.error-rentals {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.no-rentals {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    padding: 3rem 2rem;
+}
+
+.no-rentals-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #adb5bd;
+}

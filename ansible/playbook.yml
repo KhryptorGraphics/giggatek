@@ -1,0 +1,252 @@
+---
+# GigGatek Server Configuration Playbook
+
+- name: Configure GigGatek application servers
+  hosts: app_servers
+  become: true
+  vars:
+    docker_compose_version: "2.17.2"
+    app_directory: "/opt/giggatek"
+    environment: "{{ lookup('env', 'ENVIRONMENT') | default('staging', true) }}"
+    monitoring_enabled: true
+    backup_enabled: true
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install required system packages
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+          - python3-pip
+          - python3-setuptools
+          - gnupg
+          - lsb-release
+          - git
+          - unzip
+          - vim
+          - htop
+          - net-tools
+          - ufw
+        state: present
+
+    # Docker installation
+    - name: Add Docker GPG apt key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker repository
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable
+        state: present
+
+    - name: Install Docker packages
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        state: present
+        update_cache: yes
+
+    - name: Ensure Docker service is running
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    # Install Docker Compose
+    - name: Install Docker Compose
+      get_url:
+        url: "https://github.com/docker/compose/releases/download/v{{ docker_compose_version }}/docker-compose-Linux-x86_64"
+        dest: /usr/local/bin/docker-compose
+        mode: 0755
+
+    # Configure firewall
+    - name: Set up firewall - allow SSH
+      ufw:
+        rule: allow
+        port: "22"
+        proto: tcp
+
+    - name: Set up firewall - allow HTTP
+      ufw:
+        rule: allow
+        port: "80"
+        proto: tcp
+
+    - name: Set up firewall - allow HTTPS
+      ufw:
+        rule: allow
+        port: "443"
+        proto: tcp
+
+    - name: Set up firewall - enable
+      ufw:
+        state: enabled
+        policy: deny
+
+    # Create app directory
+    - name: Create application directory
+      file:
+        path: "{{ app_directory }}"
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+        mode: 0755
+
+    - name: Create logs directory
+      file:
+        path: "{{ app_directory }}/logs"
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+        mode: 0755
+        
+    - name: Create logs subdirectories
+      file:
+        path: "{{ app_directory }}/logs/{{ item }}"
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+        mode: 0755
+      loop:
+        - apache
+        - backend
+        - mysql
+
+    # Copy configuration files 
+    - name: Copy docker-compose.yml
+      template:
+        src: templates/docker-compose.{{ environment }}.yml.j2
+        dest: "{{ app_directory }}/docker-compose.yml"
+        owner: ubuntu
+        group: ubuntu
+        mode: 0644
+
+    - name: Copy environment file
+      template:
+        src: templates/.env.{{ environment }}.j2
+        dest: "{{ app_directory }}/.env"
+        owner: ubuntu
+        group: ubuntu
+        mode: 0600
+
+    # Set up monitoring if enabled
+    - name: Set up monitoring agents
+      block:
+        - name: Install node exporter
+          apt:
+            name: prometheus-node-exporter
+            state: present
+        
+        - name: Ensure node exporter is running
+          service:
+            name: prometheus-node-exporter
+            state: started
+            enabled: yes
+            
+        - name: Create Prometheus scrape config
+          template:
+            src: templates/prometheus-node.yml.j2
+            dest: "/etc/prometheus/node.yml"
+            mode: 0644
+          notify: reload prometheus
+      when: monitoring_enabled
+
+    # Set up backups if enabled
+    - name: Configure automatic backups
+      block:
+        - name: Install backup scripts
+          template:
+            src: templates/backup.sh.j2
+            dest: "{{ app_directory }}/scripts/backup.sh"
+            owner: ubuntu
+            group: ubuntu
+            mode: 0755
+            
+        - name: Set up backup cron job
+          cron:
+            name: "Daily backup"
+            hour: "2"
+            minute: "0"
+            job: "{{ app_directory }}/scripts/backup.sh >> {{ app_directory }}/logs/backup.log 2>&1"
+      when: backup_enabled
+
+    # Start application
+    - name: Pull Docker images
+      shell: cd {{ app_directory }} && docker-compose pull
+      become_user: ubuntu
+      
+    - name: Start application with Docker Compose
+      shell: cd {{ app_directory }} && docker-compose up -d
+      become_user: ubuntu
+
+  handlers:
+    - name: reload prometheus
+      service:
+        name: prometheus
+        state: reloaded
+
+- name: Configure GigGatek database servers
+  hosts: db_servers
+  become: true
+  vars:
+    backup_directory: "/opt/backups"
+    mysql_version: "8.0"
+    
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+    
+    - name: Install MySQL dependencies
+      apt:
+        name:
+          - mysql-client-core-{{ mysql_version }}
+          - python3-mysqldb
+        state: present
+    
+    - name: Create backup directory
+      file:
+        path: "{{ backup_directory }}"
+        state: directory
+        mode: 0755
+    
+    - name: Set up MySQL backup script
+      template:
+        src: templates/mysql-backup.sh.j2
+        dest: /usr/local/bin/mysql-backup.sh
+        mode: 0755
+    
+    - name: Configure backup schedule
+      cron:
+        name: "MySQL nightly backup"
+        hour: "1"
+        minute: "0"
+        job: "/usr/local/bin/mysql-backup.sh >> /var/log/mysql-backup.log 2>&1"
+        
+    - name: Install MySQL exporter for Prometheus
+      apt:
+        name: prometheus-mysqld-exporter
+        state: present
+        
+    - name: Configure MySQL exporter
+      template:
+        src: templates/mysqld-exporter.cnf.j2
+        dest: /etc/.mysqld_exporter.cnf
+        mode: 0600
+        
+    - name: Ensure MySQL exporter is running
+      service:
+        name: prometheus-mysqld-exporter
+        state: started
+        enabled: yes
