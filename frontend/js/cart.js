@@ -513,31 +513,45 @@ class ShoppingCart {
         return this.submitOrderToAPI(orderData);
     }
 
-    // Simulated API call - in production this would call the backend
+    // Submit order to backend API
     submitOrderToAPI(orderData) {
-        return new Promise((resolve, reject) => {
-            // In production, this would be a fetch call to the backend API
-            console.log('Submitting order to API:', orderData);
-            
-            // Simulate API call
-            setTimeout(() => {
-                // 90% chance of success
-                if (Math.random() < 0.9) {
-                    const response = {
-                        status: 'success',
-                        message: 'Order created successfully',
-                        order_id: 'GG-' + Math.floor(10000 + Math.random() * 90000),
-                        total_amount: this.calculateCartTotals().grandTotal
-                    };
-                    
-                    // Clear cart on successful order
-                    this.clearCart();
-                    
-                    resolve(response);
-                } else {
-                    reject(new Error('Failed to create order. Please try again.'));
+        return new Promise(async (resolve, reject) => {
+            try {
+                // Ensure auth module is available
+                if (!window.auth) {
+                    throw new Error('Authentication module is required for order submission');
                 }
-            }, 1500);
+                
+                // Get auth token
+                const token = window.auth.getToken();
+                if (!token) {
+                    throw new Error('Authentication required to place an order');
+                }
+                
+                // Make API call to backend
+                const response = await fetch('/api/orders', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(orderData)
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.message || 'Failed to create order');
+                }
+                
+                // Clear cart on successful order
+                this.clearCart();
+                
+                resolve(data);
+            } catch (error) {
+                console.error('Order submission error:', error);
+                reject(error);
+            }
         });
     }
 }
