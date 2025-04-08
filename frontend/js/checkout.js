@@ -492,15 +492,25 @@ class Checkout {
                 };
             }
             
+            // Check if authentication is available
+            if (!window.auth || !window.auth.getToken()) {
+                console.error('Authentication required for payment processing');
+                return {
+                    success: false,
+                    error: 'Authentication required'
+                };
+            }
+
             // Get Stripe handler
             const stripeHandler = window.stripeHandler;
-            
+
             // Prepare order metadata
             const metadata = {
                 customer_name: `${this.checkoutData.shipping.first_name || ''} ${this.checkoutData.shipping.last_name || ''}`.trim(),
                 customer_email: this.checkoutData.shipping.email || '',
                 order_notes: this.checkoutData.orderNotes || '',
-                items_count: this.cart.cartItems.length
+                items_count: this.cart.cartItems.length,
+                auth_token: window.auth.getToken() // Include token for server validation
             };
             
             // Create payment intent
