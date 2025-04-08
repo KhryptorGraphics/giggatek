@@ -1,4 +1,4 @@
-# GigGatek Infrastructure Makefile
+ter# GigGatek Infrastructure Makefile
 
 .PHONY: help install dev start stop restart logs test terraform-init terraform-plan terraform-apply monitoring elk clean
 

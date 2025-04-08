@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation - {{ order.id }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #2a3990;
+            padding: 20px;
+            text-align: center;
+        }
+        .header h1 {
+            color: white;
+            margin: 0;
+            font-size: 24px;
+        }
+        .content {
+            padding: 20px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+        }
+        .footer {
+            text-align: center;
+            padding: 10px;
+            font-size: 12px;
+            color: #777;
+        }
+        .button {
+            display: inline-block;
+            background-color: #2a3990;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .product-img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+        }
+        .total-row {
+            font-weight: bold;
+        }
+        .address-box {
+            background-color: #f2f2f2;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .order-meta {
+            background-color: #e9ecef;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Order Confirmation #{{ order.id }}</h1>
+    </div>
+    
+    <div class="content">
+        <p>Hello {{ user_name }},</p>
+        
+        <p>Thank you for your order! We're currently processing it and will send you an update when it ships.</p>
+        
+        <div class="order-meta">
+            <p><strong>Order Date:</strong> {{ order.order_date }}</p>
+            <p><strong>Order Number:</strong> #{{ order.id }}</p>
+            <p><strong>Order Status:</strong> {{ order.status|title }}</p>
+            <p><strong>Payment Status:</strong> {{ order.payment_status|title }}</p>
+        </div>
+        
+        <h2>Order Summary</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in order.items %}
+                <tr>
+                    <td>
+                        {% if item.image_url %}<img src="{{ item.image_url }}" alt="{{ item.product_name }}" class="product-img"><br>{% endif %}
+                        {{ item.product_name }}
+                    </td>
+                    <td>{{ item.quantity }}</td>
+                    <td>${{ item.price }}</td>
+                    <td>${{ item.subtotal }}</td>
+                </tr>
+                {% endfor %}
+                <tr class="total-row">
+                    <td colspan="3" align="right">Total:</td>
+                    <td>${{ order.total }}</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h2>Shipping Information</h2>
+        <div class="address-box">
+            {% if order.shipping_address %}
+                {{ order.shipping_address.first_name }} {{ order.shipping_address.last_name }}<br>
+                {{ order.shipping_address.street_address }}<br>
+                {{ order.shipping_address.city }}, {{ order.shipping_address.state }} {{ order.shipping_address.zip_code }}<br>
+                {{ order.shipping_address.country }}<br>
+                {% if order.shipping_address.phone %}Phone: {{ order.shipping_address.phone }}{% endif %}
+            {% else %}
+                No shipping address provided.
+            {% endif %}
+        </div>
+        
+        <h2>Billing Information</h2>
+        <div class="address-box">
+            {% if order.billing_address %}
+                {{ order.billing_address.first_name }} {{ order.billing_address.last_name }}<br>
+                {{ order.billing_address.street_address }}<br>
+                {{ order.billing_address.city }}, {{ order.billing_address.state }} {{ order.billing_address.zip_code }}<br>
+                {{ order.billing_address.country }}<br>
+                {% if order.billing_address.phone %}Phone: {{ order.billing_address.phone }}{% endif %}
+            {% else %}
+                Same as shipping address.
+            {% endif %}
+        </div>
+        
+        <p>You can view the details of your order and track its status in your account dashboard:</p>
+        
+        <a href="https://giggatek.com/dashboard/orders/{{ order.id }}" class="button">View Order</a>
+        
+        <p>If you have any questions about your order, please contact our customer service team at support@giggatek.com or call us at (555) 123-4567.</p>
+        
+        <p>Thank you for shopping with GigGatek!</p>
+        
+        <p>Best regards,<br>
+        The GigGatek Team</p>
+    </div>
+    
+    <div class="footer">
+        <p>&copy; {{ current_year }} GigGatek, Inc. All rights reserved.</p>
+        <p>123 Tech Street, San Francisco, CA 94107</p>
+        <p><small>This email was sent to you because you placed an order on GigGatek.com</small></p>
+    </div>
+</body>
+</html>

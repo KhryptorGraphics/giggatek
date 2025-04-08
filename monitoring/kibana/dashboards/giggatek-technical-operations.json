@@ -1,0 +1,486 @@
+{
+  "attributes": {
+    "title": "GigGatek Technical Operations",
+    "hits": 0,
+    "description": "Monitor system health and performance for the GigGatek platform",
+    "panelsJSON": [
+      {
+        "id": "system-resource-usage",
+        "title": "System Resource Usage",
+        "type": "visualization",
+        "visualization": {
+          "title": "CPU & Memory Usage",
+          "type": "line",
+          "params": {
+            "type": "line",
+            "grid": {
+              "categoryLines": false
+            }
+          },
+          "aggs": [
+            {
+              "id": "1",
+              "enabled": true,
+              "type": "avg",
+              "schema": "metric",
+              "params": {
+                "field": "system.cpu.total.pct"
+              }
+            },
+            {
+              "id": "2",
+              "enabled": true,
+              "type": "date_histogram",
+              "schema": "segment",
+              "params": {
+                "field": "@timestamp",
+                "timeRange": {
+                  "from": "now-12h",
+                  "to": "now"
+                },
+                "interval": "1m"
+              }
+            },
+            {
+              "id": "3",
+              "enabled": true,
+              "type": "avg",
+              "schema": "metric",
+              "params": {
+                "field": "system.memory.actual.used.pct"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "disk-usage",
+        "title": "Disk Usage",
+        "type": "visualization",
+        "visualization": {
+          "title": "Disk Space Utilization",
+          "type": "gauge",
+          "params": {
+            "type": "gauge",
+            "addTooltip": true,
+            "addLegend": true,
+            "gauge": {
+              "verticalSplit": false,
+              "extendRange": true,
+              "percentageMode": true,
+              "gaugeType": "Arc",
+              "gaugeStyle": "Full",
+              "backStyle": "Full",
+              "colorSchema": "Green to Red",
+              "colorsRange": [
+                { "from": 0, "to": 70 },
+                { "from": 70, "to": 85 },
+                { "from": 85, "to": 100 }
+              ]
+            }
+          },
+          "aggs": [
+            {
+              "id": "1",
+              "enabled": true,
+              "type": "avg",
+              "schema": "metric",
+              "params": {
+                "field": "system.filesystem.used.pct"
+              }
+            },
+            {
+              "id": "2",
+              "enabled": true,
+              "type": "terms",
+              "schema": "group",
+              "params": {
+                "field": "system.filesystem.mount_point",
+                "size": 5,
+                "order": "desc",
+                "orderBy": "1"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "container-status",
+        "title": "Container Status",
+        "type": "visualization",
+        "visualization": {
+          "title": "Container Resource Usage",
+          "type": "line",
+          "params": {
+            "type": "line",
+            "grid": {
+              "categoryLines": false
+            }
+          },
+          "aggs": [
+            {
+              "id": "1",
+              "enabled": true,
+              "type": "avg",
+              "schema": "metric",
+              "params": {
+                "field": "docker.memory.usage.pct"
+              }
+            },
+            {
+              "id": "2",
+              "enabled": true,
+              "type": "date_histogram",
+              "schema": "segment",
+              "params": {
+                "field": "@timestamp",
+                "timeRange": {
+                  "from": "now-1h",
+                  "to": "now"
+                },
+                "interval": "1m"
+              }
+            },
+            {
+              "id": "3",
+              "enabled": true,
+              "type": "terms",
+              "schema": "group",
+              "params": {
+                "field": "container.name",
+                "size": 5,
+                "order": "desc",
+                "orderBy": "1"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "http-status-codes",
+        "title": "HTTP Status Codes",
+        "type": "visualization",
+        "visualization": {
+          "title": "HTTP Response Codes",
+          "type": "bar",
+          "params": {
+            "type": "histogram",
+            "grid": {
+              "categoryLines": false
+            }
+          },
+          "aggs": [
+            {
+              "id": "1",
+              "enabled": true,
+              "type": "count",
+              "schema": "metric",
+              "params": {}
+            },
+            {
+              "id": "2",
+              "enabled": true,
+              "type": "terms",
+              "schema": "segment",
+              "params": {
+                "field": "response",
+                "size": 20,
+                "order": "desc",
+                "orderBy": "1"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "application-log-levels",
+        "title": "Application Log Levels",
+        "type": "visualization",
+        "visualization": {
+          "title": "Log Levels Distribution",
+          "type": "pie",
+          "params": {
+            "type": "pie",
+            "addTooltip": true,
+            "addLegend": true,
+            "legendPosition": "right"
+          },
+          "aggs": [
+            {
+              "id": "1",
+              "enabled": true,
+              "type": "count",
+              "schema": "metric",
+              "params": {}
+            },
+            {
+              "id": "2",
+              "enabled": true,
+              "type": "terms",
+              "schema": "segment",
+              "params": {
+                "field": "log_level.keyword",
+                "size": 10,
+                "order": "desc",
+                "orderBy": "1"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "database-performance",
+        "title": "Database Performance",
+        "type": "visualization",
+        "visualization": {
+          "title": "Database Query Time",
+          "type": "line",
+          "params": {
+            "type": "line",
+            "grid": {
+              "categoryLines": false
+            }
+          },
+          "aggs": [
+            {
+              "id": "1",
+              "enabled": true,
+              "type": "avg",
+              "schema": "metric",
+              "params": {
+                "field": "query_time.ms"
+              }
+            },
+            {
+              "id": "2",
+              "enabled": true,
+              "type": "date_histogram",
+              "schema": "segment",
+              "params": {
+                "field": "@timestamp",
+                "timeRange": {
+                  "from": "now-6h",
+                  "to": "now"
+                },
+                "interval": "5m"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "network-traffic",
+        "title": "Network Traffic",
+        "type": "visualization",
+        "visualization": {
+          "title": "Network Traffic By Container",
+          "type": "line",
+          "params": {
+            "type": "line",
+            "grid": {
+              "categoryLines": false
+            }
+          },
+          "aggs": [
+            {
+              "id": "1",
+              "enabled": true,
+              "type": "avg",
+              "schema": "metric",
+              "params": {
+                "field": "docker.network.in.bytes"
+              }
+            },
+            {
+              "id": "2",
+              "enabled": true,
+              "type": "date_histogram",
+              "schema": "segment",
+              "params": {
+                "field": "@timestamp",
+                "timeRange": {
+                  "from": "now-1h",
+                  "to": "now"
+                },
+                "interval": "1m"
+              }
+            },
+            {
+              "id": "3",
+              "enabled": true,
+              "type": "terms",
+              "schema": "group",
+              "params": {
+                "field": "container.name",
+                "size": 5,
+                "order": "desc",
+                "orderBy": "1"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "php-errors",
+        "title": "PHP Errors",
+        "type": "visualization",
+        "visualization": {
+          "title": "PHP Error Distribution",
+          "type": "bar",
+          "params": {
+            "type": "histogram",
+            "grid": {
+              "categoryLines": false
+            }
+          },
+          "aggs": [
+            {
+              "id": "1",
+              "enabled": true,
+              "type": "count",
+              "schema": "metric",
+              "params": {}
+            },
+            {
+              "id": "2",
+              "enabled": true,
+              "type": "terms",
+              "schema": "segment",
+              "params": {
+                "field": "log_message.keyword",
+                "size": 10,
+                "order": "desc",
+                "orderBy": "1"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "flask-errors",
+        "title": "Flask Errors",
+        "type": "visualization",
+        "visualization": {
+          "title": "Flask Error Distribution",
+          "type": "bar",
+          "params": {
+            "type": "histogram",
+            "grid": {
+              "categoryLines": false
+            }
+          },
+          "aggs": [
+            {
+              "id": "1",
+              "enabled": true,
+              "type": "count",
+              "schema": "metric",
+              "params": {}
+            },
+            {
+              "id": "2",
+              "enabled": true,
+              "type": "terms",
+              "schema": "segment",
+              "params": {
+                "field": "log_message.keyword",
+                "size": 10,
+                "order": "desc",
+                "orderBy": "1"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "high-server-load-alerts",
+        "title": "High Server Load Alerts",
+        "type": "visualization",
+        "visualization": {
+          "title": "CPU Load Spikes",
+          "type": "line",
+          "params": {
+            "type": "line",
+            "grid": {
+              "categoryLines": false
+            },
+            "threshold_line": {
+              "show": true,
+              "value": 80,
+              "width": 1,
+              "style": "full",
+              "color": "#E7664C"
+            }
+          },
+          "aggs": [
+            {
+              "id": "1",
+              "enabled": true,
+              "type": "max",
+              "schema": "metric",
+              "params": {
+                "field": "system.cpu.total.pct"
+              }
+            },
+            {
+              "id": "2",
+              "enabled": true,
+              "type": "date_histogram",
+              "schema": "segment",
+              "params": {
+                "field": "@timestamp",
+                "timeRange": {
+                  "from": "now-24h",
+                  "to": "now"
+                },
+                "interval": "5m"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "timeRestore": true,
+    "timeTo": "now",
+    "timeFrom": "now-24h",
+    "refreshInterval": {
+      "display": "30 seconds",
+      "pause": false,
+      "value": 30000
+    },
+    "optionsJSON": {
+      "darkTheme": true,
+      "useMargins": true,
+      "hidePanelTitles": false
+    },
+    "version": 1,
+    "kibanaSavedObjectMeta": {
+      "searchSourceJSON": {
+        "query": {
+          "query": "*",
+          "language": "kuery"
+        },
+        "filter": [
+          {
+            "meta": {
+              "index": "giggatek-*",
+              "type": "phrase",
+              "negate": false,
+              "key": "app",
+              "value": "giggatek",
+              "disabled": false
+            },
+            "query": {
+              "match": {
+                "app": {
+                  "query": "giggatek",
+                  "type": "phrase"
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

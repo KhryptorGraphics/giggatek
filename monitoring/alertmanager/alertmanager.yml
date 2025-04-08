@@ -1,15 +1,15 @@
-# GigGatek Alertmanager Configuration
+# GigGatek AlertManager Configuration
 
 global:
   # The smarthost and SMTP sender used for mail notifications
-  smtp_smarthost: 'smtp.example.com:587'
-  smtp_from: 'alertmanager@giggatek.com'
-  smtp_auth_username: 'alertmanager@giggatek.com'
-  smtp_auth_password: 'your_smtp_password'
-  smtp_require_tls: true
-
-  # The integration URL for Slack
-  slack_api_url: 'https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX'
+  smtp_smarthost: 'smtp.giggatek.com:587'
+  smtp_from: 'alerts@giggatek.com'
+  smtp_auth_username: 'alerts@giggatek.com'
+  smtp_auth_password_file: '/etc/alertmanager/secrets/smtp_password'
+  # The auth token for Slack
+  slack_api_url_file: '/etc/alertmanager/secrets/slack_url'
+  # PagerDuty integration key
+  pagerduty_url: 'https://events.pagerduty.com/v2/enqueue'
 
 # The directory from which notification templates are read
 templates:
@@ -17,79 +17,228 @@ templates:
 
 # The root route on which each incoming alert enters
 route:
-  # The default receiver
-  receiver: 'email-notifications'
-
-  # The time to wait before sending a notification again if it has already been sent successfully
-  repeat_interval: 4h
-
-  # Routes for different severity levels
-  routes:
-  - match:
-      severity: critical
-    receiver: 'slack-critical'
-    continue: true  # Also send to the default receiver
-
-  - match:
-      severity: warning
-    receiver: 'slack-warnings'
-    continue: true  # Also send to the default receiver
-
-  # Group alerts by their name to avoid notification spam
-  group_by: ['alertname', 'instance']
+  # The labels by which incoming alerts are grouped together
+  group_by: ['alertname', 'service', 'category']
   
-  # How long to initially wait to send a notification for a group of alerts
+  # When a new group of alerts is created, wait at least 'group_wait' to send the initial notification
   group_wait: 30s
   
-  # How long to wait before sending a notification about new alerts that are added to a group
+  # When the first notification was sent, wait 'group_interval' to send a batch of new alerts
   group_interval: 5m
+  
+  # If an alert has successfully been sent, wait 'repeat_interval' to resend it
+  repeat_interval: 4h
+  
+  # A default receiver
+  receiver: 'operations-team'
+  
+  # All the above attributes are inherited by all child routes and can be overwritten
+  routes:
+  # Critical alerts - send to PagerDuty for immediate action
+  - match:
+      severity: critical
+    receiver: 'pagerduty-critical'
+    continue: true
+    
+  # High priority alerts
+  - match:
+      severity: high
+    receiver: 'slack-high-priority'
+    continue: true
+    group_wait: 15s
+    
+  # Meta monitoring alerts - go to dedicated channel
+  - match:
+      meta: true
+    receiver: 'meta-monitoring'
+    continue: true
+    
+  # Service-specific routing
+  - match:
+      category: payment
+    receiver: 'payment-team'
+    
+  - match:
+      category: order
+    receiver: 'order-team'
+    
+  - match:
+      category: rental
+    receiver: 'rental-team'
+    
+  - match:
+      category: auth
+    receiver: 'auth-team'
+    
+  - match:
+      category: database
+    receiver: 'database-team'
+    
+  - match:
+      category: cache
+    receiver: 'database-team'
+    
+  - match:
+      category: application
+    receiver: 'development-team'
 
-# Receivers define notification integrations
+# Inhibition rules allow to mute a set of alerts given that another alert is
+# firing. We use this to prevent a storm of specific alerts when a general
+# alert is firing. For example, inhibiting all alerts related to a specific
+# instance or service if a general "service down" alert is already firing.
+inhibit_rules:
+# Inhibit service-specific alerts when the entire instance is down
+- source_match:
+    alertname: 'InstanceDown'
+  target_match_re:
+    service: '.+'
+  # Apply inhibition if the source and target alerts have the same instance
+  equal: ['instance']
+
+# Inhibit low severity alerts from the same alertname when higher severity
+# alerts of the same alertname are firing
+- source_match:
+    severity: 'critical'
+  target_match:
+    severity: 'warning'
+  # Apply inhibition if the alertname is the same
+  equal: ['alertname', 'service']
+
+# Each receiver is a named configuration of one or more notification integrations
 receivers:
-- name: 'email-notifications'
+# Main operations team - receives all alerts
+- name: 'operations-team'
   email_configs:
   - to: 'operations@giggatek.com'
     send_resolved: true
-    headers:
-      subject: '[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] GigGatek Alert Notification'
-
-- name: 'slack-critical'
   slack_configs:
-  - channel: '#alerts-critical'
+  - channel: '#alerts'
     send_resolved: true
-    icon_emoji: ':red_circle:'
-    title: '[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] CRITICAL ALERT'
-    text: >-
-      {{ range .Alerts }}
-        *Alert:* {{ .Annotations.summary }}
-        *Description:* {{ .Annotations.description }}
-        *Graph:* <{{ .GeneratorURL }}|:chart_with_upwards_trend:>
-        *Details:*
-        {{ range .Labels.SortedPairs }} • *{{ .Name }}:* `{{ .Value }}`
-        {{ end }}
-      {{ end }}
+    title: '{{ template "slack.giggatek.title" . }}'
+    text: '{{ template "slack.giggatek.text" . }}'
+    footer: 'GigGatek Monitoring | {{ template "slack.giggatek.link" . }}'
+    actions:
+    - type: button
+      text: 'Runbook'
+      url: '{{ (index .Alerts 0).Annotations.runbook }}'
+    - type: button
+      text: 'Dashboard'
+      url: '{{ (index .Alerts 0).Annotations.dashboard }}'
+    - type: button
+      text: 'Silence'
+      url: '{{ template "slack.giggatek.silence" . }}'
 
-- name: 'slack-warnings'
+# Critical alerts - PagerDuty integration
+- name: 'pagerduty-critical'
+  pagerduty_configs:
+  - service_key_file: '/etc/alertmanager/secrets/pagerduty_key'
+    description: '{{ template "pagerduty.giggatek.description" . }}'
+    details:
+      firing: '{{ template "pagerduty.giggatek.firing" . }}'
+      num_firing: '{{ .Alerts.Firing | len }}'
+      runbook: '{{ (index .Alerts 0).Annotations.runbook }}'
+    severity: critical
+    client: 'AlertManager'
+    client_url: '{{ template "pagerduty.giggatek.link" . }}'
+
+# High priority alerts - Slack with distinct formatting
+- name: 'slack-high-priority'
   slack_configs:
-  - channel: '#alerts-warnings'
+  - channel: '#alerts-high'
+    send_resolved: true
+    icon_emoji: ':rotating_light:'
+    title: '{{ template "slack.giggatek.title.highpriority" . }}'
+    text: '{{ template "slack.giggatek.text" . }}'
+    color: '#FF0000'
+    footer: 'GigGatek Monitoring | {{ template "slack.giggatek.link" . }}'
+    actions:
+    - type: button
+      text: 'Runbook'
+      url: '{{ (index .Alerts 0).Annotations.runbook }}'
+    - type: button
+      text: 'Dashboard'
+      url: '{{ (index .Alerts 0).Annotations.dashboard }}'
+
+# Meta monitoring - alerts about the monitoring system itself
+- name: 'meta-monitoring'
+  slack_configs:
+  - channel: '#monitoring-alerts'
     send_resolved: true
     icon_emoji: ':warning:'
-    title: '[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] Warning Alert'
-    text: >-
-      {{ range .Alerts }}
-        *Alert:* {{ .Annotations.summary }}
-        *Description:* {{ .Annotations.description }}
-        *Graph:* <{{ .GeneratorURL }}|:chart_with_upwards_trend:>
-        *Details:*
-        {{ range .Labels.SortedPairs }} • *{{ .Name }}:* `{{ .Value }}`
-        {{ end }}
-      {{ end }}
+    title: 'META ALERT: {{ .GroupLabels.alertname }}'
+    text: '{{ template "slack.giggatek.text" . }}'
+    color: '#FF00FF'
+  email_configs:
+  - to: 'monitoring@giggatek.com'
+    send_resolved: true
+    subject: 'META ALERT: {{ .GroupLabels.alertname }}'
+  pagerduty_configs:
+  - service_key_file: '/etc/alertmanager/secrets/pagerduty_monitoring_key'
+    description: '[META] {{ template "pagerduty.giggatek.description" . }}'
+    severity: critical
 
-# Inhibition rules allow to mute a set of alerts given that another alert is firing
-inhibit_rules:
-  # If a node is down, don't alert about services on that node
-  - source_match:
-      alertname: 'ServiceDown'
-    target_match:
-      severity: 'warning'
-    equal: ['instance']
+# Payment team alerts
+- name: 'payment-team'
+  slack_configs:
+  - channel: '#payment-alerts'
+    send_resolved: true
+    title: '{{ template "slack.giggatek.title" . }}'
+    text: '{{ template "slack.giggatek.text" . }}'
+  email_configs:
+  - to: 'payment-team@giggatek.com'
+    send_resolved: true
+
+# Order team alerts
+- name: 'order-team'
+  slack_configs:
+  - channel: '#order-alerts'
+    send_resolved: true
+    title: '{{ template "slack.giggatek.title" . }}'
+    text: '{{ template "slack.giggatek.text" . }}'
+  email_configs:
+  - to: 'order-team@giggatek.com'
+    send_resolved: true
+
+# Rental team alerts
+- name: 'rental-team'
+  slack_configs:
+  - channel: '#rental-alerts'
+    send_resolved: true
+    title: '{{ template "slack.giggatek.title" . }}'
+    text: '{{ template "slack.giggatek.text" . }}'
+  email_configs:
+  - to: 'rental-team@giggatek.com'
+    send_resolved: true
+
+# Auth team alerts
+- name: 'auth-team'
+  slack_configs:
+  - channel: '#auth-alerts'
+    send_resolved: true
+    title: '{{ template "slack.giggatek.title" . }}'
+    text: '{{ template "slack.giggatek.text" . }}'
+  email_configs:
+  - to: 'auth-team@giggatek.com'
+    send_resolved: true
+
+# Database team alerts
+- name: 'database-team'
+  slack_configs:
+  - channel: '#database-alerts'
+    send_resolved: true
+    title: '{{ template "slack.giggatek.title" . }}'
+    text: '{{ template "slack.giggatek.text" . }}'
+  email_configs:
+  - to: 'database-team@giggatek.com'
+    send_resolved: true
+
+# Development team alerts
+- name: 'development-team'
+  slack_configs:
+  - channel: '#dev-alerts'
+    send_resolved: true
+    title: '{{ template "slack.giggatek.title" . }}'
+    text: '{{ template "slack.giggatek.text" . }}'
+  email_configs:
+  - to: 'dev-team@giggatek.com'
+    send_resolved: true

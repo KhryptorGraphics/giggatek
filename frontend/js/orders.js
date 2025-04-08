@@ -18,7 +18,13 @@ class Orders {
      * @returns {Object} Headers object with Authorization header
      */
     getAuthHeaders() {
-        return window.auth ? window.auth.getAuthHeaders() : {};
+        if (!window.auth) {
+            return {};
+        }
+        
+        return {
+            'Authorization': `Bearer ${window.auth.getToken()}`
+        };
     }
     
     /**

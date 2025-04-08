@@ -1,0 +1,465 @@
+{
+  "attributes": {
+    "title": "GigGatek Business Metrics",
+    "hits": 0,
+    "description": "Track key business metrics for the GigGatek platform",
+    "panelsJSON": [
+      {
+        "id": "order-processing-overview",
+        "title": "Order Processing Overview",
+        "type": "visualization",
+        "visualization": {
+          "title": "Order Processing Status",
+          "type": "pie",
+          "params": {
+            "type": "pie",
+            "addTooltip": true,
+            "addLegend": true,
+            "legendPosition": "right"
+          },
+          "aggs": [
+            {
+              "id": "1",
+              "enabled": true,
+              "type": "count",
+              "schema": "metric",
+              "params": {}
+            },
+            {
+              "id": "2",
+              "enabled": true,
+              "type": "terms",
+              "schema": "segment",
+              "params": {
+                "field": "status.keyword",
+                "size": 10,
+                "order": "desc",
+                "orderBy": "1"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "order-volume-over-time",
+        "title": "Order Volume Over Time",
+        "type": "visualization",
+        "visualization": {
+          "title": "Orders Over Time",
+          "type": "line",
+          "params": {
+            "type": "line",
+            "grid": {
+              "categoryLines": false
+            },
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "type": "category",
+                "position": "bottom",
+                "title": {
+                  "text": "Time"
+                }
+              }
+            ],
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "type": "value",
+                "position": "left",
+                "title": {
+                  "text": "Orders"
+                }
+              }
+            ]
+          },
+          "aggs": [
+            {
+              "id": "1",
+              "enabled": true,
+              "type": "count",
+              "schema": "metric",
+              "params": {}
+            },
+            {
+              "id": "2",
+              "enabled": true,
+              "type": "date_histogram",
+              "schema": "segment",
+              "params": {
+                "field": "@timestamp",
+                "timeRange": {
+                  "from": "now-7d",
+                  "to": "now"
+                },
+                "interval": "auto"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "rental-contracts-metrics",
+        "title": "Rental Contracts",
+        "type": "visualization",
+        "visualization": {
+          "title": "Rental Contracts by Status",
+          "type": "bar",
+          "params": {
+            "type": "histogram",
+            "grid": {
+              "categoryLines": false
+            }
+          },
+          "aggs": [
+            {
+              "id": "1",
+              "enabled": true,
+              "type": "count",
+              "schema": "metric",
+              "params": {}
+            },
+            {
+              "id": "2",
+              "enabled": true,
+              "type": "terms",
+              "schema": "segment",
+              "params": {
+                "field": "status.keyword",
+                "size": 10,
+                "order": "desc",
+                "orderBy": "1"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "payment-processing-success-rate",
+        "title": "Payment Processing Success Rate",
+        "type": "visualization",
+        "visualization": {
+          "title": "Payment Success vs Failures",
+          "type": "pie",
+          "params": {
+            "type": "pie",
+            "addTooltip": true,
+            "addLegend": true,
+            "legendPosition": "right"
+          },
+          "aggs": [
+            {
+              "id": "1",
+              "enabled": true,
+              "type": "count",
+              "schema": "metric",
+              "params": {}
+            },
+            {
+              "id": "2",
+              "enabled": true,
+              "type": "terms",
+              "schema": "segment",
+              "params": {
+                "field": "payment_success",
+                "size": 2,
+                "order": "desc",
+                "orderBy": "1"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "revenue-trends",
+        "title": "Revenue Trends",
+        "type": "visualization",
+        "visualization": {
+          "title": "Revenue by Day",
+          "type": "line",
+          "params": {
+            "type": "line",
+            "grid": {
+              "categoryLines": false
+            }
+          },
+          "aggs": [
+            {
+              "id": "1",
+              "enabled": true,
+              "type": "sum",
+              "schema": "metric",
+              "params": {
+                "field": "amount"
+              }
+            },
+            {
+              "id": "2",
+              "enabled": true,
+              "type": "date_histogram",
+              "schema": "segment",
+              "params": {
+                "field": "@timestamp",
+                "timeRange": {
+                  "from": "now-30d",
+                  "to": "now"
+                },
+                "interval": "1d"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "api-response-times",
+        "title": "API Response Times",
+        "type": "visualization",
+        "visualization": {
+          "title": "API Response Time by Endpoint",
+          "type": "line",
+          "params": {
+            "type": "line",
+            "grid": {
+              "categoryLines": false
+            }
+          },
+          "aggs": [
+            {
+              "id": "1",
+              "enabled": true,
+              "type": "avg",
+              "schema": "metric",
+              "params": {
+                "field": "response_time"
+              }
+            },
+            {
+              "id": "2",
+              "enabled": true,
+              "type": "date_histogram",
+              "schema": "segment",
+              "params": {
+                "field": "@timestamp",
+                "timeRange": {
+                  "from": "now-24h",
+                  "to": "now"
+                },
+                "interval": "15m"
+              }
+            },
+            {
+              "id": "3",
+              "enabled": true,
+              "type": "terms",
+              "schema": "group",
+              "params": {
+                "field": "api_endpoint.keyword",
+                "size": 5,
+                "order": "desc",
+                "orderBy": "1"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "http-error-count",
+        "title": "HTTP Error Count",
+        "type": "visualization",
+        "visualization": {
+          "title": "HTTP Errors by Type",
+          "type": "bar",
+          "params": {
+            "type": "histogram",
+            "grid": {
+              "categoryLines": false
+            }
+          },
+          "aggs": [
+            {
+              "id": "1",
+              "enabled": true,
+              "type": "count",
+              "schema": "metric",
+              "params": {}
+            },
+            {
+              "id": "2",
+              "enabled": true,
+              "type": "terms",
+              "schema": "segment",
+              "params": {
+                "field": "http_error_type.keyword",
+                "size": 5,
+                "order": "desc",
+                "orderBy": "1"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "user-registration-trends",
+        "title": "User Registration Trends",
+        "type": "visualization",
+        "visualization": {
+          "title": "New User Registrations",
+          "type": "line",
+          "params": {
+            "type": "line",
+            "grid": {
+              "categoryLines": false
+            }
+          },
+          "aggs": [
+            {
+              "id": "1",
+              "enabled": true,
+              "type": "count",
+              "schema": "metric",
+              "params": {}
+            },
+            {
+              "id": "2",
+              "enabled": true,
+              "type": "date_histogram",
+              "schema": "segment",
+              "params": {
+                "field": "@timestamp",
+                "timeRange": {
+                  "from": "now-30d",
+                  "to": "now"
+                },
+                "interval": "1d"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "geographical-user-distribution",
+        "title": "User Geographic Distribution",
+        "type": "visualization",
+        "visualization": {
+          "title": "User Distribution by Country",
+          "type": "region_map",
+          "params": {
+            "type": "region_map",
+            "addTooltip": true,
+            "colorSchema": "Blues",
+            "selectedLayer": {
+              "id": "world_countries",
+              "name": "World Countries",
+              "attribution": "Elastic Maps Service",
+              "fields": [
+                {
+                  "name": "iso2",
+                  "description": "ISO 3166-1 alpha-2 code"
+                }
+              ]
+            }
+          },
+          "aggs": [
+            {
+              "id": "1",
+              "enabled": true,
+              "type": "count",
+              "schema": "metric",
+              "params": {}
+            },
+            {
+              "id": "2",
+              "enabled": true,
+              "type": "terms",
+              "schema": "segment",
+              "params": {
+                "field": "geoip.country_iso_code",
+                "size": 100,
+                "order": "desc",
+                "orderBy": "1"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "database-error-tracking",
+        "title": "Database Errors",
+        "type": "visualization",
+        "visualization": {
+          "title": "MySQL Error Types",
+          "type": "bar",
+          "params": {
+            "type": "histogram",
+            "grid": {
+              "categoryLines": false
+            }
+          },
+          "aggs": [
+            {
+              "id": "1",
+              "enabled": true,
+              "type": "count",
+              "schema": "metric",
+              "params": {}
+            },
+            {
+              "id": "2",
+              "enabled": true,
+              "type": "terms",
+              "schema": "segment",
+              "params": {
+                "field": "mysql_error_type.keyword",
+                "size": 10,
+                "order": "desc",
+                "orderBy": "1"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "timeRestore": true,
+    "timeTo": "now",
+    "timeFrom": "now-7d",
+    "refreshInterval": {
+      "display": "Off",
+      "pause": true,
+      "value": 0
+    },
+    "optionsJSON": {
+      "darkTheme": false,
+      "useMargins": true,
+      "hidePanelTitles": false
+    },
+    "version": 1,
+    "kibanaSavedObjectMeta": {
+      "searchSourceJSON": {
+        "query": {
+          "query": "*",
+          "language": "kuery"
+        },
+        "filter": [
+          {
+            "meta": {
+              "index": "giggatek-*",
+              "type": "phrase",
+              "negate": false,
+              "key": "app",
+              "value": "giggatek",
+              "disabled": false
+            },
+            "query": {
+              "match": {
+                "app": {
+                  "query": "giggatek",
+                  "type": "phrase"
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

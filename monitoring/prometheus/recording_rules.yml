@@ -1,0 +1,138 @@
+# GigGatek Recording Rules
+# These rules precompute frequently needed or computationally expensive expressions
+
+groups:
+# System level recording rules
+- name: system_resources
+  rules:
+  # CPU usage by instance (as percentage)
+  - record: instance:node_cpu_utilization:ratio
+    expr: 1 - avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m]))
+
+  # CPU usage by instance (as percentage, 0-100)
+  - record: instance:node_cpu_utilization:percent
+    expr: 100 * (1 - avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])))
+  
+  # Memory utilization (as percentage, 0-100)
+  - record: instance:node_memory_utilization:percent
+    expr: 100 * (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)
+  
+  # Disk utilization by instance and mountpoint (as percentage, 0-100)
+  - record: instance:node_filesystem_utilization:percent
+    expr: 100 * (1 - node_filesystem_avail_bytes{fstype=~"ext4|xfs"} / node_filesystem_size_bytes{fstype=~"ext4|xfs"})
+  
+  # Network traffic by instance
+  - record: instance:node_network_receive_bytes:rate5m
+    expr: sum by (instance) (rate(node_network_receive_bytes_total[5m]))
+  
+  - record: instance:node_network_transmit_bytes:rate5m
+    expr: sum by (instance) (rate(node_network_transmit_bytes_total[5m]))
+
+# HTTP request related recording rules
+- name: http_requests
+  rules:
+  # HTTP request rate by job and handler
+  - record: job_handler:http_requests:rate5m
+    expr: sum by (job, handler) (rate(http_requests_total[5m]))
+  
+  # HTTP error rate by job (percentage, 0-100)
+  - record: job:http_request_errors:percent
+    expr: 100 * (sum by (job) (rate(http_requests_total{status=~"5.."}[5m])) / sum by (job) (rate(http_requests_total[5m])))
+  
+  # HTTP request duration percentiles
+  - record: job_handler:http_request_duration:p50
+    expr: histogram_quantile(0.5, sum by (job, handler, le) (rate(http_request_duration_seconds_bucket[5m])))
+  
+  - record: job_handler:http_request_duration:p90
+    expr: histogram_quantile(0.9, sum by (job, handler, le) (rate(http_request_duration_seconds_bucket[5m])))
+  
+  - record: job_handler:http_request_duration:p95
+    expr: histogram_quantile(0.95, sum by (job, handler, le) (rate(http_request_duration_seconds_bucket[5m])))
+  
+  - record: job_handler:http_request_duration:p99
+    expr: histogram_quantile(0.99, sum by (job, handler, le) (rate(http_request_duration_seconds_bucket[5m])))
+
+# Database recording rules
+- name: database_metrics
+  rules:
+  # MySQL queries per second
+  - record: mysql:queries:rate1m
+    expr: rate(mysql_global_status_queries[1m])
+  
+  # MySQL slow queries per second
+  - record: mysql:slow_queries:rate1m
+    expr: rate(mysql_global_status_slow_queries[1m])
+  
+  # MySQL connection utilization (percentage, 0-100)
+  - record: mysql:connection_utilization:percent
+    expr: 100 * (mysql_global_status_threads_connected / mysql_global_variables_max_connections)
+  
+  # Redis command rate
+  - record: redis:commands:rate1m
+    expr: sum(rate(redis_commands_processed_total[1m]))
+  
+  # Redis memory utilization (percentage, 0-100)
+  - record: redis:memory_utilization:percent
+    expr: 100 * (redis_memory_used_bytes / redis_memory_max_bytes)
+  
+  # Redis hit rate (percentage, 0-100)
+  - record: redis:keyspace_hit_rate:percent
+    expr: 100 * (redis_keyspace_hits_total / (redis_keyspace_hits_total + redis_keyspace_misses_total))
+
+# Business metrics
+- name: business_metrics
+  rules:
+  # Order processing rates
+  - record: orders:processed:rate1h
+    expr: sum(rate(order_processed_total[1h]))
+  
+  # Average order processing time
+  - record: orders:processing_time:avg1h
+    expr: avg(rate(order_processing_duration_seconds_sum[1h]) / rate(order_processing_duration_seconds_count[1h]))
+  
+  # Order success rate (percentage, 0-100)
+  - record: orders:success_rate:percent
+    expr: 100 * (sum(order_status{status="completed"}) / sum(order_status))
+  
+  # Rental contract rates
+  - record: rentals:approved:rate1d
+    expr: sum(rate(rental_approved_total[1d]))
+  
+  # Rental approval time (hours)
+  - record: rentals:approval_time:avg1d
+    expr: avg(rate(rental_approval_duration_seconds_sum[1d]) / rate(rental_approval_duration_seconds_count[1d])) / 3600
+  
+  # Rental application success rate (percentage, 0-100)
+  - record: rentals:application_success:percent
+    expr: 100 * (sum(rental_application_status{status="approved"}) / sum(rental_application_status))
+  
+  # Payment processing rates
+  - record: payments:processed:rate1h
+    expr: sum(rate(payment_processed_total[1h]))
+  
+  # Payment success rate (percentage, 0-100)
+  - record: payments:success_rate:percent
+    expr: 100 * (sum(payment_status{status="success"}) / sum(payment_status))
+
+# SLA-related recording rules
+- name: sla_metrics
+  rules:
+  # API availability over 30 days (percentage, 0-100)
+  - record: sla:api_availability:ratio_30d
+    expr: sum_over_time(probe_success{job="blackbox",instance=~".*api.*"}[30d]) / count_over_time(probe_success{job="blackbox",instance=~".*api.*"}[30d])
+  
+  # Website availability over 30 days (percentage, 0-100)
+  - record: sla:website_availability:ratio_30d
+    expr: sum_over_time(probe_success{job="blackbox",instance=~"https://www.giggatek.com"}[30d]) / count_over_time(probe_success{job="blackbox",instance=~"https://www.giggatek.com"}[30d])
+  
+  # Order processing SLA (percentage under 30s)
+  - record: sla:order_processing:under_30s_ratio
+    expr: sum(rate(order_processing_duration_seconds_bucket{le="30"}[1d])) / sum(rate(order_processing_duration_seconds_count[1d]))
+  
+  # Transaction processing success ratio
+  - record: sla:transaction_success:ratio
+    expr: sum(rate(payment_transactions_success_total[1d])) / sum(rate(payment_transactions_total[1d]))
+  
+  # API response time SLA (percentage under 1s)
+  - record: sla:api_response:under_1s_ratio
+    expr: sum(rate(http_request_duration_seconds_bucket{le="1"}[1d])) / sum(rate(http_request_duration_seconds_count[1d]))

@@ -19,12 +19,21 @@ This document tracks the development progress of the GigGatek backend components
 | `/api/products` | POST | 🔄 Planned | Create new product | Product JSON in body | Created product |
 | `/api/products/<id>` | PUT | 🔄 Planned | Update product | Product JSON in body | Updated product |
 | `/api/products/<id>` | DELETE | 🔄 Planned | Delete product | `id` (URL param) | Success message |
-| `/api/auth/login` | POST | 🔄 Planned | User login | `email`, `password` | Auth token, user info |
-| `/api/auth/register` | POST | 🔄 Planned | User registration | User details | Success message |
-| `/api/orders` | GET | 🔄 Planned | Fetch user orders | Auth token | Array of order objects |
-| `/api/orders/<id>` | GET | 🔄 Planned | Fetch order details | `id` (URL param) | Order object with items |
-| `/api/rentals` | GET | 🔄 Planned | Fetch user rentals | Auth token | Array of rental objects |
-| `/api/rentals/<id>` | GET | 🔄 Planned | Fetch rental details | `id` (URL param) | Rental object |
+| `/api/auth/login` | POST | ✅ Completed | User login | `email`, `password` | Auth token, user info |
+| `/api/auth/register` | POST | ✅ Completed | User registration | User details | Success message |
+| `/api/auth/refresh-token` | POST | ✅ Completed | Refresh JWT token | Auth token | New auth token |
+| `/api/auth/me` | GET | ✅ Completed | Get current user | Auth token | User profile data |
+| `/api/auth/password-reset-request` | POST | ✅ Completed | Request password reset | `email` | Success message |
+| `/api/auth/password-reset` | POST | ✅ Completed | Reset password | Token, new password | Success message |
+| `/api/orders` | GET | ✅ Completed | Fetch user orders | Auth token | Array of order objects |
+| `/api/orders/<id>` | GET | ✅ Completed | Fetch order details | `id` (URL param) | Order object with items |
+| `/api/orders` | POST | ✅ Completed | Create order | Order data | New order object |
+| `/api/orders/<id>/cancel` | POST | ✅ Completed | Cancel order | `id` (URL param) | Updated order status |
+| `/api/rentals` | GET | ✅ Completed | Fetch user rentals | Auth token | Array of rental objects |
+| `/api/rentals/<id>` | GET | ✅ Completed | Fetch rental details | `id` (URL param) | Rental object |
+| `/api/rentals` | POST | ✅ Completed | Create rental | Rental data | New rental object |
+| `/api/rentals/<id>/make-payment` | POST | ✅ Completed | Make rental payment | Payment data | Payment confirmation |
+| `/api/rentals/<id>/sign-contract` | POST | ✅ Completed | Sign rental contract | Signature data | Updated rental status |
 | `/payment/stripe_handler.php` | POST | ✅ Completed | Process Stripe payments | Payment data, action type | Payment status, intent details |
 | `/payment/webhook.php` | POST | ✅ Completed | Handle Stripe webhooks | Stripe event data | Success confirmation |
 
@@ -63,18 +72,21 @@ This document tracks the development progress of the GigGatek backend components
 
 ## Authentication System
 
-- 🔄 Planned: JWT-based authentication
-- 🔄 Planned: Role-based access control (Admin, Manager, Customer)
-- 🔄 Planned: Password hashing with bcrypt
-- 🔄 Planned: Session management
+- ✅ Implemented: JWT-based authentication with token generation and validation
+- ✅ Implemented: Role-based access control (Admin, Manager, Customer)
+- ✅ Implemented: Password hashing with bcrypt
+- ✅ Implemented: Session management via JWT tokens
+- ✅ Implemented: Password reset flow with secure tokens
+- ✅ Implemented: User profile management
 
 ## Data Processing
 
 - ✅ Implemented: JSON field parsing for product specifications
 - ✅ Implemented: Image URL handling
-- 🔄 Planned: Data validation middleware
-- 🔄 Planned: Error handling standardization
-- 🔄 Planned: Response formatting standardization
+- ✅ Implemented: Data validation middleware
+- ✅ Implemented: Error handling standardization
+- ✅ Implemented: Response formatting standardization
+- ✅ Implemented: Pagination for list endpoints
 
 ## Security Features
 
@@ -111,15 +123,26 @@ This document tracks the development progress of the GigGatek backend components
 - 🔄 Planned: Caching strategy (Redis)
 - 🔄 Planned: Pagination for large data sets
 
+## Email Notification System
+
+- ✅ Implemented: Email sending framework in `utils/email.py`
+- ✅ Implemented: Template-based email generation
+- ✅ Implemented: Transactional email support
+- ✅ Implemented: Several email templates (welcome, order confirmation, rental payment)
+- 🔄 Planned: Additional email templates (password reset, verification)
+- 🔄 Planned: Email delivery tracking
+
 ## Upcoming Tasks
 
-- [ ] Complete user authentication system
-- [ ] Implement order management API endpoints
-- [ ] Build rental contract management functionality
+- [x] Complete user authentication system
+- [x] Implement order management API endpoints
+- [x] Build rental contract management functionality
 - [ ] Create admin report generation system
 - [x] Implement payment processing integration
 - [ ] Add data export functionality (CSV, PDF)
-- [ ] Build email notification system
+- [x] Build email notification framework
+- [ ] Complete remaining email templates
+- [ ] Implement frontend-backend integration testing
 
 ## Testing Strategy
 

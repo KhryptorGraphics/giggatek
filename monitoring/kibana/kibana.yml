@@ -1,0 +1,43 @@
+# GigGatek Kibana Configuration
+
+# Server settings
+server.name: kibana
+server.host: "0.0.0.0"
+server.port: 5601
+
+# Elasticsearch connection
+elasticsearch.hosts: ["http://elasticsearch:9200"]
+elasticsearch.username: ""
+elasticsearch.password: ""
+
+# Enable monitoring collection
+monitoring.kibana.collection.enabled: true
+
+# Saved objects configuration
+xpack.saved_objects.encryptionKey: "giggatek-monitoring-encryption-key"
+
+# Set dark mode default for operations monitoring
+xpack.themes.darkMode.enabled: true
+
+# Index patterns to set up by default
+kibana.defaultAppId: "home"
+
+# Configure index patterns - automatically setup common patterns
+setup.dashboards.enabled: true
+
+# Security settings (minimal for development)
+xpack.security.enabled: false
+
+# Reporting settings
+xpack.reporting.enabled: true
+xpack.reporting.capture.browser.chromium.disableSandbox: true
+
+# Increase logging for development
+logging.root.level: info
+
+# Define paths for dashboards
+xpack.savedObjects.importRetry: 5
+xpack.savedObjects.maxImportPayloadBytes: 10485760
+
+# Dashboards auto-load configuration
+xpack.savedObjects.init.onStartup: ["dashboard", "visualization", "index-pattern"]

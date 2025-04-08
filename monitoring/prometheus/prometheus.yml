@@ -1,54 +1,184 @@
 # GigGatek Prometheus Configuration
+# Main configuration file for Prometheus monitoring
+
 global:
-  scrape_interval: 15s
-  evaluation_interval: 15s
-  scrape_timeout: 10s
+  scrape_interval:     15s  # Set the scrape interval to every 15 seconds
+  evaluation_interval: 15s  # Evaluate rules every 15 seconds
+  scrape_timeout:      10s  # Timeout after 10 seconds of scrape attempt
+
+  # External labels to add to any time series or alerts when communicating with
+  # external systems (federation, remote storage, Alertmanager)
+  external_labels:
+    monitor: 'giggatek-monitor'
+    environment: 'production'
 
 # Alertmanager configuration
 alerting:
   alertmanagers:
-    - static_configs:
-        - targets:
-          - alertmanager:9093
+  - static_configs:
+    - targets:
+      - 'alertmanager:9093'
+    scheme: http
+    timeout: 10s
+    api_version: v2
 
 # Rule files to load
 rule_files:
-  - "rules/alert_rules.yml"
+  - "alert_rules.yml"
+  - "recording_rules.yml"
+  - "meta_alerts.yml"
 
-# Scrape configurations
+# A scrape configuration containing endpoints to scrape
 scrape_configs:
-  # Prometheus itself
+  # Self monitoring - Prometheus itself
   - job_name: 'prometheus'
+    scrape_interval: 15s
     static_configs:
       - targets: ['localhost:9090']
+    metrics_path: /metrics
 
-  # Node exporter for server metrics
-  - job_name: 'node'
+  # Monitor Alert Manager
+  - job_name: 'alertmanager'
+    scrape_interval: 15s
     static_configs:
-      - targets: ['node-exporter:9100']
+      - targets: ['alertmanager:9093']
 
-  # MySQL exporter for database metrics
+  # Monitor Grafana
+  - job_name: 'grafana'
+    scrape_interval: 15s
+    static_configs:
+      - targets: ['grafana:3000']
+    
+  # System monitoring - Node Exporter
+  - job_name: 'node'
+    scrape_interval: 15s
+    static_configs:
+      - targets: 
+        - 'node-exporter:9100'  # Main application server
+        - 'db-node-exporter:9100'  # Database server
+        - 'cache-node-exporter:9100'  # Redis server
+        - 'worker-node-exporter:9100'  # Background worker server
+        
+  # MySQL monitoring
   - job_name: 'mysql'
+    scrape_interval: 15s
     static_configs:
       - targets: ['mysql-exporter:9104']
-    
-  # Redis exporter for cache metrics
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        regex: '(.*):.*'
+        replacement: '${1}'
+        
+  # Redis monitoring
   - job_name: 'redis'
+    scrape_interval: 15s
     static_configs:
       - targets: ['redis-exporter:9121']
-
-  # Backend application metrics
-  - job_name: 'backend'
-    metrics_path: '/metrics'
-    static_configs:
-      - targets: ['backend:5000']
     
-  # Apache exporter for frontend metrics
-  - job_name: 'apache'
+  # Web endpoints monitoring (blackbox)
+  - job_name: 'blackbox'
+    metrics_path: /probe
+    params:
+      module: [http_2xx]  # Look for a HTTP 200 response
     static_configs:
-      - targets: ['apache-exporter:9117']
+      - targets:
+        - 'https://www.giggatek.com'  # Main website
+        - 'https://api.giggatek.com/health'  # API health endpoint
+        - 'https://api.giggatek.com/orders/health'  # Orders service
+        - 'https://api.giggatek.com/rentals/health'  # Rentals service
+        - 'https://api.giggatek.com/auth/health'  # Auth service
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter:9115  # The blackbox exporter's real hostname:port
 
-  # Cadvisor for container metrics
-  - job_name: 'cadvisor'
+  # Application metrics - Backend API
+  - job_name: 'backend-api'
+    scrape_interval: 15s
+    metrics_path: /metrics
+    scheme: https
     static_configs:
-      - targets: ['cadvisor:8080']
+      - targets: ['api.giggatek.com']
+    basic_auth:
+      username: prometheus
+      password_file: /etc/prometheus/auth/api_password
+      
+  # Application metrics - Orders Service
+  - job_name: 'orders-service'
+    scrape_interval: 15s
+    metrics_path: /orders/metrics
+    scheme: https
+    static_configs:
+      - targets: ['api.giggatek.com']
+    basic_auth:
+      username: prometheus
+      password_file: /etc/prometheus/auth/api_password
+      
+  # Application metrics - Rentals Service
+  - job_name: 'rentals-service'
+    scrape_interval: 15s
+    metrics_path: /rentals/metrics
+    scheme: https
+    static_configs:
+      - targets: ['api.giggatek.com']
+    basic_auth:
+      username: prometheus
+      password_file: /etc/prometheus/auth/api_password
+      
+  # Application metrics - Auth Service
+  - job_name: 'auth-service'
+    scrape_interval: 15s
+    metrics_path: /auth/metrics
+    scheme: https
+    static_configs:
+      - targets: ['api.giggatek.com']
+    basic_auth:
+      username: prometheus
+      password_file: /etc/prometheus/auth/api_password
+      
+  # Background worker monitoring
+  - job_name: 'workers'
+    scrape_interval: 15s
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['worker:9090']
+      
+  # Push Gateway for batch jobs
+  - job_name: 'pushgateway'
+    scrape_interval: 15s
+    honor_labels: true
+    static_configs:
+      - targets: ['pushgateway:9091']
+
+# Remote write configuration for long-term storage (optional)
+# remote_write:
+#   - url: "http://remote-storage:9201/write"
+#     remote_timeout: 30s
+#     queue_config:
+#       capacity: 10000
+#       max_shards: 200
+#       max_samples_per_send: 2000
+#     write_relabel_configs:
+#       - source_labels: [__name__]
+#         regex: 'go_.*'
+#         action: drop
+
+# Enable tracing to check performance issues with Prometheus itself
+# tracing:
+#   endpoint: "jaeger:14268/api/traces"
+
+# Storage configuration
+storage:
+  tsdb:
+    path: /prometheus
+    retention: 15d
+    # For newer Prometheus versions (2.6.0+), you can use the following instead:
+    # retention:
+    #   time: 15d
+    #   size: 0
+    # exemplars:
+    #   max_samples: 100000
