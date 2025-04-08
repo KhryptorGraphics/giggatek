@@ -74,10 +74,16 @@ class StripePaymentHandler {
      */
     async createPaymentIntent(amount, description, metadata = {}) {
         try {
-            const response = await fetch('/backend/payment/stripe_handler.php', {
+            // Check if authentication is available
+            if (!window.auth || !window.auth.getToken()) {
+                throw new Error('Authentication required for payment processing');
+            }
+            
+            const response = await fetch('/api/payment/stripe_handler.php', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${window.auth.getToken()}`
                 },
                 body: JSON.stringify({
                     action: 'create_payment_intent',
@@ -126,10 +132,11 @@ class StripePaymentHandler {
             }
             
             // Confirm the payment intent with the payment method
-            const confirmResult = await fetch('/backend/payment/stripe_handler.php', {
+            const confirmResult = await fetch('/api/payment/stripe_handler.php', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${window.auth.getToken()}`
                 },
                 body: JSON.stringify({
                     action: 'confirm_payment_intent',
