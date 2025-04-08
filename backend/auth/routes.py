@@ -2,10 +2,13 @@ from flask import Blueprint, request, jsonify
 import jwt
 import datetime
 import bcrypt
+import json
 from functools import wraps
 import re
 from ..utils.db import get_db_connection
 from ..utils.validators import validate_email, validate_password
+from ..utils.security import rate_limit, auth_rate_limit, check_ip_blacklist
+from ..utils.encryption import encrypt_pii_fields, decrypt_pii_fields, encrypt_data, decrypt_data
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -63,6 +66,8 @@ def admin_required(f):
     return decorated
 
 @auth_bp.route('/register', methods=['POST'])
+@rate_limit(10, 3600)  # 10 registrations per hour per IP
+@check_ip_blacklist
 def register():
     data = request.get_json()
     
@@ -134,6 +139,8 @@ def register():
         return jsonify({'error': str(e)}), 500
 
 @auth_bp.route('/login', methods=['POST'])
+@auth_rate_limit(5, 60)  # 5 attempts per minute
+@check_ip_blacklist
 def login():
     data = request.get_json()
     
@@ -181,6 +188,7 @@ def login():
 
 @auth_bp.route('/refresh-token', methods=['POST'])
 @token_required
+@rate_limit(30, 3600)  # 30 refreshes per hour
 def refresh_token():
     # Generate a new token
     new_token = generate_token(request.user_id, request.is_admin)
@@ -210,6 +218,8 @@ def get_current_user():
     }), 200
 
 @auth_bp.route('/password-reset-request', methods=['POST'])
+@auth_rate_limit(3, 300)  # 3 password reset requests per 5 minutes
+@check_ip_blacklist
 def password_reset_request():
     data = request.get_json()
     
@@ -264,6 +274,8 @@ def password_reset_request():
         return jsonify({'error': str(e)}), 500
 
 @auth_bp.route('/password-reset', methods=['POST'])
+@auth_rate_limit(3, 300)  # 3 password reset attempts per 5 minutes
+@check_ip_blacklist
 def password_reset():
     data = request.get_json()
     
@@ -328,6 +340,7 @@ def update_profile():
     
     # Fields that can be updated
     allowed_fields = ['first_name', 'last_name', 'phone']
+    pii_fields = ['first_name', 'last_name', 'phone']
     
     # Check if any allowed field is provided
     update_data = {}
@@ -338,20 +351,43 @@ def update_profile():
     if not update_data:
         return jsonify({'error': 'No valid fields to update'}), 400
     
+    # Prepare encrypted fields
+    encrypted_fields = {}
+    for field in update_data:
+        if field in pii_fields:
+            # Store original value in regular column for backward compatibility
+            encrypted_fields[f"{field}_encrypted"] = encrypt_data(update_data[field])
+    
+    # Combine regular and encrypted fields
+    combined_data = {**update_data, **encrypted_fields}
+    
     # Construct the SQL query dynamically
-    set_clause = ', '.join([f"{field} = %s" for field in update_data.keys()])
+    set_clause = ', '.join([f"{field} = %s" for field in combined_data.keys()])
     query = f"UPDATE users SET {set_clause} WHERE id = %s"
     
     # Prepare values for the query
-    values = list(update_data.values())
+    values = list(combined_data.values())
     values.append(request.user_id)
     
     # Execute the update
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(dictionary=True)
     
     try:
         cursor.execute(query, values)
+        
+        # Log the encryption operation
+        log_query = """
+            INSERT INTO encryption_audit 
+            (operation, table_name, record_id, encrypted_fields, performed_by)
+            VALUES (%s, %s, %s, %s, %s)
+        """
+        encrypted_field_names = list(encrypted_fields.keys())
+        cursor.execute(
+            log_query, 
+            ('UPDATE', 'users', request.user_id, json.dumps(encrypted_field_names), f"user:{request.user_id}")
+        )
+        
         conn.commit()
         
         # Get updated user data
@@ -374,6 +410,7 @@ def update_profile():
 
 @auth_bp.route('/change-password', methods=['PUT'])
 @token_required
+@rate_limit(5, 3600)  # 5 password changes per hour
 def change_password():
     data = request.get_json()
     

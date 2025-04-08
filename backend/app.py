@@ -20,7 +20,19 @@ from utils.db import get_db_connection
 
 # Initialize Flask app
 app = Flask(__name__, template_folder='templates')
-CORS(app)  # Enable CORS for all routes
+
+# Configure CORS with stricter settings
+cors_allowed_origins = os.environ.get('CORS_ALLOWED_ORIGINS', 'http://localhost:3000,https://giggatek.com').split(',')
+cors_allowed_methods = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+cors_allowed_headers = ['Content-Type', 'Authorization', 'X-Requested-With']
+cors_max_age = 86400  # 24 hours
+
+CORS(app, 
+     resources={r"/*": {"origins": cors_allowed_origins}},
+     methods=cors_allowed_methods,
+     allow_headers=cors_allowed_headers,
+     supports_credentials=True,
+     max_age=cors_max_age)
 
 # Configure JWT
 app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'giggatek-dev-key-change-in-production')
@@ -141,6 +153,21 @@ def get_product(product_id):
             cursor.close()
         if conn and conn.is_connected():
             conn.close()
+
+# Add security headers middleware
+@app.after_request
+def add_security_headers(response):
+    # Prevent browsers from trying to guess the MIME type
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    # Prevent clickjacking
+    response.headers['X-Frame-Options'] = 'DENY'
+    # Enable XSS protection
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    # Set strict content security policy
+    response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self'; object-src 'none'"
+    # Set HTTP Strict Transport Security (HSTS)
+    response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+    return response
 
 # Placeholder product data for development - can be returned when DB is not available
 PLACEHOLDER_PRODUCTS = [
