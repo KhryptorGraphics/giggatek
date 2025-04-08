@@ -1,0 +1,124 @@
+name: Integration Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  # Run nightly at 2 AM UTC
+  schedule:
+    - cron: '0 2 * * *'
+
+jobs:
+  integration-tests:
+    name: Run Integration Tests
+    runs-on: ubuntu-latest
+    
+    services:
+      # Database service for testing
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: giggatek_test
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+      
+      # Mail testing service
+      mailhog:
+        image: mailhog/mailhog:latest
+        ports:
+          - 1025:1025
+          - 8025:8025
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+      
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: mbstring, intl, pdo_mysql
+      
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest requests pytest-html pymysql pytest-dotenv faker bcrypt
+      
+      - name: Set up Test Environment
+        run: |
+          # Create test environment configuration
+          cp .env.example .env.test
+          # Configure test environment
+          echo "DB_HOST=localhost" >> .env.test
+          echo "DB_USER=root" >> .env.test
+          echo "DB_PASS=root" >> .env.test
+          echo "DB_NAME=giggatek_test" >> .env.test
+          echo "JWT_SECRET=test_jwt_secret_key_do_not_use_in_production" >> .env.test
+          echo "TOKEN_EXPIRATION=60" >> .env.test
+          echo "SMTP_HOST=localhost" >> .env.test
+          echo "SMTP_PORT=1025" >> .env.test
+          echo "EMAIL_FROM=test@giggatek.com" >> .env.test
+          echo "EMAIL_FROM_NAME=GigGatek Test" >> .env.test
+          echo "STRIPE_PUBLIC_KEY=pk_test_example" >> .env.test
+          echo "STRIPE_SECRET_KEY=sk_test_example" >> .env.test
+          echo "STRIPE_WEBHOOK_SECRET=whsec_test_example" >> .env.test
+          echo "TEST_MODE=true" >> .env.test
+      
+      - name: Import Database Schema
+        run: |
+          # Import database schemas
+          mysql -h127.0.0.1 -uroot -proot giggatek_test < backend/database/auth_schema.sql
+          mysql -h127.0.0.1 -uroot -proot giggatek_test < backend/database/orders_schema.sql
+          mysql -h127.0.0.1 -uroot -proot giggatek_test < backend/database/rentals_schema.sql
+      
+      - name: Generate Test Data
+        run: |
+          # Generate test data
+          python tests/generate_test_data.py
+      
+      - name: Start Backend Server
+        run: |
+          # Start the backend server in the background for testing
+          cd backend
+          python app.py --config=../.env.test &
+          # Wait for the server to start
+          sleep 5
+      
+      - name: Start Frontend Server
+        run: |
+          # Start the frontend server in the background for testing
+          cd frontend
+          php -S localhost:8000 &
+          # Wait for the server to start
+          sleep 3
+      
+      - name: Run Authentication Tests
+        run: |
+          pytest -v tests/integration/auth/test_authentication.py --html=tests/results/auth_tests.html --self-contained-html
+      
+      - name: Run Order Management Tests
+        run: |
+          pytest -v tests/integration/orders/test_orders.py --html=tests/results/order_tests.html --self-contained-html
+      
+      - name: Run Rental System Tests
+        run: |
+          pytest -v tests/integration/rentals/test_rentals.py --html=tests/results/rental_tests.html --self-contained-html
+      
+      - name: Run Email Notification Tests
+        run: |
+          pytest -v tests/integration/email/test_email_notifications.py --html=tests/results/email_tests.html --self-contained-html
+      
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: test-results
+          path: tests/results/*.html
+          retention-days: 14
