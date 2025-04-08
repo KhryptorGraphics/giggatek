@@ -19,7 +19,7 @@ const auth = (function() {
     };
     
     // API URL - should be configured based on environment
-    const API_URL = '/backend';
+    const API_URL = '/api';  // Updated to match correct backend configuration
     
     /**
      * Initialize the auth module
