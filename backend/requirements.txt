@@ -22,3 +22,8 @@ Flask-CORS==4.0.0
 
 # Development and Utilities
 python-dotenv==1.0.0
+
+# Push Notifications
+pywebpush==1.14.0
+py-vapid==1.9.0
+cryptography==41.0.3

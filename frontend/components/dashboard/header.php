@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/orders.css">
     <link rel="stylesheet" href="css/rentals.css">
+    <link rel="stylesheet" href="css/wishlist.css">
+    <link rel="stylesheet" href="css/dashboard.css">
 </head>
 <body data-require-auth="true">
     <header>

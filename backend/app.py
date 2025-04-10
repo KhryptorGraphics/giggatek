@@ -27,7 +27,7 @@ cors_allowed_methods = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 cors_allowed_headers = ['Content-Type', 'Authorization', 'X-Requested-With']
 cors_max_age = 86400  # 24 hours
 
-CORS(app, 
+CORS(app,
      resources={r"/*": {"origins": cors_allowed_origins}},
      methods=cors_allowed_methods,
      allow_headers=cors_allowed_headers,
@@ -46,6 +46,16 @@ app.register_blueprint(auth_bp)
 app.register_blueprint(orders_bp)
 from rentals import rentals_bp
 app.register_blueprint(rentals_bp)
+from wishlist import wishlist_bp
+app.register_blueprint(wishlist_bp)
+
+# Import and register payment blueprints
+from payment import payment_bp
+app.register_blueprint(payment_bp)
+
+# Import and register push notification blueprints
+from push import push_bp
+app.register_blueprint(push_bp)
 
 # Using the centralized get_db_connection from utils.db
 
@@ -66,18 +76,94 @@ def db_test():
 
 @app.route('/api/products')
 def get_products():
-    """API endpoint to get all products."""
+    """API endpoint to get all products with filtering and sorting."""
     products = []
     conn = None
     cursor = None
+
+    # Get query parameters for filtering and sorting
+    page = request.args.get('page', 1, type=int)
+    limit = request.args.get('limit', 24, type=int)
+    sort_by = request.args.get('sort', 'featured')
+
+    # Calculate offset for pagination
+    offset = (page - 1) * limit
+
+    # Get filter parameters
+    categories = request.args.getlist('category')
+    brands = request.args.getlist('brand')
+    conditions = request.args.getlist('condition')
+    price_min = request.args.get('price_min', 0, type=float)
+    price_max = request.args.get('price_max', 10000, type=float)
+
     try:
         conn = get_db_connection()
         if conn and conn.is_connected():
             cursor = conn.cursor(dictionary=True)
-            # Fetching limited fields for the product list/grid view
-            cursor.execute("SELECT product_id, name, category, purchase_price, rental_price_12m, image_urls FROM products WHERE stock_quantity > 0 LIMIT 20")
+
+            # Build the base query
+            query = """SELECT product_id, name, category, purchase_price, rental_price_12m,
+                      condition_rating as condition, image_urls
+                      FROM products WHERE stock_quantity > 0"""
+
+            # Add filter conditions
+            params = []
+
+            # Category filter
+            if categories:
+                placeholders = ', '.join(['%s'] * len(categories))
+                query += f" AND category IN ({placeholders})"
+                params.extend(categories)
+
+            # Brand filter (assuming brand is part of specifications JSON)
+            if brands:
+                # This is a simplified approach - in a real implementation, you'd need to parse the JSON
+                # For now, we'll use a LIKE query which is not optimal but works for demonstration
+                brand_conditions = []
+                for brand in brands:
+                    brand_conditions.append("specifications LIKE %s")
+                    params.append(f'%"{brand}"%')
+
+                if brand_conditions:
+                    query += " AND (" + " OR ".join(brand_conditions) + ")"
+
+            # Condition filter
+            if conditions:
+                placeholders = ', '.join(['%s'] * len(conditions))
+                query += f" AND condition_rating IN ({placeholders})"
+                params.extend(conditions)
+
+            # Price range filter
+            query += " AND purchase_price BETWEEN %s AND %s"
+            params.extend([price_min, price_max])
+
+            # Add sorting
+            if sort_by == 'price-low':
+                query += " ORDER BY purchase_price ASC"
+            elif sort_by == 'price-high':
+                query += " ORDER BY purchase_price DESC"
+            elif sort_by == 'newest':
+                query += " ORDER BY created_at DESC"
+            else:  # Default to 'featured'
+                query += " ORDER BY is_featured DESC, product_id ASC"
+
+            # Get total count for pagination
+            count_query = query.replace("SELECT product_id, name, category, purchase_price, rental_price_12m, \
+                      condition_rating as condition, image_urls", "SELECT COUNT(*) as total")
+
+            cursor.execute(count_query, params)
+            result = cursor.fetchone()
+            total_products = result['total'] if result else 0
+
+            # Add pagination
+            query += " LIMIT %s OFFSET %s"
+            params.extend([limit, offset])
+
+            # Execute the final query
+            cursor.execute(query, params)
             products = cursor.fetchall()
-            # Basic handling for image_urls JSON string if needed for frontend
+
+            # Process image URLs
             for product in products:
                 if product.get('image_urls'):
                     try:
@@ -90,7 +176,14 @@ def get_products():
                 else:
                     product['primary_image'] = None
 
-            return jsonify(products)
+            # Return products with pagination info
+            return jsonify({
+                'products': products,
+                'total': total_products,
+                'page': page,
+                'limit': limit,
+                'pages': (total_products + limit - 1) // limit  # Ceiling division
+            })
         else:
             # Log error or return specific message if connection failed
             print("Database connection failed.")
@@ -115,18 +208,18 @@ def get_product(product_id):
             cursor = conn.cursor(dictionary=True)
             # Fetch all details for a specific product
             cursor.execute("""
-                SELECT product_id, name, description, category, specifications, 
-                condition_rating, purchase_price, rental_price_3m, rental_price_6m, 
+                SELECT product_id, name, description, category, specifications,
+                condition_rating, purchase_price, rental_price_3m, rental_price_6m,
                 rental_price_12m, stock_quantity, image_urls
-                FROM products 
+                FROM products
                 WHERE product_id = %s
             """, (product_id,))
-            
+
             product = cursor.fetchone()
-            
+
             if not product:
                 return jsonify({"status": "error", "message": "Product not found"}), 404
-                
+
             # Process JSON fields
             for field in ['specifications', 'image_urls']:
                 if product.get(field) and isinstance(product[field], str):
@@ -134,13 +227,13 @@ def get_product(product_id):
                         product[field] = json.loads(product[field])
                     except json.JSONDecodeError:
                         product[field] = None
-            
+
             # Set primary_image from image_urls if available
             if product.get('image_urls') and isinstance(product['image_urls'], list) and len(product['image_urls']) > 0:
                 product['primary_image'] = product['image_urls'][0]
             else:
                 product['primary_image'] = None
-                
+
             return jsonify(product)
         else:
             print("Database connection failed.")
@@ -172,9 +265,9 @@ def add_security_headers(response):
 # Placeholder product data for development - can be returned when DB is not available
 PLACEHOLDER_PRODUCTS = [
     {
-        "product_id": 1, 
-        "name": "Refurbished GPU Model X", 
-        "category": "GPUs", 
+        "product_id": 1,
+        "name": "Refurbished GPU Model X",
+        "category": "GPUs",
         "description": "A powerful refurbished GPU perfect for gaming and professional work.",
         "specifications": {
             "Memory": "8GB GDDR6",
@@ -185,25 +278,25 @@ PLACEHOLDER_PRODUCTS = [
             "Warranty": "1 Year Limited"
         },
         "condition_rating": "Excellent",
-        "purchase_price": 399.99, 
+        "purchase_price": 399.99,
         "rental_price_3m": 49.99,
         "rental_price_6m": 44.99,
         "rental_price_12m": 39.99,
         "primary_image": None
     },
     {
-        "product_id": 2, 
-        "name": "Refurbished CPU Model Y", 
-        "category": "CPUs", 
-        "purchase_price": 249.99, 
+        "product_id": 2,
+        "name": "Refurbished CPU Model Y",
+        "category": "CPUs",
+        "purchase_price": 249.99,
         "rental_price_12m": 24.99,
         "primary_image": None
     },
     {
-        "product_id": 3, 
-        "name": "Refurbished System Z", 
-        "category": "Systems", 
-        "purchase_price": 899.99, 
+        "product_id": 3,
+        "name": "Refurbished System Z",
+        "category": "Systems",
+        "purchase_price": 899.99,
         "rental_price_12m": 89.99,
         "primary_image": None
     }

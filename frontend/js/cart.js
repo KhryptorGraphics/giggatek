@@ -12,10 +12,10 @@ class ShoppingCart {
     init() {
         // Load cart from localStorage
         this.loadCart();
-        
+
         // Initialize event listeners
         this.initEventListeners();
-        
+
         // Update cart UI
         this.updateCartUI();
     }
@@ -38,9 +38,9 @@ class ShoppingCart {
 
     addItem(product) {
         // Check if product already exists in cart
-        const existingItem = this.cartItems.find(item => 
-            item.product_id === product.product_id && 
-            item.purchase_type === product.purchase_type && 
+        const existingItem = this.cartItems.find(item =>
+            item.product_id === product.product_id &&
+            item.purchase_type === product.purchase_type &&
             item.rental_term === product.rental_term
         );
 
@@ -58,19 +58,19 @@ class ShoppingCart {
 
         // Save cart to localStorage
         this.saveCart();
-        
+
         // Update UI
         this.updateCartUI();
-        
+
         // Show confirmation message
         this.showNotification('Item added to cart!');
     }
 
     updateItemQuantity(productId, purchaseType, rentalTerm, newQuantity) {
         // Find the item in the cart
-        const itemIndex = this.cartItems.findIndex(item => 
-            item.product_id === productId && 
-            item.purchase_type === purchaseType && 
+        const itemIndex = this.cartItems.findIndex(item =>
+            item.product_id === productId &&
+            item.purchase_type === purchaseType &&
             item.rental_term === rentalTerm
         );
 
@@ -89,15 +89,15 @@ class ShoppingCart {
 
     removeItem(productId, purchaseType, rentalTerm) {
         // Filter out the item to remove
-        this.cartItems = this.cartItems.filter(item => 
-            !(item.product_id === productId && 
-              item.purchase_type === purchaseType && 
+        this.cartItems = this.cartItems.filter(item =>
+            !(item.product_id === productId &&
+              item.purchase_type === purchaseType &&
               item.rental_term === rentalTerm)
         );
-        
+
         // Save cart to localStorage
         this.saveCart();
-        
+
         // Update UI
         this.updateCartUI();
     }
@@ -116,7 +116,7 @@ class ShoppingCart {
 
         this.cartItems.forEach(item => {
             totalItems += item.quantity;
-            
+
             if (item.purchase_type === 'purchase') {
                 const itemTotal = item.price * item.quantity;
                 subtotal += itemTotal;
@@ -131,10 +131,10 @@ class ShoppingCart {
         // Calculate tax (simplified for demo - in production would call backend API)
         const taxRate = 0.0825; // Example tax rate (8.25%)
         const taxAmount = subtotal * taxRate;
-        
+
         // Free shipping for orders over $500 (example business rule)
         const shippingCost = subtotal > 500 ? 0 : 9.99;
-        
+
         const grandTotal = subtotal + taxAmount + shippingCost;
 
         return {
@@ -151,7 +151,7 @@ class ShoppingCart {
     updateCartUI() {
         // Update cart icon in header
         this.updateCartIcon();
-        
+
         // If on cart page, update cart items display
         if (document.getElementById('cart-items-container')) {
             this.renderCartItems();
@@ -163,7 +163,7 @@ class ShoppingCart {
         if (cartCountElement) {
             const totalItems = this.cartItems.reduce((total, item) => total + item.quantity, 0);
             cartCountElement.textContent = totalItems;
-            
+
             // Show/hide the counter based on item count
             if (totalItems > 0) {
                 cartCountElement.classList.remove('hidden');
@@ -176,38 +176,38 @@ class ShoppingCart {
     renderCartItems() {
         const cartContainer = document.getElementById('cart-items-container');
         const emptyCartEl = document.getElementById('empty-cart');
-        
+
         if (!cartContainer) return;
-        
+
         // If cart is empty, show empty cart message
         if (this.cartItems.length === 0) {
             cartContainer.style.display = 'none';
             if (emptyCartEl) emptyCartEl.style.display = 'block';
             return;
         }
-        
+
         // Show cart items container, hide empty message
         cartContainer.style.display = 'block';
         if (emptyCartEl) emptyCartEl.style.display = 'none';
-        
+
         // Update cart header
         const totalItems = this.cartItems.reduce((total, item) => total + item.quantity, 0);
         const cartHeaderEl = cartContainer.querySelector('.cart-header h3');
         if (cartHeaderEl) {
             cartHeaderEl.textContent = `Cart Items (${totalItems})`;
         }
-        
+
         // Clear existing items (except the header)
         const cartHeader = cartContainer.querySelector('.cart-header');
         cartContainer.innerHTML = '';
         cartContainer.appendChild(cartHeader);
-        
+
         // Add each cart item to the container
         this.cartItems.forEach(item => {
             const itemElement = this.createCartItemElement(item);
             cartContainer.appendChild(itemElement);
         });
-        
+
         // Update order summary
         this.updateOrderSummary();
     }
@@ -215,15 +215,15 @@ class ShoppingCart {
     createCartItemElement(item) {
         const itemElement = document.createElement('div');
         itemElement.className = 'cart-item';
-        
-        const purchaseType = item.purchase_type === 'rental' 
-            ? `${item.rental_term}-month Rent-to-Own plan` 
+
+        const purchaseType = item.purchase_type === 'rental'
+            ? `${item.rental_term}-month Rent-to-Own plan`
             : 'Purchase (One-time payment)';
-        
-        const price = item.purchase_type === 'rental' 
-            ? `$${item.rental_price.toFixed(2)}/month` 
+
+        const price = item.purchase_type === 'rental'
+            ? `$${item.rental_price.toFixed(2)}/month`
             : `$${item.price.toFixed(2)}`;
-        
+
         itemElement.innerHTML = `
             <div class="cart-item-image">
                 <img src="${item.image_url || 'img/placeholder-product.png'}" alt="${item.name}">
@@ -237,41 +237,41 @@ class ShoppingCart {
             <div class="cart-item-actions">
                 ${item.purchase_type === 'rental' ? `
                     <button class="btn btn-sm btn-outline-primary mb-2" data-action="change-plan"
-                        data-product-id="${item.product_id}" 
+                        data-product-id="${item.product_id}"
                         data-purchase-type="${item.purchase_type}"
                         data-rental-term="${item.rental_term}">Change Plan</button>
                 ` : `
                     <div class="quantity-controls">
                         <button class="quantity-btn" data-action="decrease"
-                            data-product-id="${item.product_id}" 
+                            data-product-id="${item.product_id}"
                             data-purchase-type="${item.purchase_type}"
                             data-rental-term="${item.rental_term}">-</button>
                         <input type="number" class="quantity-input" value="${item.quantity}" min="1" max="10"
-                            data-product-id="${item.product_id}" 
+                            data-product-id="${item.product_id}"
                             data-purchase-type="${item.purchase_type}"
                             data-rental-term="${item.rental_term}">
                         <button class="quantity-btn" data-action="increase"
-                            data-product-id="${item.product_id}" 
+                            data-product-id="${item.product_id}"
                             data-purchase-type="${item.purchase_type}"
                             data-rental-term="${item.rental_term}">+</button>
                     </div>
                 `}
                 <button class="btn btn-sm btn-danger" data-action="remove"
-                    data-product-id="${item.product_id}" 
+                    data-product-id="${item.product_id}"
                     data-purchase-type="${item.purchase_type}"
                     data-rental-term="${item.rental_term}">Remove</button>
             </div>
         `;
-        
+
         return itemElement;
     }
 
     updateOrderSummary() {
         const summaryEl = document.querySelector('.cart-summary');
         if (!summaryEl) return;
-        
+
         const totals = this.calculateCartTotals();
-        
+
         // Update items count and subtotal
         const itemsRow = summaryEl.querySelector('.summary-row:nth-child(1)');
         if (itemsRow) {
@@ -280,7 +280,7 @@ class ShoppingCart {
                 <span>$${totals.subtotal.toFixed(2)}</span>
             `;
         }
-        
+
         // Update shipping cost
         const shippingRow = summaryEl.querySelector('.summary-row:nth-child(2)');
         if (shippingRow) {
@@ -289,7 +289,7 @@ class ShoppingCart {
                 <span>${totals.shippingCost === 0 ? 'Free' : '$' + totals.shippingCost.toFixed(2)}</span>
             `;
         }
-        
+
         // Update tax
         const taxRow = summaryEl.querySelector('.summary-row:nth-child(3)');
         if (taxRow) {
@@ -298,7 +298,7 @@ class ShoppingCart {
                 <span>$${totals.taxAmount.toFixed(2)}</span>
             `;
         }
-        
+
         // Update total
         const totalRow = summaryEl.querySelector('.summary-total');
         if (totalRow) {
@@ -307,12 +307,12 @@ class ShoppingCart {
                 <span>$${totals.grandTotal.toFixed(2)}</span>
             `;
         }
-        
+
         // Update payment details
         const summaryDetails = summaryEl.querySelector('.summary-details');
         if (summaryDetails) {
             summaryDetails.innerHTML = '';
-            
+
             if (totals.oneTimeTotal > 0) {
                 const oneTimeEl = document.createElement('div');
                 oneTimeEl.className = 'summary-detail';
@@ -322,7 +322,7 @@ class ShoppingCart {
                 `;
                 summaryDetails.appendChild(oneTimeEl);
             }
-            
+
             if (totals.monthlyTotal > 0) {
                 const monthlyEl = document.createElement('div');
                 monthlyEl.className = 'summary-detail';
@@ -341,14 +341,14 @@ class ShoppingCart {
             // Add to cart button
             if (event.target.matches('#add-to-cart-btn, .add-to-cart-btn')) {
                 event.preventDefault();
-                
+
                 // Get product details from data attributes or form inputs
                 const productId = parseInt(event.target.dataset.productId || document.getElementById('product-id')?.value);
                 const name = event.target.dataset.productName || document.getElementById('product-name')?.textContent;
                 const purchaseType = document.querySelector('input[name="purchase_type"]:checked')?.value || 'purchase';
-                
+
                 let price, rentalPrice, rentalTerm;
-                
+
                 if (purchaseType === 'purchase') {
                     price = parseFloat(event.target.dataset.price || document.getElementById('product-price')?.dataset.price);
                 } else {
@@ -356,14 +356,14 @@ class ShoppingCart {
                     rentalTerm = parseInt(document.querySelector('input[name="rental_term"]:checked')?.value || 12);
                     rentalPrice = parseFloat(document.getElementById(`rental-price-${rentalTerm}m`)?.dataset.price);
                 }
-                
-                const imageUrl = event.target.dataset.imageUrl || 
-                    document.querySelector('.product-main-image img')?.src || 
+
+                const imageUrl = event.target.dataset.imageUrl ||
+                    document.querySelector('.product-main-image img')?.src ||
                     'img/placeholder-product.png';
-                
-                const condition = event.target.dataset.condition || 
+
+                const condition = event.target.dataset.condition ||
                     document.querySelector('.product-condition')?.textContent || 'Excellent';
-                
+
                 // Map condition to CSS class
                 const conditionMap = {
                     'Excellent': 'success',
@@ -371,9 +371,9 @@ class ShoppingCart {
                     'Good': 'warning',
                     'Fair': 'danger'
                 };
-                
+
                 const conditionClass = conditionMap[condition] || 'success';
-                
+
                 // Create product object
                 const product = {
                     product_id: productId,
@@ -387,11 +387,11 @@ class ShoppingCart {
                     condition_class: conditionClass,
                     quantity: 1
                 };
-                
+
                 // Add to cart
                 this.addItem(product);
             }
-            
+
             // Cart page event handlers
             if (document.getElementById('cart-items-container')) {
                 // Quantity decrease button
@@ -402,11 +402,11 @@ class ShoppingCart {
                     const input = event.target.parentElement.querySelector('.quantity-input');
                     const currentQty = parseInt(input.value);
                     const newQty = Math.max(1, currentQty - 1);
-                    
+
                     input.value = newQty;
                     this.updateItemQuantity(productId, purchaseType, rentalTerm, newQty);
                 }
-                
+
                 // Quantity increase button
                 if (event.target.matches('.quantity-btn[data-action="increase"]')) {
                     const productId = parseInt(event.target.dataset.productId);
@@ -415,34 +415,34 @@ class ShoppingCart {
                     const input = event.target.parentElement.querySelector('.quantity-input');
                     const currentQty = parseInt(input.value);
                     const newQty = Math.min(10, currentQty + 1);
-                    
+
                     input.value = newQty;
                     this.updateItemQuantity(productId, purchaseType, rentalTerm, newQty);
                 }
-                
+
                 // Remove item button
                 if (event.target.matches('[data-action="remove"]')) {
                     const productId = parseInt(event.target.dataset.productId);
                     const purchaseType = event.target.dataset.purchaseType;
                     const rentalTerm = parseInt(event.target.dataset.rentalTerm || 0);
-                    
+
                     this.removeItem(productId, purchaseType, rentalTerm);
                 }
-                
+
                 // Change rental plan button
                 if (event.target.matches('[data-action="change-plan"]')) {
                     // Open modal with rental plan options
                     // This would typically open a modal with 3, 6, 12 month options
                     alert('This would open a modal to change the rental plan term');
                 }
-                
+
                 // Proceed to checkout button
                 if (event.target.matches('.cart-actions .btn-primary')) {
                     window.location.href = 'checkout.php';
                 }
             }
         });
-        
+
         // Quantity input change
         document.addEventListener('change', event => {
             if (event.target.matches('.quantity-input')) {
@@ -450,11 +450,11 @@ class ShoppingCart {
                 const purchaseType = event.target.dataset.purchaseType;
                 const rentalTerm = parseInt(event.target.dataset.rentalTerm || 0);
                 const newQty = parseInt(event.target.value);
-                
+
                 // Enforce min/max
                 if (newQty < 1) event.target.value = 1;
                 if (newQty > 10) event.target.value = 10;
-                
+
                 this.updateItemQuantity(productId, purchaseType, rentalTerm, parseInt(event.target.value));
             }
         });
@@ -469,14 +469,14 @@ class ShoppingCart {
             notification.className = 'notification';
             document.body.appendChild(notification);
         }
-        
+
         // Set message and type
         notification.textContent = message;
         notification.className = `notification notification-${type}`;
-        
+
         // Show notification
         notification.classList.add('show');
-        
+
         // Hide after 3 seconds
         setTimeout(() => {
             notification.classList.remove('show');
@@ -489,28 +489,104 @@ class ShoppingCart {
             product_id: item.product_id,
             quantity: item.quantity,
             is_rental: item.purchase_type === 'rental',
-            rental_term_months: item.rental_term
+            rental_term_months: item.rental_term,
+            unit_price: item.purchase_type === 'rental' ? item.rental_price : item.price,
+            name: item.name,
+            condition: item.condition
         }));
-        
+
         // Get totals
         const totals = this.calculateCartTotals();
-        
-        // Get shipping address (would come from form in real implementation)
-        const shippingAddress = JSON.parse(localStorage.getItem('giggatek_shipping_address')) || {};
-        
+
+        // Get shipping address from checkout form
+        const shippingAddress = this.getShippingAddress();
+
+        // Get billing address
+        const sameAsBilling = document.getElementById('same-as-shipping')?.checked;
+        const billingAddress = sameAsBilling ? shippingAddress : this.getBillingAddress();
+
+        // Get selected shipping method
+        const shippingMethod = document.querySelector('input[name="shipping_method"]:checked')?.value || 'standard';
+
+        // Get payment details
+        const paymentMethod = document.querySelector('input[name="payment_method"]:checked')?.value || 'credit_card';
+        const paymentDetails = this.getPaymentDetails(paymentMethod);
+
         // Create order object
         const orderData = {
             items: orderItems,
+            customer: {
+                email: document.getElementById('email')?.value,
+                phone: document.getElementById('phone')?.value
+            },
             shipping_address: shippingAddress,
-            payment_method: localStorage.getItem('giggatek_payment_method') || 'credit_card',
-            shipping_method: 'standard',
+            billing_address: billingAddress,
+            payment_method: paymentMethod,
+            payment_details: paymentDetails,
+            shipping_method: shippingMethod,
             shipping_cost: totals.shippingCost,
+            subtotal: totals.subtotal,
             tax_amount: totals.taxAmount,
-            notes: localStorage.getItem('giggatek_order_notes') || ''
+            grand_total: totals.grandTotal,
+            notes: document.getElementById('order-notes')?.value || '',
+            special_instructions: document.getElementById('special-instructions')?.value || '',
+            coupon_code: document.getElementById('coupon-code')?.value || '',
+            created_at: new Date().toISOString(),
+            monthly_total: totals.monthlyTotal,
+            one_time_total: totals.oneTimeTotal
         };
-        
+
+        // Save order to localStorage for demo purposes
+        localStorage.setItem('giggatek_last_order', JSON.stringify(orderData));
+
         // In a real implementation, this would be an API call
         return this.submitOrderToAPI(orderData);
+    }
+
+    getShippingAddress() {
+        return {
+            first_name: document.getElementById('shipping-first-name')?.value,
+            last_name: document.getElementById('shipping-last-name')?.value,
+            address_line1: document.getElementById('shipping-address')?.value,
+            address_line2: document.getElementById('shipping-apartment')?.value,
+            city: document.getElementById('shipping-city')?.value,
+            state: document.getElementById('shipping-state')?.value,
+            postal_code: document.getElementById('shipping-zip')?.value,
+            country: document.getElementById('shipping-country')?.value || 'US',
+            is_default: document.getElementById('save-shipping-address')?.checked
+        };
+    }
+
+    getBillingAddress() {
+        return {
+            first_name: document.getElementById('billing-first-name')?.value,
+            last_name: document.getElementById('billing-last-name')?.value,
+            address_line1: document.getElementById('billing-address')?.value,
+            address_line2: document.getElementById('billing-apartment')?.value,
+            city: document.getElementById('billing-city')?.value,
+            state: document.getElementById('billing-state')?.value,
+            postal_code: document.getElementById('billing-zip')?.value,
+            country: document.getElementById('billing-country')?.value || 'US',
+            is_default: document.getElementById('save-billing-address')?.checked
+        };
+    }
+
+    getPaymentDetails(paymentMethod) {
+        if (paymentMethod === 'credit_card') {
+            return {
+                card_number: document.getElementById('card-number')?.value,
+                name_on_card: document.getElementById('name-on-card')?.value,
+                expiry_date: document.getElementById('expiry-date')?.value,
+                cvv: document.getElementById('cvv')?.value,
+                save_card: document.getElementById('save-card')?.checked
+            };
+        } else if (paymentMethod === 'paypal') {
+            return {
+                paypal_email: document.getElementById('paypal-email')?.value
+            };
+        }
+
+        return {};
     }
 
     // Submit order to backend API
@@ -521,13 +597,13 @@ class ShoppingCart {
                 if (!window.auth) {
                     throw new Error('Authentication module is required for order submission');
                 }
-                
+
                 // Get auth token
                 const token = window.auth.getToken();
                 if (!token) {
                     throw new Error('Authentication required to place an order');
                 }
-                
+
                 // Make API call to backend
                 const response = await fetch('/api/orders', {
                     method: 'POST',
@@ -537,16 +613,16 @@ class ShoppingCart {
                     },
                     body: JSON.stringify(orderData)
                 });
-                
+
                 const data = await response.json();
-                
+
                 if (!response.ok) {
                     throw new Error(data.message || 'Failed to create order');
                 }
-                
+
                 // Clear cart on successful order
                 this.clearCart();
-                
+
                 resolve(data);
             } catch (error) {
                 console.error('Order submission error:', error);
@@ -560,12 +636,12 @@ class ShoppingCart {
 document.addEventListener('DOMContentLoaded', function() {
     // Create global cart instance
     window.cart = new ShoppingCart();
-    
+
     // Add cart count to header if it doesn't exist
     const navUl = document.querySelector('header nav ul');
     if (navUl) {
         const accountLi = navUl.querySelector('li:last-child');
-        
+
         // Check if cart count badge already exists
         if (!document.getElementById('cart-count')) {
             const cartLi = document.createElement('li');
@@ -577,7 +653,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </span>
                 </a>
             `;
-            
+
             navUl.insertBefore(cartLi, accountLi);
         }
     }

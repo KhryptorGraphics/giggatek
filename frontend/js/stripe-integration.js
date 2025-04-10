@@ -8,17 +8,17 @@ class StripePaymentHandler {
         // Initialize with Stripe publishable key
         // For production, use your live publishable key
         // This is a test publishable key for demonstration
-        this.stripe = Stripe('pk_test_YOUR_STRIPE_PUBLISHABLE_KEY');
+        this.stripe = Stripe('pk_test_51NxSAmCYKm6sBNXxDlVfGk7Nt6SeUSGwgGBZKaAjZJlpKEDjQOjpRQxtRJCfGWYpHJLUwPsVMOkqzGvDUFVA9jZM00QLxyz9Oe');
         this.elements = null;
         this.paymentElement = null;
         this.cardElement = null;
         this.paymentIntentId = null;
         this.clientSecret = null;
-        
+
         // Reference to the checkout instance
         this.checkout = window.checkout;
     }
-    
+
     /**
      * Initialize Stripe Elements
      */
@@ -26,7 +26,7 @@ class StripePaymentHandler {
         try {
             // Create elements instance
             this.elements = this.stripe.elements();
-            
+
             // Create and mount the card element
             this.cardElement = this.elements.create('card', {
                 style: {
@@ -45,12 +45,12 @@ class StripePaymentHandler {
                     }
                 }
             });
-            
+
             // Mount the card element
             const cardElementMount = document.getElementById('card-element');
             if (cardElementMount) {
                 this.cardElement.mount('#card-element');
-                
+
                 // Listen for errors
                 this.cardElement.on('change', event => {
                     const displayError = document.getElementById('card-errors');
@@ -64,7 +64,7 @@ class StripePaymentHandler {
             this.showError('Unable to initialize payment system. Please try again later.');
         }
     }
-    
+
     /**
      * Create a payment intent with the backend
      * @param {number} amount - The payment amount
@@ -78,7 +78,7 @@ class StripePaymentHandler {
             if (!window.auth || !window.auth.getToken()) {
                 throw new Error('Authentication required for payment processing');
             }
-            
+
             const response = await fetch('/api/payment/stripe_handler.php', {
                 method: 'POST',
                 headers: {
@@ -92,23 +92,23 @@ class StripePaymentHandler {
                     metadata: metadata
                 })
             });
-            
+
             const result = await response.json();
-            
+
             if (!result.success) {
                 throw new Error(result.error || 'Unknown error occurred');
             }
-            
+
             this.clientSecret = result.client_secret;
             this.paymentIntentId = result.payment_intent_id;
-            
+
             return result;
         } catch (error) {
             console.error('Error creating payment intent:', error);
             throw error;
         }
     }
-    
+
     /**
      * Process the payment with the provided payment method
      * @param {Object} billingDetails - Customer billing details
@@ -119,18 +119,18 @@ class StripePaymentHandler {
             if (!this.cardElement) {
                 throw new Error('Payment form not initialized');
             }
-            
+
             // Use the card element to create a payment method
             const result = await this.stripe.createPaymentMethod({
                 type: 'card',
                 card: this.cardElement,
                 billing_details: billingDetails
             });
-            
+
             if (result.error) {
                 throw result.error;
             }
-            
+
             // Confirm the payment intent with the payment method
             const confirmResult = await fetch('/api/payment/stripe_handler.php', {
                 method: 'POST',
@@ -144,13 +144,13 @@ class StripePaymentHandler {
                     payment_method_id: result.paymentMethod.id
                 })
             });
-            
+
             const confirmResponse = await confirmResult.json();
-            
+
             if (!confirmResponse.success) {
                 throw new Error(confirmResponse.error || 'Payment confirmation failed');
             }
-            
+
             return {
                 success: true,
                 status: confirmResponse.status,
@@ -164,7 +164,7 @@ class StripePaymentHandler {
             };
         }
     }
-    
+
     /**
      * Show an error message to the user
      * @param {string} message - The error message

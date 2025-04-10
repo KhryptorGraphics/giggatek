@@ -1,0 +1,262 @@
+/**
+ * GigGatek PWA Styles
+ * Styles for Progressive Web App features
+ */
+
+/* Offline indicator */
+.offline-indicator {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background-color: var(--warning);
+    color: var(--white);
+    padding: 10px 15px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+.offline-indicator .icon {
+    margin-right: 8px;
+}
+
+body.offline .offline-indicator {
+    display: flex;
+}
+
+/* Install button */
+.install-pwa-btn {
+    display: none;
+    align-items: center;
+    background-color: var(--primary);
+    color: var(--white);
+    border: none;
+    border-radius: var(--border-radius);
+    padding: 8px 15px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-left: auto;
+    transition: background-color var(--transition-fast);
+}
+
+.install-pwa-btn:hover {
+    background-color: var(--primary-dark);
+}
+
+.install-pwa-btn .icon {
+    margin-right: 8px;
+}
+
+/* Update notification */
+.update-notification {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: var(--primary);
+    color: var(--white);
+    padding: 15px;
+    z-index: 1000;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+}
+
+.update-notification.show {
+    transform: translateY(0);
+}
+
+.update-notification-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+.update-notification p {
+    margin: 0;
+}
+
+.update-notification-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.update-notification .btn {
+    padding: 5px 15px;
+    font-size: 0.9rem;
+    border-radius: var(--border-radius-sm);
+}
+
+.update-notification .btn-outline {
+    background-color: transparent;
+    border: 1px solid var(--white);
+    color: var(--white);
+}
+
+/* Offline mode styles */
+body.offline {
+    /* Add a subtle indicator that we're in offline mode */
+    background-color: #f8f9fa;
+}
+
+body.offline .requires-online {
+    opacity: 0.5;
+    pointer-events: none;
+    position: relative;
+}
+
+body.offline .requires-online::after {
+    content: 'Offline Mode';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--warning);
+    color: var(--white);
+    padding: 5px 10px;
+    border-radius: var(--border-radius-sm);
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+/* Add to home screen prompt */
+.add-to-home {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-lg);
+    padding: 15px;
+    z-index: 1000;
+    width: 90%;
+    max-width: 400px;
+    display: none;
+}
+
+.add-to-home.show {
+    display: block;
+    animation: slideUp 0.3s ease forwards;
+}
+
+.add-to-home-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.add-to-home-icon {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+.add-to-home-title {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin: 0;
+}
+
+.add-to-home-content {
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+    color: var(--secondary);
+}
+
+.add-to-home-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.add-to-home-close {
+    background: none;
+    border: none;
+    color: var(--secondary);
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.add-to-home-install {
+    background-color: var(--primary);
+    color: var(--white);
+    border: none;
+    border-radius: var(--border-radius-sm);
+    padding: 8px 15px;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+/* iOS specific styles */
+.ios-install-instructions {
+    display: none;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #dee2e6;
+}
+
+.ios-install-instructions.show {
+    display: block;
+}
+
+.ios-install-step {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.ios-install-step-number {
+    width: 24px;
+    height: 24px;
+    background-color: var(--primary);
+    color: var(--white);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    margin-right: 10px;
+}
+
+.ios-install-step-text {
+    font-size: 0.9rem;
+}
+
+/* Animation */
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translate(-50%, 20px);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+    .update-notification-content {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .update-notification p {
+        margin-bottom: 10px;
+    }
+    
+    .install-pwa-btn {
+        font-size: 0.8rem;
+        padding: 6px 10px;
+    }
+    
+    .install-pwa-btn .icon {
+        margin-right: 5px;
+    }
+}

@@ -1,0 +1,523 @@
+{
+  "common": {
+    "home": "Home",
+    "products": "Products",
+    "rentToOwn": "Rent-to-Own",
+    "support": "Support",
+    "account": "Account",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "search": "Search",
+    "cart": "Cart",
+    "wishlist": "Wishlist",
+    "dashboard": "Dashboard",
+    "orders": "Orders",
+    "rentals": "Rentals",
+    "settings": "Settings",
+    "profile": "Profile",
+    "addresses": "Addresses",
+    "paymentMethods": "Payment Methods",
+    "checkout": "Checkout",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "remove": "Remove",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "continue": "Continue",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "info": "Information",
+    "required": "Required",
+    "optional": "Optional",
+    "yes": "Yes",
+    "no": "No",
+    "or": "or",
+    "and": "and",
+    "all": "All",
+    "none": "None",
+    "more": "More",
+    "less": "Less",
+    "show": "Show",
+    "hide": "Hide",
+    "filter": "Filter",
+    "sort": "Sort",
+    "apply": "Apply",
+    "reset": "Reset",
+    "clear": "Clear",
+    "close": "Close",
+    "open": "Open",
+    "view": "View",
+    "details": "Details",
+    "description": "Description",
+    "specifications": "Specifications",
+    "features": "Features",
+    "price": "Price",
+    "total": "Total",
+    "subtotal": "Subtotal",
+    "tax": "Tax",
+    "shipping": "Shipping",
+    "discount": "Discount",
+    "quantity": "Quantity",
+    "condition": "Condition",
+    "excellent": "Excellent",
+    "good": "Good",
+    "fair": "Fair",
+    "poor": "Poor",
+    "inStock": "In Stock",
+    "outOfStock": "Out of Stock",
+    "lowStock": "Low Stock",
+    "addToCart": "Add to Cart",
+    "addToWishlist": "Add to Wishlist",
+    "removeFromWishlist": "Remove from Wishlist",
+    "viewCart": "View Cart",
+    "emptyCart": "Your cart is empty",
+    "emptyWishlist": "Your wishlist is empty",
+    "emptyOrders": "You have no orders",
+    "emptyRentals": "You have no rentals",
+    "emptyAddresses": "You have no saved addresses",
+    "emptyPaymentMethods": "You have no saved payment methods",
+    "offline": "You are currently offline. Some features may be unavailable.",
+    "update": "Update",
+    "install": "Install App",
+    "language": "Language"
+  },
+  "home": {
+    "hero": {
+      "title": "Premium Tech, Flexible Options",
+      "subtitle": "Discover high-quality refurbished computer hardware with purchase and rent-to-own options tailored to your budget and needs.",
+      "shopNow": "Shop Now",
+      "learnMore": "Learn About Rent-to-Own"
+    },
+    "categories": {
+      "title": "Browse by Category",
+      "subtitle": "Find exactly what you need from our extensive selection of refurbished hardware.",
+      "gpus": "Graphics Cards",
+      "cpus": "Processors",
+      "motherboards": "Motherboards",
+      "memory": "Memory (RAM)",
+      "storage": "Storage",
+      "systems": "Complete Systems"
+    },
+    "featured": {
+      "title": "Featured Products",
+      "subtitle": "Top-quality refurbished hardware handpicked by our team.",
+      "viewAll": "View All Products"
+    },
+    "rentToOwn": {
+      "title": "Flexible Rent-to-Own Options",
+      "subtitle": "Get the hardware you need today with affordable monthly payments. After your final payment, the hardware is yours to keep!",
+      "features": {
+        "noCredit": "No credit check required",
+        "flexibleTerms": "Flexible terms: 3, 6, or 12 months",
+        "upgradeAnytime": "Option to upgrade anytime",
+        "qualityHardware": "Quality refurbished hardware"
+      },
+      "learnMore": "Learn More"
+    },
+    "whyChoose": {
+      "title": "Why Choose GigGatek?",
+      "subtitle": "Our commitment to quality, value, and customer satisfaction sets us apart.",
+      "qualityTested": {
+        "title": "Thoroughly Tested",
+        "description": "Every product undergoes comprehensive testing and certification by our expert technicians before being offered for sale or rental."
+      },
+      "warrantyIncluded": {
+        "title": "Solid Warranty",
+        "description": "All products include a warranty covering the entire rental period or 90 days for purchases, giving you peace of mind with your investment."
+      },
+      "bestValue": {
+        "title": "Exceptional Value",
+        "description": "Get high-performance hardware at 30-70% off the original retail price without compromising on quality or reliability."
+      },
+      "ecoFriendly": {
+        "title": "Environmentally Responsible",
+        "description": "Our professional refurbishing process extends the lifecycle of hardware, reducing electronic waste and your carbon footprint."
+      }
+    },
+    "testimonials": {
+      "title": "What Our Customers Say",
+      "subtitle": "Don't just take our word for it. See what our customers think about GigGatek."
+    },
+    "newsletter": {
+      "title": "Stay Updated",
+      "subtitle": "Subscribe to our newsletter for the latest product updates, special offers, and tech news.",
+      "placeholder": "Your email address",
+      "subscribe": "Subscribe"
+    }
+  },
+  "products": {
+    "title": "Products",
+    "subtitle": "Browse our selection of quality refurbished computer hardware.",
+    "filter": {
+      "title": "Filter",
+      "category": "Category",
+      "price": "Price",
+      "condition": "Condition",
+      "brand": "Brand",
+      "availability": "Availability",
+      "apply": "Apply Filters",
+      "reset": "Reset Filters"
+    },
+    "sort": {
+      "title": "Sort By",
+      "featured": "Featured",
+      "priceLowToHigh": "Price: Low to High",
+      "priceHighToLow": "Price: High to Low",
+      "newest": "Newest",
+      "bestSelling": "Best Selling",
+      "topRated": "Top Rated"
+    },
+    "search": {
+      "placeholder": "Search products...",
+      "noResults": "No products found for '{{query}}'",
+      "results": "{{count}} products found for '{{query}}'"
+    },
+    "pagination": {
+      "showing": "Showing {{start}}-{{end}} of {{total}} products",
+      "next": "Next",
+      "previous": "Previous"
+    },
+    "rentPrice": "From {{price}}/mo with Rent-to-Own",
+    "viewDetails": "View Details"
+  },
+  "product": {
+    "addToCart": "Add to Cart",
+    "addToWishlist": "Add to Wishlist",
+    "removeFromWishlist": "Remove from Wishlist",
+    "inStock": "In Stock",
+    "outOfStock": "Out of Stock",
+    "lowStock": "Only {{count}} left in stock",
+    "condition": "Condition",
+    "warranty": "Warranty",
+    "shipping": "Shipping",
+    "returns": "Returns",
+    "description": "Description",
+    "specifications": "Specifications",
+    "features": "Features",
+    "relatedProducts": "You May Also Like",
+    "conditionDescriptions": {
+      "excellent": "Like new with minimal to no signs of use. Fully tested and guaranteed to perform like new.",
+      "good": "Minor cosmetic imperfections that don't affect performance. Thoroughly tested and in excellent working condition.",
+      "fair": "Visible signs of use but fully functional. May have scratches or other cosmetic issues.",
+      "refurbished": "Professionally restored to working order by our certified technicians. May have cosmetic imperfections."
+    },
+    "rentToOwn": {
+      "title": "Flexible Rent-to-Own Options",
+      "subtitle": "Get the tech you need today with affordable monthly payments",
+      "term3": "3 Months (Best Value)",
+      "term6": "6 Months (Most Popular)",
+      "term12": "12 Months (Lowest Monthly Payment)",
+      "monthlyPayment": "Monthly Payment",
+      "totalCost": "Total Cost",
+      "learnMore": "How Rent-to-Own Works",
+      "selectPlan": "Choose This Plan",
+      "benefits": {
+        "title": "Benefits of Rent-to-Own",
+        "noCredit": "No credit check required",
+        "noDeposit": "No large upfront deposit",
+        "ownership": "Own the hardware after your final payment",
+        "upgrade": "Option to upgrade anytime",
+        "cancel": "Cancel anytime with no long-term commitment"
+      }
+    }
+  },
+  "cart": {
+    "title": "Shopping Cart",
+    "empty": "Your cart is empty",
+    "continueShopping": "Continue Shopping",
+    "proceedToCheckout": "Proceed to Checkout",
+    "summary": {
+      "title": "Order Summary",
+      "subtotal": "Subtotal",
+      "shipping": "Shipping",
+      "tax": "Tax",
+      "total": "Total"
+    },
+    "item": {
+      "quantity": "Quantity",
+      "price": "Price",
+      "total": "Total",
+      "remove": "Remove"
+    },
+    "update": "Update Cart",
+    "clear": "Clear Cart",
+    "coupon": {
+      "title": "Coupon Code",
+      "placeholder": "Enter coupon code",
+      "apply": "Apply",
+      "invalid": "Invalid coupon code",
+      "success": "Coupon applied successfully",
+      "remove": "Remove"
+    }
+  },
+  "checkout": {
+    "title": "Secure Checkout",
+    "steps": {
+      "information": "Your Information",
+      "shipping": "Shipping",
+      "payment": "Payment",
+      "review": "Review & Place Order"
+    },
+    "contact": {
+      "title": "Contact Information",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "emailHint": "We'll send your receipt and order updates to this email",
+      "phoneHint": "For delivery questions and order updates"
+    },
+    "shipping": {
+      "title": "Shipping Address",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "address": "Street Address",
+      "apartment": "Apartment, suite, etc. (optional)",
+      "city": "City",
+      "state": "State",
+      "zipCode": "ZIP Code",
+      "country": "Country",
+      "saveAddress": "Save this address for future orders",
+      "shippingMethods": {
+        "title": "Shipping Method",
+        "standard": "Standard Shipping (3-5 business days)",
+        "expedited": "Expedited Shipping (2-3 business days)",
+        "overnight": "Overnight Shipping (1 business day)",
+        "free": "Free shipping on orders over $100"
+      }
+    },
+    "billing": {
+      "title": "Billing Address",
+      "sameAsShipping": "Same as shipping address"
+    },
+    "payment": {
+      "title": "Payment Method",
+      "creditCard": "Credit/Debit Card",
+      "paypal": "PayPal",
+      "applePay": "Apple Pay",
+      "googlePay": "Google Pay",
+      "cardNumber": "Card Number",
+      "nameOnCard": "Name on Card",
+      "expiryDate": "Expiration Date (MM/YY)",
+      "cvv": "Security Code (CVV)",
+      "cvvHint": "3-digit code on back of card",
+      "saveCard": "Securely save this card for faster checkout next time",
+      "securePayment": "All payments are secure and encrypted"
+    },
+    "review": {
+      "title": "Review Your Order",
+      "shippingAddress": "Shipping Address",
+      "billingAddress": "Billing Address",
+      "paymentMethod": "Payment Method",
+      "orderSummary": "Order Summary",
+      "editButton": "Edit",
+      "termsAgree": "I agree to the Terms of Service and Privacy Policy"
+    },
+    "placeOrder": "Place Order Securely",
+    "orderSuccess": {
+      "title": "Thank You for Your Order!",
+      "subtitle": "Your order has been placed successfully. We'll send you a confirmation email shortly with all the details.",
+      "orderNumber": "Order Number",
+      "viewOrder": "View Order Details",
+      "continueShopping": "Continue Shopping",
+      "trackShipment": "Track Shipment",
+      "estimatedDelivery": "Estimated delivery"
+    }
+  },
+  "dashboard": {
+    "title": "My Account",
+    "welcome": "Welcome, {{name}}!",
+    "overview": {
+      "title": "Overview",
+      "recentOrders": "Recent Orders",
+      "upcomingPayments": "Upcoming Payments",
+      "accountStats": "Account Statistics"
+    },
+    "orders": {
+      "title": "Orders",
+      "orderNumber": "Order #{{number}}",
+      "date": "Date",
+      "status": "Status",
+      "total": "Total",
+      "items": "{{count}} items",
+      "viewDetails": "View Details",
+      "statuses": {
+        "processing": "Processing",
+        "shipped": "Shipped",
+        "delivered": "Delivered",
+        "cancelled": "Cancelled"
+      }
+    },
+    "rentals": {
+      "title": "Rentals",
+      "product": "Product",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "monthlyPayment": "Monthly Payment",
+      "nextPayment": "Next Payment",
+      "remainingPayments": "Remaining Payments",
+      "progress": "Progress",
+      "makePayment": "Make Payment",
+      "viewDetails": "View Details"
+    },
+    "wishlist": {
+      "title": "Wishlist",
+      "empty": "Your wishlist is empty",
+      "addToCart": "Add to Cart",
+      "remove": "Remove",
+      "clearAll": "Clear All"
+    },
+    "profile": {
+      "title": "Profile",
+      "personalInfo": "Personal Information",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "phone": "Phone",
+      "changePassword": "Change Password",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm Password",
+      "save": "Save Changes"
+    },
+    "addresses": {
+      "title": "Addresses",
+      "defaultShipping": "Default Shipping Address",
+      "defaultBilling": "Default Billing Address",
+      "addNew": "Add New Address",
+      "edit": "Edit",
+      "delete": "Delete",
+      "setAsDefault": "Set as Default"
+    },
+    "paymentMethods": {
+      "title": "Payment Methods",
+      "defaultMethod": "Default Payment Method",
+      "addNew": "Add New Payment Method",
+      "edit": "Edit",
+      "delete": "Delete",
+      "setAsDefault": "Set as Default"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Login",
+      "email": "Email",
+      "password": "Password",
+      "rememberMe": "Remember Me",
+      "forgotPassword": "Forgot Password?",
+      "submit": "Login",
+      "noAccount": "Don't have an account?",
+      "register": "Register",
+      "errors": {
+        "invalidCredentials": "Invalid email or password",
+        "required": "This field is required"
+      }
+    },
+    "register": {
+      "title": "Register",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "submit": "Register",
+      "hasAccount": "Already have an account?",
+      "login": "Login",
+      "errors": {
+        "emailExists": "Email already exists",
+        "passwordMismatch": "Passwords do not match",
+        "required": "This field is required",
+        "invalidEmail": "Invalid email address",
+        "passwordTooShort": "Password must be at least 8 characters"
+      }
+    },
+    "forgotPassword": {
+      "title": "Forgot Password",
+      "email": "Email",
+      "submit": "Reset Password",
+      "backToLogin": "Back to Login",
+      "success": "Password reset email sent",
+      "errors": {
+        "emailNotFound": "Email not found",
+        "required": "This field is required",
+        "invalidEmail": "Invalid email address"
+      }
+    },
+    "resetPassword": {
+      "title": "Reset Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm Password",
+      "submit": "Reset Password",
+      "success": "Password reset successfully",
+      "errors": {
+        "passwordMismatch": "Passwords do not match",
+        "required": "This field is required",
+        "passwordTooShort": "Password must be at least 8 characters",
+        "invalidToken": "Invalid or expired token"
+      }
+    }
+  },
+  "notifications": {
+    "addedToCart": "{{product}} added to cart",
+    "removedFromCart": "{{product}} removed from cart",
+    "cartUpdated": "Cart updated",
+    "addedToWishlist": "{{product}} added to wishlist",
+    "removedFromWishlist": "{{product}} removed from wishlist",
+    "orderPlaced": "Order placed successfully",
+    "paymentSuccess": "Payment processed successfully",
+    "paymentError": "Payment failed: {{message}}",
+    "loginSuccess": "Logged in successfully",
+    "logoutSuccess": "Logged out successfully",
+    "registerSuccess": "Registered successfully",
+    "profileUpdated": "Profile updated successfully",
+    "addressAdded": "Address added successfully",
+    "addressUpdated": "Address updated successfully",
+    "addressDeleted": "Address deleted successfully",
+    "paymentMethodAdded": "Payment method added successfully",
+    "paymentMethodUpdated": "Payment method updated successfully",
+    "paymentMethodDeleted": "Payment method deleted successfully",
+    "passwordChanged": "Password changed successfully",
+    "passwordResetSent": "Password reset email sent",
+    "passwordReset": "Password reset successfully",
+    "offline": "You are offline. Some features may be unavailable.",
+    "online": "You are back online!",
+    "updateAvailable": "A new version is available!",
+    "updateNow": "Update Now",
+    "updateLater": "Later",
+    "error": "An error occurred: {{message}}"
+  },
+  "footer": {
+    "copyright": "© {{year}} GigGatek. All rights reserved.",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "contactUs": "Contact Us"
+  },
+  "errors": {
+    "pageNotFound": {
+      "title": "Page Not Found",
+      "message": "The page you are looking for does not exist.",
+      "backToHome": "Back to Home"
+    },
+    "serverError": {
+      "title": "Server Error",
+      "message": "An error occurred on the server. Please try again later.",
+      "backToHome": "Back to Home"
+    },
+    "offline": {
+      "title": "You're Offline",
+      "message": "It looks like you've lost your internet connection. Some features may be unavailable until you're back online.",
+      "tryAgain": "Try Again"
+    }
+  },
+  "languageModal": {
+    "title": "Select Your Language",
+    "subtitle": "Please select your preferred language:",
+    "continue": "Continue"
+  }
+}

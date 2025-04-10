@@ -13,32 +13,32 @@
         .auth-container {
             max-width: 500px;
         }
-        
+
         .password-requirements {
             font-size: 0.85rem;
             color: var(--medium);
             margin-top: 0.5rem;
         }
-        
+
         .password-requirement {
             margin-bottom: 0.25rem;
             display: flex;
             align-items: center;
         }
-        
+
         .password-requirement.met i {
             color: var(--success);
         }
-        
+
         .password-requirement.not-met i {
             color: var(--medium);
         }
-        
+
         .password-requirement i {
             margin-right: 0.5rem;
             font-size: 0.9rem;
         }
-        
+
         .auth-separator {
             display: flex;
             align-items: center;
@@ -46,31 +46,31 @@
             margin: 1.5rem 0;
             color: var(--medium);
         }
-        
+
         .auth-separator::before,
         .auth-separator::after {
             content: '';
             flex: 1;
             border-bottom: 1px solid #dee2e6;
         }
-        
+
         .auth-separator span {
             padding: 0 1rem;
         }
-        
+
         .social-login {
             display: flex;
             flex-direction: column;
             gap: 1rem;
         }
-        
+
         .social-btn {
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 0.75rem;
         }
-        
+
         .social-btn img {
             width: 24px;
             height: 24px;
@@ -97,30 +97,30 @@
     <main class="container">
         <div class="auth-container">
             <h2>Create Account</h2>
-            
+
             <form class="auth-form" id="register-form" action="dashboard.php" method="post">
                 <div class="form-row">
                     <div class="form-group">
                         <label for="first-name">First Name</label>
                         <input type="text" id="first-name" name="first_name" class="form-control" required>
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="last-name">Last Name</label>
                         <input type="text" id="last-name" name="last_name" class="form-control" required>
                     </div>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="email">Email Address</label>
                     <input type="email" id="email" name="email" class="form-control" required>
                     <div id="email-error" class="form-error"></div>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="password">Password</label>
                     <input type="password" id="password" name="password" class="form-control" required>
-                    
+
                     <div class="password-requirements">
                         <div class="password-requirement" id="req-length">
                             <i>○</i> At least 8 characters
@@ -136,13 +136,13 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="confirm-password">Confirm Password</label>
                     <input type="password" id="confirm-password" name="confirm_password" class="form-control" required>
                     <div id="password-match-error" class="form-error"></div>
                 </div>
-                
+
                 <div class="form-group form-check">
                     <label class="form-check-label">
                         <input type="checkbox" class="form-check-input" name="terms" id="terms" required>
@@ -150,33 +150,33 @@
                     </label>
                     <div id="terms-error" class="form-error"></div>
                 </div>
-                
+
                 <div class="form-group form-check">
                     <label class="form-check-label">
                         <input type="checkbox" class="form-check-input" name="newsletter" id="newsletter">
                         Subscribe to our newsletter to receive updates and special offers
                     </label>
                 </div>
-                
+
                 <div class="auth-actions">
                     <button type="submit" class="btn btn-primary">Create Account</button>
                 </div>
-                
+
                 <div class="auth-links">
                     Already have an account? <a href="login.php">Sign In</a>
                 </div>
             </form>
-            
+
             <div class="auth-separator">
                 <span>or</span>
             </div>
-            
+
             <div class="social-login">
                 <button class="btn btn-outline-secondary social-btn">
                     <img src="img/icons/google.svg" alt="Google">
                     <span>Sign up with Google</span>
                 </button>
-                
+
                 <button class="btn btn-outline-secondary social-btn">
                     <img src="img/icons/facebook.svg" alt="Facebook">
                     <span>Sign up with Facebook</span>
@@ -196,9 +196,10 @@
         </div>
     </footer>
 
-    <!-- Include the auth.js file for authentication -->
+    <!-- Include configuration and authentication modules -->
+    <script src="js/config.js"></script>
     <script src="js/auth.js"></script>
-    
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('register-form');
@@ -212,24 +213,24 @@
             const firstNameInput = document.getElementById('first-name');
             const lastNameInput = document.getElementById('last-name');
             const newsletterInput = document.getElementById('newsletter');
-            
+
             // Check if we already have a valid auth token
             if (window.auth && window.auth.isAuthenticated()) {
                 // Already logged in, redirect to dashboard
                 window.location.href = 'dashboard.php';
                 return;
             }
-            
+
             // Password requirements
             const reqLength = document.getElementById('req-length');
             const reqUppercase = document.getElementById('req-uppercase');
             const reqLowercase = document.getElementById('req-lowercase');
             const reqNumber = document.getElementById('req-number');
-            
+
             // Validate password strength on input
             password.addEventListener('input', function() {
                 const value = password.value;
-                
+
                 // Check length
                 if (value.length >= 8) {
                     reqLength.classList.add('met');
@@ -240,7 +241,7 @@
                     reqLength.classList.add('not-met');
                     reqLength.querySelector('i').textContent = '○';
                 }
-                
+
                 // Check uppercase
                 if (/[A-Z]/.test(value)) {
                     reqUppercase.classList.add('met');
@@ -251,7 +252,7 @@
                     reqUppercase.classList.add('not-met');
                     reqUppercase.querySelector('i').textContent = '○';
                 }
-                
+
                 // Check lowercase
                 if (/[a-z]/.test(value)) {
                     reqLowercase.classList.add('met');
@@ -262,7 +263,7 @@
                     reqLowercase.classList.add('not-met');
                     reqLowercase.querySelector('i').textContent = '○';
                 }
-                
+
                 // Check number
                 if (/\d/.test(value)) {
                     reqNumber.classList.add('met');
@@ -274,7 +275,7 @@
                     reqNumber.querySelector('i').textContent = '○';
                 }
             });
-            
+
             // Check if passwords match
             confirmPassword.addEventListener('input', function() {
                 if (password.value !== confirmPassword.value) {
@@ -286,7 +287,7 @@
                     confirmPassword.classList.add('is-valid');
                 }
             });
-            
+
             // Validate email format
             email.addEventListener('blur', function() {
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -299,13 +300,13 @@
                     email.classList.add('is-valid');
                 }
             });
-            
+
             // Form submission
             form.addEventListener('submit', async function(e) {
                 e.preventDefault();
-                
+
                 let isValid = true;
-                
+
                 // Check terms agreement
                 if (!terms.checked) {
                     termsError.textContent = 'You must agree to the Terms of Service and Privacy Policy';
@@ -313,20 +314,20 @@
                 } else {
                     termsError.textContent = '';
                 }
-                
+
                 // Check passwords match
                 if (password.value !== confirmPassword.value) {
                     passwordMatchError.textContent = 'Passwords do not match';
                     isValid = false;
                 }
-                
+
                 // Check email format
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 if (!emailRegex.test(email.value)) {
                     emailError.textContent = 'Please enter a valid email address';
                     isValid = false;
                 }
-                
+
                 // Check password requirements
                 if (
                     password.value.length < 8 ||
@@ -336,20 +337,20 @@
                 ) {
                     isValid = false;
                 }
-                
+
                 if (isValid) {
                     // Disable form during submission
                     const submitButton = form.querySelector('button[type="submit"]');
                     submitButton.disabled = true;
                     submitButton.innerHTML = 'Creating Account...';
-                    
+
                     // Clear any previous errors
                     const generalError = document.getElementById('general-error');
                     if (generalError) {
                         generalError.textContent = '';
                         generalError.style.display = 'none';
                     }
-                    
+
                     try {
                         // Prepare user data
                         const userData = {
@@ -359,10 +360,10 @@
                             last_name: lastNameInput.value,
                             newsletter: newsletterInput.checked
                         };
-                        
+
                         // Register user
                         const result = await window.auth.register(userData);
-                        
+
                         if (result.success) {
                             // Registration successful
                             window.location.href = 'dashboard.php';
@@ -379,11 +380,11 @@
                     }
                 }
             });
-            
+
             // Helper to display errors
             function displayError(message) {
                 let errorElement = document.getElementById('general-error');
-                
+
                 // Create error element if it doesn't exist
                 if (!errorElement) {
                     errorElement = document.createElement('div');
@@ -391,7 +392,7 @@
                     errorElement.className = 'form-error alert alert-danger';
                     form.prepend(errorElement);
                 }
-                
+
                 errorElement.textContent = message;
                 errorElement.style.display = 'block';
             }

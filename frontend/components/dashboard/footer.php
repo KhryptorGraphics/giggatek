@@ -9,10 +9,15 @@
         </div>
     </footer>
 
-    <!-- Include authentication, order, and rental modules -->
+    <!-- Include configuration and authentication modules -->
+    <script src="js/config.js"></script>
     <script src="js/auth.js"></script>
+    <script src="js/dashboard-settings.js"></script>
+    <script src="js/dashboard-orders.js"></script>
+    <script src="js/dashboard-rentals.js"></script>
     <script src="js/orders.js"></script>
     <script src="js/rentals.js"></script>
+    <script src="js/wishlist.js"></script>
     <script src="js/dashboard.js"></script>
 </body>
 </html>

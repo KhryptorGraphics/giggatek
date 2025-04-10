@@ -1,0 +1,162 @@
+/**
+ * GigGatek Notification System Styles
+ * Styles for the unified notification system
+ */
+
+/* Notification Container */
+.notification-container {
+    position: fixed;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 350px;
+    width: 100%;
+    pointer-events: none;
+}
+
+/* Container Positions */
+.notification-container.top-right {
+    top: 20px;
+    right: 20px;
+}
+
+.notification-container.top-left {
+    top: 20px;
+    left: 20px;
+}
+
+.notification-container.bottom-right {
+    bottom: 20px;
+    right: 20px;
+    flex-direction: column-reverse;
+}
+
+.notification-container.bottom-left {
+    bottom: 20px;
+    left: 20px;
+    flex-direction: column-reverse;
+}
+
+.notification-container.top-center {
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.notification-container.bottom-center {
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    flex-direction: column-reverse;
+}
+
+/* Individual Notification */
+.notification {
+    background-color: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-lg);
+    padding: 15px;
+    margin-bottom: 10px;
+    opacity: 0;
+    transform: translateX(50px);
+    transition: all 0.3s ease;
+    pointer-events: auto;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    max-width: 350px;
+}
+
+.notification.visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.notification.hiding {
+    opacity: 0;
+    transform: translateX(50px);
+}
+
+/* Notification Content */
+.notification-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.notification-message {
+    flex: 1;
+    margin-right: 10px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.notification-close {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: var(--secondary);
+    padding: 0;
+    margin: 0;
+    line-height: 1;
+    transition: color var(--transition-fast);
+}
+
+.notification-close:hover {
+    color: var(--dark);
+}
+
+/* Notification Progress Bar */
+.notification-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.notification-progress::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: currentColor;
+}
+
+/* Notification Types */
+.notification-success {
+    border-left: 4px solid var(--success);
+    color: var(--success);
+}
+
+.notification-error {
+    border-left: 4px solid var(--danger);
+    color: var(--danger);
+}
+
+.notification-warning {
+    border-left: 4px solid var(--warning);
+    color: var(--warning);
+}
+
+.notification-info {
+    border-left: 4px solid var(--info);
+    color: var(--info);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 576px) {
+    .notification-container {
+        max-width: calc(100% - 40px);
+        width: calc(100% - 40px);
+    }
+    
+    .notification {
+        max-width: 100%;
+    }
+}

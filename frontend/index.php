@@ -5,9 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GigGatek - Refurbished Computer Hardware & Rent-to-Own Technology</title>
     <meta name="description" content="GigGatek offers quality refurbished computer hardware with both direct purchase and rent-to-own options. Find GPUs, CPUs, complete systems, and more!">
+
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#007bff">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="GigGatek">
+
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="/img/icons/icon-152.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/img/icons/icon-152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/img/icons/icon-180.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="/img/icons/icon-167.png">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/img/icons/icon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/img/icons/icon-16.png">
+
+    <!-- Fonts and Styles -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/framework.css">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/notifications.css">
+    <link rel="stylesheet" href="css/wishlist.css">
+    <link rel="stylesheet" href="css/pwa.css">
+    <link rel="stylesheet" href="css/i18n.css">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link id="language-font" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
 </head>
 <body>
     <header>
@@ -15,24 +43,29 @@
             <a href="index.php" class="logo-link"><img src="img/logo.png" alt="GigGatek Logo" id="logo"></a>
             <nav>
                 <ul>
-                    <li><a href="index.php" class="active">Home</a></li>
-                    <li><a href="products.php">Products</a></li>
-                    <li><a href="rent-to-own.php">Rent-to-Own</a></li>
-                    <li><a href="#">Support</a></li>
-                    <li><a href="login.php">Account</a></li>
+                    <li><a href="index.php" class="active" data-i18n="common.home">Home</a></li>
+                    <li><a href="products.php" data-i18n="common.products">Products</a></li>
+                    <li><a href="rent-to-own.php" data-i18n="common.rentToOwn">Rent-to-Own</a></li>
+                    <li><a href="#" data-i18n="common.support">Support</a></li>
+                    <li><a href="login.php" data-i18n="common.account">Account</a></li>
                 </ul>
             </nav>
+            <div class="header-actions">
+                <a href="cart.php" class="cart-icon"><i class="fas fa-shopping-cart"></i> <span class="cart-count">0</span></a>
+                <a href="login.php" class="login-link" data-i18n="common.login">Login</a>
+                <a href="register.php" class="register-link" data-i18n="common.register">Register</a>
+            </div>
         </div>
     </header>
 
     <main>
         <section class="hero">
             <div class="container">
-                <h1>Quality Tech, Flexible Options</h1>
-                <p>Discover premium refurbished computer hardware with both purchase and rent-to-own options to fit your budget and needs.</p>
+                <h1 data-i18n="home.hero.title">Quality Tech, Flexible Options</h1>
+                <p data-i18n="home.hero.subtitle">Discover premium refurbished computer hardware with both purchase and rent-to-own options to fit your budget and needs.</p>
                 <div class="hero-actions">
-                    <a href="products.php" class="btn btn-primary btn-lg">Shop Now</a>
-                    <a href="rent-to-own.php" class="btn btn-secondary btn-lg">Learn About Rent-to-Own</a>
+                    <a href="products.php" class="btn btn-primary btn-lg" data-i18n="home.hero.shopNow">Shop Now</a>
+                    <a href="rent-to-own.php" class="btn btn-secondary btn-lg" data-i18n="home.hero.learnMore">Learn About Rent-to-Own</a>
                 </div>
             </div>
         </section>
@@ -40,44 +73,44 @@
         <section class="categories-section">
             <div class="container">
                 <div class="section-header">
-                    <h2>Browse by Category</h2>
-                    <p>Find exactly what you need from our extensive selection of refurbished hardware.</p>
+                    <h2 data-i18n="home.categories.title">Browse by Category</h2>
+                    <p data-i18n="home.categories.subtitle">Find exactly what you need from our extensive selection of refurbished hardware.</p>
                 </div>
                 <div class="categories-grid">
                     <div class="category-card">
                         <a href="products.php?category=gpus">
                             <img src="img/categories/gpu.png" alt="Graphics Cards">
-                            <h4>Graphics Cards</h4>
+                            <h4 data-i18n="home.categories.gpus">Graphics Cards</h4>
                         </a>
                     </div>
                     <div class="category-card">
                         <a href="products.php?category=cpus">
                             <img src="img/categories/cpu.png" alt="Processors">
-                            <h4>Processors</h4>
+                            <h4 data-i18n="home.categories.cpus">Processors</h4>
                         </a>
                     </div>
                     <div class="category-card">
                         <a href="products.php?category=motherboards">
                             <img src="img/categories/motherboard.png" alt="Motherboards">
-                            <h4>Motherboards</h4>
+                            <h4 data-i18n="home.categories.motherboards">Motherboards</h4>
                         </a>
                     </div>
                     <div class="category-card">
                         <a href="products.php?category=memory">
                             <img src="img/categories/ram.png" alt="Memory (RAM)">
-                            <h4>Memory (RAM)</h4>
+                            <h4 data-i18n="home.categories.memory">Memory (RAM)</h4>
                         </a>
                     </div>
                     <div class="category-card">
                         <a href="products.php?category=storage">
                             <img src="img/categories/storage.png" alt="Storage">
-                            <h4>Storage</h4>
+                            <h4 data-i18n="home.categories.storage">Storage</h4>
                         </a>
                     </div>
                     <div class="category-card">
                         <a href="products.php?category=systems">
                             <img src="img/categories/pc.png" alt="Complete Systems">
-                            <h4>Complete Systems</h4>
+                            <h4 data-i18n="home.categories.systems">Complete Systems</h4>
                         </a>
                     </div>
                 </div>
@@ -100,7 +133,7 @@
                         <div class="rent-price">From $69.99/mo with Rent-to-Own</div>
                         <a href="product.php?id=1" class="btn btn-primary">View Details</a>
                     </div>
-                    
+
                     <!-- Product 2 -->
                     <div class="product-item">
                         <div class="condition-badge condition-good">Good</div>
@@ -110,7 +143,7 @@
                         <div class="rent-price">From $39.99/mo with Rent-to-Own</div>
                         <a href="product.php?id=2" class="btn btn-primary">View Details</a>
                     </div>
-                    
+
                     <!-- Product 3 -->
                     <div class="product-item">
                         <div class="condition-badge condition-excellent">Excellent</div>
@@ -120,7 +153,7 @@
                         <div class="rent-price">From $16.99/mo with Rent-to-Own</div>
                         <a href="product.php?id=3" class="btn btn-primary">View Details</a>
                     </div>
-                    
+
                     <!-- Product 4 -->
                     <div class="product-item">
                         <div class="condition-badge condition-good">Good</div>
@@ -221,19 +254,39 @@
 
     <footer>
         <div class="container">
-            <p>&copy; 2025 GigGatek. All rights reserved.</p>
+            <p data-i18n="footer.copyright" data-i18n-params='{"year": "2025"}' >&copy; 2025 GigGatek. All rights reserved.</p>
             <ul>
-                <li><a href="#">Privacy Policy</a></li>
-                <li><a href="#">Terms of Service</a></li>
-                <li><a href="#">Contact Us</a></li>
+                <li><a href="#" data-i18n="footer.privacyPolicy">Privacy Policy</a></li>
+                <li><a href="#" data-i18n="footer.termsOfService">Terms of Service</a></li>
+                <li><a href="#" data-i18n="footer.contactUs">Contact Us</a></li>
             </ul>
         </div>
     </footer>
+
+    <!-- Include configuration and utility scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/notifications.js"></script>
+    <script src="js/wishlist.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/pwa.js"></script>
+    <script src="js/i18n.js"></script>
+
+    <!-- Offline indicator -->
+    <div class="offline-indicator">
+        <span class="icon">📶</span>
+        <span data-i18n="common.offline">You are currently offline. Some features may be unavailable.</span>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Any JavaScript functionality can be added here
             console.log('GigGatek homepage loaded successfully!');
+
+            // Test notification system
+            setTimeout(() => {
+                window.notifications.success('Welcome to GigGatek!', { duration: 5000 });
+            }, 1000);
         });
     </script>
 </body>
