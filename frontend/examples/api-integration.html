@@ -497,7 +497,7 @@
             border-color: #bee5eb;
         }
 
-        .alert h3 {
+        .alert h3, .alert h4 {
             margin-top: 0;
             margin-bottom: 10px;
         }
@@ -506,6 +506,34 @@
             background-color: rgba(0, 0, 0, 0.05);
             padding: 2px 4px;
             border-radius: 3px;
+        }
+
+        .environment-switcher {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #bee5eb;
+        }
+
+        .environment-options {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .environment-options label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .environment-options input[type="radio"] {
+            margin-right: 8px;
+        }
+
+        .environment-info {
+            margin-top: 10px;
+            font-size: 0.9rem;
         }
     </style>
 </head>
@@ -531,6 +559,22 @@
                 <li>Customer: <code>john@example.com</code> / <code>password123</code></li>
                 <li>Admin: <code>admin@example.com</code> / <code>admin123</code></li>
             </ul>
+
+            <div class="environment-switcher">
+                <h4>Environment</h4>
+                <div class="environment-options">
+                    <label>
+                        <input type="radio" name="environment" value="development" checked> Development (Mock API)
+                    </label>
+                    <label>
+                        <input type="radio" name="environment" value="staging"> Staging
+                    </label>
+                    <label>
+                        <input type="radio" name="environment" value="production"> Production
+                    </label>
+                </div>
+                <p class="environment-info">Current API URL: <code id="current-api-url">http://localhost:3000/api/v1</code></p>
+            </div>
         </div>
 
             <div class="tabs">
@@ -605,6 +649,9 @@
     <script src="../js/accessibility.js"></script>
     <script src="../js/notifications.js"></script>
     <script src="../js/progressive-loading.js"></script>
+    <script src="../js/env.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/data-models-loader.js"></script>
     <script src="../js/api-client.js"></script>
     <script src="../js/state-manager.js"></script>
     <script src="../js/error-handler.js"></script>
@@ -614,6 +661,9 @@
     <script src="../js/components/order-history.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Initialize environment switcher
+            initializeEnvironmentSwitcher();
+
             // Initialize components
             initializeTabs();
             initializeComponents();
@@ -622,6 +672,60 @@
             // Check authentication status
             checkAuthStatus();
         });
+
+        // Initialize environment switcher
+        function initializeEnvironmentSwitcher() {
+            const environmentRadios = document.querySelectorAll('input[name="environment"]');
+            const currentApiUrlElement = document.getElementById('current-api-url');
+
+            // Update API URL display
+            function updateApiUrlDisplay() {
+                currentApiUrlElement.textContent = ENV.get('apiBaseUrl');
+            }
+
+            // Initialize with current environment
+            updateApiUrlDisplay();
+
+            // Add event listeners to radio buttons
+            environmentRadios.forEach(radio => {
+                // Set initial state
+                if (radio.value === ENV.current) {
+                    radio.checked = true;
+                }
+
+                // Add change event listener
+                radio.addEventListener('change', () => {
+                    if (radio.checked) {
+                        // Update environment
+                        ENV.current = radio.value;
+
+                        // Update API URL display
+                        updateApiUrlDisplay();
+
+                        // Show notification
+                        if (typeof notifications !== 'undefined') {
+                            notifications.info(`Switched to ${radio.value} environment`, 'Environment Changed');
+                        }
+
+                        // Clear authentication and reload components
+                        if (typeof api !== 'undefined') {
+                            api.clearTokens();
+                        }
+
+                        // Clear state cache
+                        if (typeof stateManager !== 'undefined') {
+                            stateManager.clear();
+                        }
+
+                        // Reload components
+                        initializeComponents();
+
+                        // Update authentication status
+                        checkAuthStatus();
+                    }
+                });
+            });
+        }
 
         // Initialize tabs
         function initializeTabs() {

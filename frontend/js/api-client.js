@@ -6,8 +6,9 @@
 
 class ApiClient {
   constructor() {
-    // Use mock API server in development
-    this.baseUrl = 'http://localhost:3000/api/v1';
+    // Use configuration from config.js
+    this.config = window.config || (typeof config !== 'undefined' ? config : { api: { baseUrl: 'http://localhost:3000/api/v1' } });
+    this.baseUrl = this.config.api.baseUrl;
     this.token = null;
     this.refreshToken = null;
     this.tokenExpiry = null;
@@ -27,7 +28,8 @@ class ApiClient {
    */
   loadTokenFromStorage() {
     try {
-      const authData = JSON.parse(localStorage.getItem('giggatek_auth'));
+      const storageKey = this.config.api.auth?.storageKey || 'giggatek_auth';
+      const authData = JSON.parse(localStorage.getItem(storageKey));
       if (authData) {
         this.token = authData.token;
         this.refreshToken = authData.refreshToken;
@@ -44,12 +46,13 @@ class ApiClient {
    */
   saveTokenToStorage() {
     try {
+      const storageKey = this.config.api.auth?.storageKey || 'giggatek_auth';
       const authData = {
         token: this.token,
         refreshToken: this.refreshToken,
         tokenExpiry: this.tokenExpiry
       };
-      localStorage.setItem('giggatek_auth', JSON.stringify(authData));
+      localStorage.setItem(storageKey, JSON.stringify(authData));
     } catch (error) {
       console.error('Error saving token to storage:', error);
     }
@@ -64,7 +67,8 @@ class ApiClient {
     this.tokenExpiry = null;
 
     // Clear from storage
-    localStorage.removeItem('giggatek_auth');
+    const storageKey = this.config.api.auth?.storageKey || 'giggatek_auth';
+    localStorage.removeItem(storageKey);
 
     // Clear refresh timeout
     if (this.refreshTimeout) {
@@ -87,8 +91,9 @@ class ApiClient {
     const expiryTime = new Date(this.tokenExpiry).getTime();
     const timeUntilExpiry = expiryTime - now;
 
-    // Refresh token 5 minutes before it expires
-    const refreshTime = Math.max(0, timeUntilExpiry - (5 * 60 * 1000));
+    // Get refresh before expiry time from config (default to 5 minutes)
+    const refreshBeforeExpiryMinutes = this.config.api.auth?.refreshBeforeExpiryMinutes || 5;
+    const refreshTime = Math.max(0, timeUntilExpiry - (refreshBeforeExpiryMinutes * 60 * 1000));
 
     // Set timeout to refresh token
     this.refreshTimeout = setTimeout(() => {
@@ -148,7 +153,8 @@ class ApiClient {
     }
 
     try {
-      const response = await this.post('/auth/refresh', {
+      const refreshEndpoint = this.config.api.auth?.endpoints?.refresh || '/auth/refresh';
+      const response = await this.post(refreshEndpoint, {
         refreshToken: this.refreshToken
       }, false);
 
@@ -355,7 +361,8 @@ class ApiClient {
    * @returns {Promise} Promise that resolves with user data
    */
   async login(email, password) {
-    const response = await this.post('/auth/login', { email, password }, false);
+    const loginEndpoint = this.config.api.auth?.endpoints?.login || '/auth/login';
+    const response = await this.post(loginEndpoint, { email, password }, false);
 
     this.setAuthToken({
       token: response.token,
@@ -373,7 +380,8 @@ class ApiClient {
    * @returns {Promise} Promise that resolves with user data
    */
   async register(userData) {
-    return this.post('/auth/register', userData, false);
+    const registerEndpoint = this.config.api.auth?.endpoints?.register || '/auth/register';
+    return this.post(registerEndpoint, userData, false);
   }
 
   /**
@@ -385,7 +393,8 @@ class ApiClient {
     try {
       // Call logout endpoint if authenticated
       if (this.isAuthenticated()) {
-        await this.post('/auth/logout');
+        const logoutEndpoint = this.config.api.auth?.endpoints?.logout || '/auth/logout';
+        await this.post(logoutEndpoint);
       }
     } catch (error) {
       console.error('Error during logout:', error);
@@ -404,7 +413,8 @@ class ApiClient {
    * @returns {Promise} Promise that resolves with user data
    */
   async getCurrentUser() {
-    return this.get('/users/me');
+    const currentUserEndpoint = this.config.api.auth?.endpoints?.currentUser || '/users/me';
+    return this.get(currentUserEndpoint);
   }
 
   /**
@@ -414,7 +424,8 @@ class ApiClient {
    * @returns {Promise} Promise that resolves with products data
    */
   async getProducts(params = {}) {
-    return this.get('/products', params, false);
+    const productsEndpoint = this.config.api.products?.list || '/products';
+    return this.get(productsEndpoint, params, false);
   }
 
   /**
@@ -424,7 +435,10 @@ class ApiClient {
    * @returns {Promise} Promise that resolves with product data
    */
   async getProduct(id) {
-    return this.get(`/products/${id}`, null, false);
+    const productDetailEndpoint = this.config.api.products?.detail ?
+      this.config.api.products.detail(id) :
+      `/products/${id}`;
+    return this.get(productDetailEndpoint, null, false);
   }
 
   /**
@@ -434,7 +448,8 @@ class ApiClient {
    * @returns {Promise} Promise that resolves with orders data
    */
   async getOrders(params = {}) {
-    return this.get('/orders', params);
+    const ordersEndpoint = this.config.api.orders?.list || '/orders';
+    return this.get(ordersEndpoint, params);
   }
 
   /**
@@ -444,7 +459,10 @@ class ApiClient {
    * @returns {Promise} Promise that resolves with order data
    */
   async getOrder(id) {
-    return this.get(`/orders/${id}`);
+    const orderDetailEndpoint = this.config.api.orders?.detail ?
+      this.config.api.orders.detail(id) :
+      `/orders/${id}`;
+    return this.get(orderDetailEndpoint);
   }
 
   /**
@@ -454,7 +472,8 @@ class ApiClient {
    * @returns {Promise} Promise that resolves with created order data
    */
   async createOrder(orderData) {
-    return this.post('/orders', orderData);
+    const createOrderEndpoint = this.config.api.orders?.create || '/orders';
+    return this.post(createOrderEndpoint, orderData);
   }
 
   /**
@@ -464,7 +483,8 @@ class ApiClient {
    * @returns {Promise} Promise that resolves with rentals data
    */
   async getRentals(params = {}) {
-    return this.get('/rentals', params);
+    const rentalsEndpoint = this.config.api.rentals?.list || '/rentals';
+    return this.get(rentalsEndpoint, params);
   }
 
   /**
@@ -474,7 +494,10 @@ class ApiClient {
    * @returns {Promise} Promise that resolves with rental data
    */
   async getRental(id) {
-    return this.get(`/rentals/${id}`);
+    const rentalDetailEndpoint = this.config.api.rentals?.detail ?
+      this.config.api.rentals.detail(id) :
+      `/rentals/${id}`;
+    return this.get(rentalDetailEndpoint);
   }
 
   /**
@@ -484,7 +507,8 @@ class ApiClient {
    * @returns {Promise} Promise that resolves with created rental data
    */
   async createRental(rentalData) {
-    return this.post('/rentals', rentalData);
+    const createRentalEndpoint = this.config.api.rentals?.create || '/rentals';
+    return this.post(createRentalEndpoint, rentalData);
   }
 }
 
