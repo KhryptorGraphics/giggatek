@@ -34,10 +34,6 @@ RUN chown -R www-data:www-data /var/www/html \
 
 # Set environment variables
 ENV BACKEND_URL http://backend:5000
-ENV DB_HOST db
-ENV DB_NAME giggatek
-ENV DB_USER giggatek_user
-ENV DB_PASSWORD giggatek_password
 
 # Expose port 80
 EXPOSE 80

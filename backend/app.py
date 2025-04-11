@@ -13,10 +13,13 @@ import os
 from datetime import timedelta
 
 # Import blueprints
-from admin.routes import admin_bp
-from auth import auth_bp
-from orders import orders_bp
-from utils.db import get_db_connection
+import sys
+sys.path.append('.')
+
+from backend.admin.routes import admin_bp
+from backend.auth import auth_bp
+from backend.orders import orders_bp
+from backend.utils.db import get_db_connection
 
 # Initialize Flask app
 app = Flask(__name__, template_folder='templates')
@@ -44,17 +47,17 @@ jwt = JWTManager(app)
 app.register_blueprint(admin_bp)
 app.register_blueprint(auth_bp)
 app.register_blueprint(orders_bp)
-from rentals import rentals_bp
+from backend.rentals import rentals_bp
 app.register_blueprint(rentals_bp)
-from wishlist import wishlist_bp
+from backend.wishlist import wishlist_bp
 app.register_blueprint(wishlist_bp)
 
 # Import and register payment blueprints
-from payment import payment_bp
+from backend.payment import payment_bp
 app.register_blueprint(payment_bp)
 
 # Import and register push notification blueprints
-from push import push_bp
+from backend.push import push_bp
 app.register_blueprint(push_bp)
 
 # Using the centralized get_db_connection from utils.db

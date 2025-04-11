@@ -78,12 +78,12 @@ CREATE TABLE IF NOT EXISTS `rental_notifications` (
 );
 
 -- Create indices for performance
-CREATE INDEX IF NOT EXISTS idx_rentals_user_id ON `rentals` (`user_id`);
-CREATE INDEX IF NOT EXISTS idx_rentals_product_id ON `rentals` (`product_id`);
-CREATE INDEX IF NOT EXISTS idx_rentals_status ON `rentals` (`status`);
-CREATE INDEX IF NOT EXISTS idx_rental_payments_rental_id ON `rental_payments` (`rental_id`);
-CREATE INDEX IF NOT EXISTS idx_rental_payments_due_date ON `rental_payments` (`due_date`);
-CREATE INDEX IF NOT EXISTS idx_rental_payments_status ON `rental_payments` (`status`);
-CREATE INDEX IF NOT EXISTS idx_rental_status_history_rental_id ON `rental_status_history` (`rental_id`);
-CREATE INDEX IF NOT EXISTS idx_rental_notifications_user_id ON `rental_notifications` (`user_id`);
-CREATE INDEX IF NOT EXISTS idx_rental_notifications_type ON `rental_notifications` (`type`);
+CREATE INDEX idx_rentals_user_id ON `rentals` (`user_id`);
+CREATE INDEX idx_rentals_product_id ON `rentals` (`product_id`);
+CREATE INDEX idx_rentals_status ON `rentals` (`status`);
+CREATE INDEX idx_rental_payments_rental_id ON `rental_payments` (`rental_id`);
+CREATE INDEX idx_rental_payments_due_date ON `rental_payments` (`due_date`);
+CREATE INDEX idx_rental_payments_status ON `rental_payments` (`status`);
+CREATE INDEX idx_rental_status_history_rental_id ON `rental_status_history` (`rental_id`);
+CREATE INDEX idx_rental_notifications_user_id ON `rental_notifications` (`user_id`);
+CREATE INDEX idx_rental_notifications_type ON `rental_notifications` (`type`);

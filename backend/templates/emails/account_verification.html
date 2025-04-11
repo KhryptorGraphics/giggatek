@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Account Verification - GigGatek</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f7f7f7; color: #222; margin: 0; padding: 0; }
+    .container { max-width: 480px; margin: 40px auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); padding: 32px; }
+    h2 { color: #2a7ae2; }
+    .button { display: inline-block; background: #2a7ae2; color: #fff; padding: 12px 24px; border-radius: 4px; text-decoration: none; font-weight: bold; margin-top: 24px; }
+    .footer { margin-top: 32px; font-size: 12px; color: #888; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Verify Your Account</h2>
+    <p>Hello {{ user_name }},</p>
+    <p>Thank you for registering with GigGatek! To activate your account, please verify your email address by clicking the button below:</p>
+    <p>
+      <a href="{{ verification_url }}" class="button">Verify Account</a>
+    </p>
+    <p>If the button above does not work, copy and paste the following link into your browser:</p>
+    <p style="word-break: break-all;">{{ verification_url }}</p>
+    <div class="footer">
+      If you did not create this account, you can ignore this email.<br>
+      &copy; {{ year }} GigGatek. All rights reserved.
+    </div>
+  </div>
+</body>
+</html>

@@ -109,7 +109,7 @@
         owner: ubuntu
         group: ubuntu
         mode: 0755
-        
+
     - name: Create logs subdirectories
       file:
         path: "{{ app_directory }}/logs/{{ item }}"
@@ -122,7 +122,7 @@
         - backend
         - mysql
 
-    # Copy configuration files 
+    # Copy configuration files
     - name: Copy docker-compose.yml
       template:
         src: templates/docker-compose.{{ environment }}.yml.j2
@@ -146,13 +146,13 @@
           apt:
             name: prometheus-node-exporter
             state: present
-        
+
         - name: Ensure node exporter is running
           service:
             name: prometheus-node-exporter
             state: started
             enabled: yes
-            
+
         - name: Create Prometheus scrape config
           template:
             src: templates/prometheus-node.yml.j2
@@ -171,7 +171,7 @@
             owner: ubuntu
             group: ubuntu
             mode: 0755
-            
+
         - name: Set up backup cron job
           cron:
             name: "Daily backup"
@@ -184,7 +184,15 @@
     - name: Pull Docker images
       shell: cd {{ app_directory }} && docker-compose pull
       become_user: ubuntu
-      
+
+    - name: Copy run.py file
+      template:
+        src: templates/run.py.j2
+        dest: "{{ app_directory }}/run.py"
+        owner: ubuntu
+        group: ubuntu
+        mode: 0644
+
     - name: Start application with Docker Compose
       shell: cd {{ app_directory }} && docker-compose up -d
       become_user: ubuntu
@@ -201,50 +209,50 @@
   vars:
     backup_directory: "/opt/backups"
     mysql_version: "8.0"
-    
+
   tasks:
     - name: Update apt cache
       apt:
         update_cache: yes
         cache_valid_time: 3600
-    
+
     - name: Install MySQL dependencies
       apt:
         name:
           - mysql-client-core-{{ mysql_version }}
           - python3-mysqldb
         state: present
-    
+
     - name: Create backup directory
       file:
         path: "{{ backup_directory }}"
         state: directory
         mode: 0755
-    
+
     - name: Set up MySQL backup script
       template:
         src: templates/mysql-backup.sh.j2
         dest: /usr/local/bin/mysql-backup.sh
         mode: 0755
-    
+
     - name: Configure backup schedule
       cron:
         name: "MySQL nightly backup"
         hour: "1"
         minute: "0"
         job: "/usr/local/bin/mysql-backup.sh >> /var/log/mysql-backup.log 2>&1"
-        
+
     - name: Install MySQL exporter for Prometheus
       apt:
         name: prometheus-mysqld-exporter
         state: present
-        
+
     - name: Configure MySQL exporter
       template:
         src: templates/mysqld-exporter.cnf.j2
         dest: /etc/.mysqld_exporter.cnf
         mode: 0600
-        
+
     - name: Ensure MySQL exporter is running
       service:
         name: prometheus-mysqld-exporter

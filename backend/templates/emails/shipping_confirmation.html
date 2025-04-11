@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Shipping Confirmation - GigGatek</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f7f7f7; color: #222; margin: 0; padding: 0; }
+    .container { max-width: 480px; margin: 40px auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); padding: 32px; }
+    h2 { color: #2a7ae2; }
+    .button { display: inline-block; background: #2a7ae2; color: #fff; padding: 12px 24px; border-radius: 4px; text-decoration: none; font-weight: bold; margin-top: 24px; }
+    .footer { margin-top: 32px; font-size: 12px; color: #888; }
+    .details { margin: 20px 0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Your Order Has Shipped!</h2>
+    <p>Hello {{ user_name }},</p>
+    <p>Your order <strong>#{{ order_id }}</strong> has been shipped and is on its way to you.</p>
+    <div class="details">
+      <p><strong>Carrier:</strong> {{ carrier }}</p>
+      <p><strong>Tracking Number:</strong> {{ tracking_number }}</p>
+    </div>
+    <p>
+      <a href="{{ tracking_url }}" class="button">Track Your Shipment</a>
+    </p>
+    <p>If the button above does not work, copy and paste the following link into your browser:</p>
+    <p style="word-break: break-all;">{{ tracking_url }}</p>
+    <div class="footer">
+      Thank you for shopping with GigGatek!<br>
+      &copy; {{ year }} GigGatek. All rights reserved.
+    </div>
+  </div>
+</body>
+</html>

@@ -7,19 +7,14 @@ services:
       context: .
       dockerfile: docker/Dockerfile.frontend
     ports:
-      - "80:80"
+      - "8000:80"  # Changed from 80:80 to 8000:80 to avoid conflicts
     volumes:
       - ./frontend:/var/www/html
       - ./frontend/uploads:/var/www/html/uploads
     depends_on:
       - backend
-      - db
     environment:
       - BACKEND_URL=http://backend:5000
-      - DB_HOST=db
-      - DB_USER=giggatek_user
-      - DB_PASSWORD=giggatek_password
-      - DB_NAME=giggatek
     networks:
       - giggatek_network
     restart: unless-stopped
@@ -34,67 +29,23 @@ services:
     volumes:
       - ./backend:/app
       - ./logs/backend:/app/logs
-    depends_on:
-      - db
-      - redis
+      - ./run.py:/app/run.py
+      - ./giggatek.db:/app/giggatek.db
     environment:
-      - FLASK_APP=app.py
+      - FLASK_APP=run.py
       - FLASK_ENV=development
       - FLASK_DEBUG=1
-      - DB_HOST=db
-      - DB_PORT=3306
-      - DB_USER=giggatek_user
-      - DB_PASSWORD=giggatek_password
-      - DB_NAME=giggatek
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - EMAIL_HOST=smtp.example.com
-      - EMAIL_PORT=587
-      - EMAIL_HOST_USER=notifications@giggatek.com
-      - EMAIL_HOST_PASSWORD=password
-      - EMAIL_USE_TLS=True
+      - CORS_ALLOWED_ORIGINS=http://localhost:8000,http://localhost,http://frontend
     networks:
       - giggatek_network
     restart: unless-stopped
-
-  # Database service (MySQL)
-  db:
-    image: mysql:8.0
-    ports:
-      - "3306:3306"
-    volumes:
-      - db_data:/var/lib/mysql
-      - ./backend/database:/docker-entrypoint-initdb.d
-      - ./logs/mysql:/var/log/mysql
-    environment:
-      - MYSQL_ROOT_PASSWORD=root_password
-      - MYSQL_DATABASE=giggatek
-      - MYSQL_USER=giggatek_user
-      - MYSQL_PASSWORD=giggatek_password
-    networks:
-      - giggatek_network
-    restart: unless-stopped
-    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
-
-  # Cache and session storage (Redis)
-  redis:
-    image: redis:6.2-alpine
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    networks:
-      - giggatek_network
-    restart: unless-stopped
-    command: redis-server --appendonly yes
+    command: python run.py
 
   # Development admin tool - Adminer
   adminer:
     image: adminer
     ports:
       - "8080:8080"
-    depends_on:
-      - db
     networks:
       - giggatek_network
     restart: unless-stopped
@@ -113,8 +64,3 @@ services:
 networks:
   giggatek_network:
     driver: bridge
-
-# Define volumes
-volumes:
-  db_data:
-  redis_data:
