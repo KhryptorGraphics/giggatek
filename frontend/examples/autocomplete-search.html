@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GigGatek - Autocomplete Search Example</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/components/autocomplete-search.css">
+    <style>
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .page-header {
+            margin-bottom: 30px;
+        }
+        
+        .page-header h1 {
+            margin-bottom: 10px;
+        }
+        
+        .page-description {
+            color: #6c757d;
+            margin-bottom: 20px;
+        }
+        
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .search-results {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        
+        .search-results h2 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.25rem;
+        }
+        
+        .search-results pre {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            overflow: auto;
+            max-height: 300px;
+        }
+        
+        .search-actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <a href="../index.html">
+                        <img src="../images/logo.png" alt="GigGatek Logo">
+                    </a>
+                </div>
+                <nav class="main-nav">
+                    <ul>
+                        <li><a href="../index.html">Home</a></li>
+                        <li><a href="../products.html">Products</a></li>
+                        <li><a href="../rent-to-own.html">Rent-to-Own</a></li>
+                        <li><a href="../about.html">About</a></li>
+                        <li><a href="../contact.html">Contact</a></li>
+                    </ul>
+                </nav>
+                <div class="header-actions">
+                    <a href="../cart.html" class="btn-cart">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-count">0</span>
+                    </a>
+                    <a href="../account.html" class="btn-account">
+                        <i class="fas fa-user"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <main class="container">
+        <div class="page-header">
+            <h1>Autocomplete Search Example</h1>
+            <p class="page-description">This example demonstrates the autocomplete search functionality of the GigGatek platform.</p>
+        </div>
+        
+        <div class="search-container">
+            <div id="autocomplete-search"></div>
+            
+            <div class="search-actions">
+                <button id="search-button" class="btn btn-primary">Search</button>
+                <button id="clear-button" class="btn btn-secondary">Clear</button>
+            </div>
+            
+            <div class="search-results">
+                <h2>Search Results</h2>
+                <pre id="search-results-json">No search performed yet.</pre>
+            </div>
+        </div>
+    </main>
+    
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="../images/logo.png" alt="GigGatek Logo">
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h3>Shop</h3>
+                        <ul>
+                            <li><a href="../products.html">All Products</a></li>
+                            <li><a href="../products.html?category=cameras">Cameras</a></li>
+                            <li><a href="../products.html?category=audio">Audio</a></li>
+                            <li><a href="../products.html?category=lighting">Lighting</a></li>
+                            <li><a href="../products.html?category=accessories">Accessories</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h3>Rent-to-Own</h3>
+                        <ul>
+                            <li><a href="../rent-to-own.html">How It Works</a></li>
+                            <li><a href="../rent-to-own.html#calculator">Payment Calculator</a></li>
+                            <li><a href="../rent-to-own.html#faq">FAQ</a></li>
+                            <li><a href="../rent-to-own.html#terms">Terms & Conditions</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h3>Company</h3>
+                        <ul>
+                            <li><a href="../about.html">About Us</a></li>
+                            <li><a href="../contact.html">Contact</a></li>
+                            <li><a href="../blog.html">Blog</a></li>
+                            <li><a href="../careers.html">Careers</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h3>Support</h3>
+                        <ul>
+                            <li><a href="../support.html">Help Center</a></li>
+                            <li><a href="../returns.html">Returns & Warranty</a></li>
+                            <li><a href="../shipping.html">Shipping Information</a></li>
+                            <li><a href="../privacy.html">Privacy Policy</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 GigGatek. All rights reserved.</p>
+                <div class="social-links">
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Scripts -->
+    <script src="../js/accessibility.js"></script>
+    <script src="../js/notifications.js"></script>
+    <script src="../js/progressive-loading.js"></script>
+    <script src="../js/env.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/data-models-loader.js"></script>
+    <script src="../js/api-client.js"></script>
+    <script src="../js/state-manager.js"></script>
+    <script src="../js/error-handler.js"></script>
+    <script src="../js/data-service.js"></script>
+    <script src="../js/components/autocomplete-search.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize API client
+            const apiClient = new ApiClient({
+                baseUrl: config.api.baseUrl
+            });
+            
+            // Initialize state manager
+            const stateManager = new StateManager();
+            
+            // Initialize data service
+            const dataService = new DataService(apiClient, stateManager);
+            
+            // Initialize autocomplete search
+            const autocompleteSearch = new AutocompleteSearch('#autocomplete-search', {
+                placeholder: 'Search products...',
+                minChars: 2,
+                delay: 300,
+                maxResults: 5,
+                apiEndpoint: '/api/v1/search/suggestions',
+                onSelect: (suggestion) => {
+                    console.log('Selected suggestion:', suggestion);
+                    displayResults(suggestion);
+                },
+                onSearch: (query) => {
+                    console.log('Search query:', query);
+                }
+            });
+            
+            // Handle search button click
+            document.getElementById('search-button').addEventListener('click', () => {
+                const query = autocompleteSearch.getQuery();
+                
+                if (query) {
+                    // Perform search
+                    dataService.getProducts({ search: query })
+                        .then(results => {
+                            displayResults(results);
+                        })
+                        .catch(error => {
+                            console.error('Error searching products:', error);
+                            displayResults({ error: 'Error searching products' });
+                        });
+                } else {
+                    displayResults({ message: 'Please enter a search query' });
+                }
+            });
+            
+            // Handle clear button click
+            document.getElementById('clear-button').addEventListener('click', () => {
+                autocompleteSearch.clearSearch();
+                displayResults({ message: 'Search cleared' });
+            });
+            
+            // Display results
+            function displayResults(data) {
+                const resultsElement = document.getElementById('search-results-json');
+                resultsElement.textContent = JSON.stringify(data, null, 2);
+            }
+        });
+    </script>
+</body>
+</html>

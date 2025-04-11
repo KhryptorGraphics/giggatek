@@ -519,6 +519,18 @@ class ApiClient {
   }
 
   /**
+   * Get search suggestions
+   *
+   * @param {string} query - Search query
+   * @param {number} limit - Maximum number of suggestions to return
+   * @returns {Promise} Promise that resolves with suggestions data
+   */
+  async getSearchSuggestions(query, limit = 5) {
+    const suggestionsEndpoint = this.config.api.search?.suggestions || '/search/suggestions';
+    return this.get(suggestionsEndpoint, { q: query, limit }, false);
+  }
+
+  /**
    * Get orders
    *
    * @param {Object} params - Query parameters

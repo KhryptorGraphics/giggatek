@@ -56,6 +56,9 @@ class ProductList {
     // Initialize advanced filter if enabled
     if (this.state.useAdvancedFilters) {
       this.initAdvancedFilter();
+    } else {
+      // Initialize autocomplete search
+      this.initAutocompleteSearch();
     }
 
     // Add event listeners
@@ -99,6 +102,97 @@ class ProductList {
         this.loadProducts();
       }
     });
+  }
+
+  /**
+   * Initialize autocomplete search
+   */
+  initAutocompleteSearch() {
+    // Check if AutocompleteSearch class is available
+    if (typeof AutocompleteSearch === 'undefined') {
+      console.error('AutocompleteSearch component not found');
+      return;
+    }
+
+    // Get container
+    const container = this.container.querySelector('#autocomplete-search-container');
+    if (!container) {
+      console.error('Autocomplete search container not found');
+      return;
+    }
+
+    // Initialize autocomplete search
+    this.autocompleteSearch = new AutocompleteSearch(container, {
+      placeholder: 'Search products...',
+      minChars: 2,
+      delay: 300,
+      maxResults: 5,
+      apiEndpoint: '/api/v1/search/suggestions',
+      onSelect: (suggestion) => {
+        // Handle suggestion selection
+        if (suggestion.type === 'product') {
+          // Set search filter to product name
+          this.state.filters.search = suggestion.text;
+
+          // Reset page
+          this.state.page = 1;
+
+          // Load products
+          this.loadProducts();
+        } else if (suggestion.type === 'category') {
+          // Set category filter
+          this.state.filters.category = suggestion.value;
+          this.state.filters.search = '';
+
+          // Update category select if it exists
+          const categorySelect = this.container.querySelector('#filter-category');
+          if (categorySelect) {
+            categorySelect.value = suggestion.value;
+          }
+
+          // Reset page
+          this.state.page = 1;
+
+          // Load products
+          this.loadProducts();
+        } else if (suggestion.type === 'brand') {
+          // Set brand filter
+          this.state.filters.brand = [suggestion.value];
+          this.state.filters.search = '';
+
+          // Reset page
+          this.state.page = 1;
+
+          // Load products
+          this.loadProducts();
+        } else if (suggestion.type === 'feature') {
+          // Set feature filter
+          this.state.filters.features = [suggestion.value];
+          this.state.filters.search = '';
+
+          // Reset page
+          this.state.page = 1;
+
+          // Load products
+          this.loadProducts();
+        }
+      },
+      onSearch: (query) => {
+        // Set search filter
+        this.state.filters.search = query;
+
+        // Reset page
+        this.state.page = 1;
+
+        // Load products
+        this.loadProducts();
+      }
+    });
+
+    // Set initial value
+    if (this.state.filters.search) {
+      this.autocompleteSearch.setQuery(this.state.filters.search);
+    }
   }
 
   /**
@@ -174,8 +268,8 @@ class ProductList {
         <div class="product-list-filters">
           <form class="filters-form">
             <div class="filter-group">
-              <label for="filter-search">Search</label>
-              <input type="text" id="filter-search" class="form-control" placeholder="Search products" value="${this.state.filters.search}">
+              <label for="autocomplete-search-container">Search</label>
+              <div id="autocomplete-search-container"></div>
             </div>
 
             <div class="filter-group">
@@ -461,14 +555,13 @@ class ProductList {
    */
   applyFilters() {
     // Get filter values
-    const searchInput = this.container.querySelector('#filter-search');
     const categorySelect = this.container.querySelector('#filter-category');
     const minPriceInput = this.container.querySelector('#filter-price-min');
     const maxPriceInput = this.container.querySelector('#filter-price-max');
 
     // Update state
     this.state.filters = {
-      search: searchInput ? searchInput.value : '',
+      ...this.state.filters,
       category: categorySelect ? categorySelect.value : '',
       minPrice: minPriceInput ? minPriceInput.value : '',
       maxPrice: maxPriceInput ? maxPriceInput.value : ''
@@ -486,12 +579,10 @@ class ProductList {
    */
   resetFilters() {
     // Reset filter values
-    const searchInput = this.container.querySelector('#filter-search');
     const categorySelect = this.container.querySelector('#filter-category');
     const minPriceInput = this.container.querySelector('#filter-price-min');
     const maxPriceInput = this.container.querySelector('#filter-price-max');
 
-    if (searchInput) searchInput.value = '';
     if (categorySelect) categorySelect.value = '';
     if (minPriceInput) minPriceInput.value = '';
     if (maxPriceInput) maxPriceInput.value = '';
@@ -512,6 +603,11 @@ class ProductList {
     // Reset advanced filter if enabled
     if (this.state.useAdvancedFilters && this.advancedFilter) {
       this.advancedFilter.updateFilters(this.state.filters);
+    }
+
+    // Reset autocomplete search if enabled
+    if (!this.state.useAdvancedFilters && this.autocompleteSearch) {
+      this.autocompleteSearch.setQuery('');
     }
 
     // Reset page

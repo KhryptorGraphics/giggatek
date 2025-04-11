@@ -51,6 +51,11 @@ const config = {
       detail: (id) => `/products/${id}`
     },
 
+    // Search endpoints
+    search: {
+      suggestions: '/search/suggestions'
+    },
+
     // Order endpoints
     orders: {
       list: '/orders',

@@ -140,6 +140,27 @@ class DataService {
   }
 
   /**
+   * Get search suggestions
+   *
+   * @param {string} query - Search query
+   * @param {number} limit - Maximum number of suggestions to return
+   * @returns {Promise} Promise that resolves with suggestions data
+   */
+  async getSearchSuggestions(query, limit = 5) {
+    // Don't cache suggestions as they change frequently
+    const options = {
+      cache: false,
+      dedupe: true
+    };
+
+    const cacheKey = `search_suggestions_${query}_${limit}`;
+
+    return this.stateManager.fetch(cacheKey, async () => {
+      return await this.api.getSearchSuggestions(query, limit);
+    }, options);
+  }
+
+  /**
    * Get orders
    *
    * @param {Object} params - Query parameters

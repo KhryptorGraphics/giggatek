@@ -377,6 +377,100 @@ app.get('/api/v1/products/:id', (req, res) => {
   res.json(product);
 });
 
+// Search suggestions endpoint
+app.get('/api/v1/search/suggestions', (req, res) => {
+  const query = req.query.q || '';
+  const limit = parseInt(req.query.limit) || 5;
+
+  if (!query) {
+    return res.json({
+      suggestions: []
+    });
+  }
+
+  const queryLower = query.toLowerCase();
+
+  // Find matching products
+  const matchingProducts = products.filter(product =>
+    product.name.toLowerCase().includes(queryLower) ||
+    product.description.toLowerCase().includes(queryLower) ||
+    (product.brand && product.brand.toLowerCase().includes(queryLower)) ||
+    (product.category && product.category.toLowerCase().includes(queryLower)) ||
+    (Array.isArray(product.features) && product.features.some(feature =>
+      feature.toLowerCase().includes(queryLower)
+    ))
+  );
+
+  // Extract suggestions
+  const suggestions = [];
+
+  // Add product name suggestions
+  matchingProducts.forEach(product => {
+    if (product.name.toLowerCase().includes(queryLower)) {
+      suggestions.push({
+        type: 'product',
+        id: product.id,
+        text: product.name,
+        category: product.category,
+        image_url: product.image_url
+      });
+    }
+  });
+
+  // Add category suggestions
+  const categories = [...new Set(matchingProducts.map(p => p.category))];
+  categories.forEach(category => {
+    if (category && category.toLowerCase().includes(queryLower)) {
+      suggestions.push({
+        type: 'category',
+        text: `Category: ${category}`,
+        value: category
+      });
+    }
+  });
+
+  // Add brand suggestions
+  const brands = [...new Set(matchingProducts.map(p => p.brand).filter(Boolean))];
+  brands.forEach(brand => {
+    if (brand && brand.toLowerCase().includes(queryLower)) {
+      suggestions.push({
+        type: 'brand',
+        text: `Brand: ${brand}`,
+        value: brand
+      });
+    }
+  });
+
+  // Add feature suggestions
+  const features = [];
+  matchingProducts.forEach(product => {
+    if (Array.isArray(product.features)) {
+      product.features.forEach(feature => {
+        if (feature.toLowerCase().includes(queryLower) && !features.includes(feature)) {
+          features.push(feature);
+        }
+      });
+    }
+  });
+
+  features.forEach(feature => {
+    suggestions.push({
+      type: 'feature',
+      text: `Feature: ${feature}`,
+      value: feature
+    });
+  });
+
+  // Limit results
+  const limitedSuggestions = suggestions.slice(0, limit);
+
+  // Return suggestions
+  res.json({
+    query,
+    suggestions: limitedSuggestions
+  });
+});
+
 // Order routes
 app.get('/api/v1/orders', authenticate, (req, res) => {
   // Get query parameters
