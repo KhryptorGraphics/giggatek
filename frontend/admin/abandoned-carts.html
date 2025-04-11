@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abandoned Carts - Admin Dashboard</title>
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <div class="admin-container">
+        <nav class="admin-sidebar">
+            <div class="logo">
+                <img src="../img/logo.png" alt="GigGatek Logo">
+            </div>
+            <ul class="nav-links">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="products.html">Products</a></li>
+                <li><a href="orders.html">Orders</a></li>
+                <li><a href="customers.html">Customers</a></li>
+                <li class="active"><a href="abandoned-carts.html">Abandoned Carts</a></li>
+                <li><a href="customer-segments.html">Customer Segments</a></li>
+                <li><a href="segment-campaigns.html">Campaigns</a></li>
+                <li><a href="ab-testing.html">A/B Testing</a></li>
+                <li><a href="marketing-integrations.html">Marketing Integrations</a></li>
+                <li><a href="predictive-analytics.html">Predictive Analytics</a></li>
+                <li><a href="settings.html">Settings</a></li>
+            </ul>
+        </nav>
+
+        <main class="admin-content">
+            <header class="admin-header">
+                <h1>Abandoned Carts</h1>
+                <div class="admin-actions">
+                    <a href="abandoned-carts-analytics.html" class="btn btn-secondary">View Analytics</a>
+                    <a href="customer-segments.html" class="btn btn-secondary">Manage Segments</a>
+                    <a href="ab-testing.html" class="btn btn-secondary">A/B Testing</a>
+                    <a href="marketing-integrations.html" class="btn btn-secondary">Marketing Integrations</a>
+                    <a href="predictive-analytics.html" class="btn btn-secondary">Predictive Analytics</a>
+                    <button type="button" id="send-notifications-btn" class="btn btn-primary">Send Recovery Emails</button>
+                </div>
+            </header>
+
+            <div class="admin-stats">
+                <div class="stat-card">
+                    <h3>Total Abandoned Carts</h3>
+                    <p class="stat-value" id="total-carts">Loading...</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Recovered Carts</h3>
+                    <p class="stat-value" id="recovered-carts">Loading...</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Recovery Rate</h3>
+                    <p class="stat-value" id="recovery-rate">Loading...</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Avg. Cart Value</h3>
+                    <p class="stat-value" id="avg-cart-value">Loading...</p>
+                </div>
+            </div>
+
+            <div class="admin-filters">
+                <div class="filter-group">
+                    <label for="status-filter">Status:</label>
+                    <select id="status-filter">
+                        <option value="all">All</option>
+                        <option value="abandoned">Abandoned</option>
+                        <option value="recovered">Recovered</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="date-range">Date Range:</label>
+                    <select id="date-range">
+                        <option value="7">Last 7 days</option>
+                        <option value="30" selected>Last 30 days</option>
+                        <option value="90">Last 90 days</option>
+                        <option value="all">All time</option>
+                    </select>
+                </div>
+                <div class="search-group">
+                    <input type="text" id="search-input" placeholder="Search by email or ID...">
+                    <button type="button" id="search-btn">Search</button>
+                </div>
+            </div>
+
+            <div class="admin-table-container">
+                <table class="admin-table" id="carts-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Customer</th>
+                            <th>Items</th>
+                            <th>Total</th>
+                            <th>Created</th>
+                            <th>Last Notification</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="carts-table-body">
+                        <tr>
+                            <td colspan="8" class="loading-message">Loading abandoned carts...</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="pagination" id="pagination">
+                    <button type="button" id="prev-page" disabled>&laquo; Previous</button>
+                    <span id="page-info">Page 1 of 1</span>
+                    <button type="button" id="next-page" disabled>Next &raquo;</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal for sending notifications -->
+    <div class="modal" id="send-notifications-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Send Recovery Emails</h2>
+            <form id="send-notifications-form">
+                <div class="form-group">
+                    <label for="hours-threshold">Hours since abandonment:</label>
+                    <input type="number" id="hours-threshold" min="1" value="1">
+                </div>
+                <div class="form-group">
+                    <label for="include-discount">Include discount:</label>
+                    <input type="checkbox" id="include-discount" checked>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Send Emails</button>
+                    <button type="button" class="btn btn-secondary close-modal-btn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for viewing cart details -->
+    <div class="modal" id="cart-details-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Cart Details</h2>
+            <div id="cart-details-content">
+                <div class="loading-message">Loading cart details...</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/admin/abandoned-carts.js"></script>
+</body>
+</html>

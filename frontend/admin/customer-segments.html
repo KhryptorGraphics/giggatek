@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Segments - Admin Dashboard</title>
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <div class="admin-container">
+        <nav class="admin-sidebar">
+            <div class="logo">
+                <img src="../img/logo.png" alt="GigGatek Logo">
+            </div>
+            <ul class="nav-links">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="products.html">Products</a></li>
+                <li><a href="orders.html">Orders</a></li>
+                <li><a href="customers.html">Customers</a></li>
+                <li><a href="abandoned-carts.html">Abandoned Carts</a></li>
+                <li class="active"><a href="customer-segments.html">Customer Segments</a></li>
+                <li><a href="segment-campaigns.html">Campaigns</a></li>
+                <li><a href="ab-testing.html">A/B Testing</a></li>
+                <li><a href="marketing-integrations.html">Marketing Integrations</a></li>
+                <li><a href="predictive-analytics.html">Predictive Analytics</a></li>
+                <li><a href="settings.html">Settings</a></li>
+            </ul>
+        </nav>
+
+        <main class="admin-content">
+            <header class="admin-header">
+                <h1>Customer Segments</h1>
+                <div class="admin-actions">
+                    <button type="button" id="create-segment-btn" class="btn btn-primary">Create Segment</button>
+                </div>
+            </header>
+
+            <div class="admin-filters">
+                <div class="filter-group">
+                    <label for="status-filter">Status:</label>
+                    <select id="status-filter">
+                        <option value="all">All</option>
+                        <option value="active" selected>Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+                <div class="search-group">
+                    <input type="text" id="search-input" placeholder="Search segments...">
+                    <button type="button" id="search-btn">Search</button>
+                </div>
+            </div>
+
+            <div class="admin-table-container">
+                <table class="admin-table" id="segments-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Members</th>
+                            <th>Created</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="segments-table-body">
+                        <tr>
+                            <td colspan="7" class="loading-message">Loading segments...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal for creating/editing segments -->
+    <div class="modal" id="segment-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 id="segment-modal-title">Create Segment</h2>
+            <form id="segment-form">
+                <input type="hidden" id="segment-id">
+
+                <div class="form-group">
+                    <label for="segment-name">Name:</label>
+                    <input type="text" id="segment-name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="segment-description">Description:</label>
+                    <textarea id="segment-description" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="segment-active">Active:</label>
+                    <input type="checkbox" id="segment-active" checked>
+                </div>
+
+                <h3>Segment Criteria</h3>
+
+                <div class="criteria-section">
+                    <div class="form-group">
+                        <label>Cart Value:</label>
+                        <div class="criteria-range">
+                            <div class="range-input">
+                                <label for="cart-value-min">Min ($):</label>
+                                <input type="number" id="cart-value-min" min="0" step="0.01">
+                            </div>
+                            <div class="range-input">
+                                <label for="cart-value-max">Max ($):</label>
+                                <input type="number" id="cart-value-max" min="0" step="0.01">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Abandoned Cart Count:</label>
+                        <div class="criteria-range">
+                            <div class="range-input">
+                                <label for="abandoned-count-min">Min:</label>
+                                <input type="number" id="abandoned-count-min" min="0" step="1">
+                            </div>
+                            <div class="range-input">
+                                <label for="abandoned-count-max">Max:</label>
+                                <input type="number" id="abandoned-count-max" min="0" step="1">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Last Abandoned Cart:</label>
+                        <div class="criteria-range">
+                            <div class="range-input">
+                                <label for="last-abandoned-days">Within days:</label>
+                                <input type="number" id="last-abandoned-days" min="1" step="1">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Purchase Count:</label>
+                        <div class="criteria-range">
+                            <div class="range-input">
+                                <label for="purchase-count-min">Min:</label>
+                                <input type="number" id="purchase-count-min" min="0" step="1">
+                            </div>
+                            <div class="range-input">
+                                <label for="purchase-count-max">Max:</label>
+                                <input type="number" id="purchase-count-max" min="0" step="1">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="product-category">Product Category:</label>
+                        <select id="product-category">
+                            <option value="">Any</option>
+                            <option value="GPUs">GPUs</option>
+                            <option value="CPUs">CPUs</option>
+                            <option value="Motherboards">Motherboards</option>
+                            <option value="RAM">RAM</option>
+                            <option value="Storage">Storage</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save Segment</button>
+                    <button type="button" class="btn btn-secondary close-modal-btn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for viewing segment members -->
+    <div class="modal" id="members-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Segment Members</h2>
+            <div id="members-content">
+                <div class="loading-message">Loading members...</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/admin/customer-segments.js"></script>
+
+    <style>
+        .criteria-section {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .criteria-range {
+            display: flex;
+            gap: 15px;
+        }
+
+        .range-input {
+            flex: 1;
+        }
+
+        .range-input label {
+            display: block;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+    </style>
+</body>
+</html>

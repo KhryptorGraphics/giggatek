@@ -16,6 +16,11 @@ from datetime import timedelta
 from admin.routes import admin_bp
 from auth import auth_bp
 from orders import orders_bp
+from abandoned_carts import abandoned_carts_bp
+from segmentation import segmentation_bp
+from ab_testing import ab_testing_bp
+from marketing import marketing_bp
+from predictive import predictive_bp
 from utils.db import get_db_connection
 
 # Initialize Flask app
@@ -34,6 +39,11 @@ app.register_blueprint(auth_bp)
 app.register_blueprint(orders_bp)
 from rentals import rentals_bp
 app.register_blueprint(rentals_bp)
+app.register_blueprint(abandoned_carts_bp)
+app.register_blueprint(segmentation_bp)
+app.register_blueprint(ab_testing_bp)
+app.register_blueprint(marketing_bp)
+app.register_blueprint(predictive_bp)
 
 # Using the centralized get_db_connection from utils.db
 
@@ -103,18 +113,18 @@ def get_product(product_id):
             cursor = conn.cursor(dictionary=True)
             # Fetch all details for a specific product
             cursor.execute("""
-                SELECT product_id, name, description, category, specifications, 
-                condition_rating, purchase_price, rental_price_3m, rental_price_6m, 
+                SELECT product_id, name, description, category, specifications,
+                condition_rating, purchase_price, rental_price_3m, rental_price_6m,
                 rental_price_12m, stock_quantity, image_urls
-                FROM products 
+                FROM products
                 WHERE product_id = %s
             """, (product_id,))
-            
+
             product = cursor.fetchone()
-            
+
             if not product:
                 return jsonify({"status": "error", "message": "Product not found"}), 404
-                
+
             # Process JSON fields
             for field in ['specifications', 'image_urls']:
                 if product.get(field) and isinstance(product[field], str):
@@ -122,13 +132,13 @@ def get_product(product_id):
                         product[field] = json.loads(product[field])
                     except json.JSONDecodeError:
                         product[field] = None
-            
+
             # Set primary_image from image_urls if available
             if product.get('image_urls') and isinstance(product['image_urls'], list) and len(product['image_urls']) > 0:
                 product['primary_image'] = product['image_urls'][0]
             else:
                 product['primary_image'] = None
-                
+
             return jsonify(product)
         else:
             print("Database connection failed.")
@@ -145,9 +155,9 @@ def get_product(product_id):
 # Placeholder product data for development - can be returned when DB is not available
 PLACEHOLDER_PRODUCTS = [
     {
-        "product_id": 1, 
-        "name": "Refurbished GPU Model X", 
-        "category": "GPUs", 
+        "product_id": 1,
+        "name": "Refurbished GPU Model X",
+        "category": "GPUs",
         "description": "A powerful refurbished GPU perfect for gaming and professional work.",
         "specifications": {
             "Memory": "8GB GDDR6",
@@ -158,25 +168,25 @@ PLACEHOLDER_PRODUCTS = [
             "Warranty": "1 Year Limited"
         },
         "condition_rating": "Excellent",
-        "purchase_price": 399.99, 
+        "purchase_price": 399.99,
         "rental_price_3m": 49.99,
         "rental_price_6m": 44.99,
         "rental_price_12m": 39.99,
         "primary_image": None
     },
     {
-        "product_id": 2, 
-        "name": "Refurbished CPU Model Y", 
-        "category": "CPUs", 
-        "purchase_price": 249.99, 
+        "product_id": 2,
+        "name": "Refurbished CPU Model Y",
+        "category": "CPUs",
+        "purchase_price": 249.99,
         "rental_price_12m": 24.99,
         "primary_image": None
     },
     {
-        "product_id": 3, 
-        "name": "Refurbished System Z", 
-        "category": "Systems", 
-        "purchase_price": 899.99, 
+        "product_id": 3,
+        "name": "Refurbished System Z",
+        "category": "Systems",
+        "purchase_price": 899.99,
         "rental_price_12m": 89.99,
         "primary_image": None
     }

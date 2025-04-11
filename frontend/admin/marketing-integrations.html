@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketing Integrations - Admin Dashboard</title>
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <div class="admin-container">
+        <nav class="admin-sidebar">
+            <div class="logo">
+                <img src="../img/logo.png" alt="GigGatek Logo">
+            </div>
+            <ul class="nav-links">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="products.html">Products</a></li>
+                <li><a href="orders.html">Orders</a></li>
+                <li><a href="customers.html">Customers</a></li>
+                <li><a href="abandoned-carts.html">Abandoned Carts</a></li>
+                <li><a href="customer-segments.html">Customer Segments</a></li>
+                <li><a href="segment-campaigns.html">Campaigns</a></li>
+                <li><a href="ab-testing.html">A/B Testing</a></li>
+                <li class="active"><a href="marketing-integrations.html">Marketing Integrations</a></li>
+                <li><a href="predictive-analytics.html">Predictive Analytics</a></li>
+                <li><a href="settings.html">Settings</a></li>
+            </ul>
+        </nav>
+
+        <main class="admin-content">
+            <header class="admin-header">
+                <h1>Marketing Integrations</h1>
+                <div class="admin-actions">
+                    <button type="button" id="create-integration-btn" class="btn btn-primary">Add Integration</button>
+                </div>
+            </header>
+
+            <div class="admin-filters">
+                <div class="filter-group">
+                    <label for="status-filter">Status:</label>
+                    <select id="status-filter">
+                        <option value="all">All</option>
+                        <option value="active" selected>Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+                <div class="search-group">
+                    <input type="text" id="search-input" placeholder="Search integrations...">
+                    <button type="button" id="search-btn">Search</button>
+                </div>
+            </div>
+
+            <div class="admin-table-container">
+                <table class="admin-table" id="integrations-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Provider</th>
+                            <th>API Endpoint</th>
+                            <th>Created</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="integrations-table-body">
+                        <tr>
+                            <td colspan="7" class="loading-message">Loading integrations...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal for creating/editing integrations -->
+    <div class="modal" id="integration-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 id="integration-modal-title">Add Integration</h2>
+            <form id="integration-form">
+                <input type="hidden" id="integration-id">
+
+                <div class="form-group">
+                    <label for="integration-name">Name:</label>
+                    <input type="text" id="integration-name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="integration-provider">Provider:</label>
+                    <select id="integration-provider" required>
+                        <option value="">Select a provider</option>
+                        <option value="mailchimp">Mailchimp</option>
+                        <option value="klaviyo">Klaviyo</option>
+                        <option value="hubspot">HubSpot</option>
+                        <option value="sendgrid">SendGrid</option>
+                        <option value="custom">Custom</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="integration-api-key">API Key:</label>
+                    <input type="password" id="integration-api-key">
+                </div>
+
+                <div class="form-group">
+                    <label for="integration-api-secret">API Secret:</label>
+                    <input type="password" id="integration-api-secret">
+                </div>
+
+                <div class="form-group">
+                    <label for="integration-api-endpoint">API Endpoint:</label>
+                    <input type="text" id="integration-api-endpoint">
+                </div>
+
+                <div class="form-group">
+                    <label for="integration-config">Additional Configuration (JSON):</label>
+                    <textarea id="integration-config" rows="5"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="integration-active">Active:</label>
+                    <input type="checkbox" id="integration-active" checked>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save Integration</button>
+                    <button type="button" class="btn btn-secondary close-modal-btn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for testing integration -->
+    <div class="modal" id="test-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Test Integration</h2>
+            <div id="test-content">
+                <div class="loading-message">Testing connection...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for syncing integration -->
+    <div class="modal" id="sync-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Sync Integration</h2>
+            <div id="sync-content">
+                <p>Select what to sync:</p>
+
+                <div class="form-group">
+                    <label>
+                        <input type="radio" name="sync-type" value="contacts" checked> Contacts
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="radio" name="sync-type" value="lists"> Lists
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="radio" name="sync-type" value="templates"> Templates
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="radio" name="sync-type" value="full"> Full Sync
+                    </label>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" id="start-sync-btn" class="btn btn-primary">Start Sync</button>
+                    <button type="button" class="btn btn-secondary close-modal-btn">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/admin/marketing-integrations.js"></script>
+</body>
+</html>

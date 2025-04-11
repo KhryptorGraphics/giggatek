@@ -27,7 +27,7 @@
 
     <main class="container">
         <h1 class="mb-4">Shopping Cart</h1>
-        
+
         <div class="row">
             <div class="col-12 col-lg-8">
                 <!-- Cart Items -->
@@ -35,7 +35,7 @@
                     <div class="cart-header">
                         <h3>Cart Items (3)</h3>
                     </div>
-                    
+
                     <!-- Item 1 -->
                     <div class="cart-item">
                         <div class="cart-item-image">
@@ -56,7 +56,7 @@
                             <button class="btn btn-sm btn-danger" data-action="remove">Remove</button>
                         </div>
                     </div>
-                    
+
                     <!-- Item 2 -->
                     <div class="cart-item">
                         <div class="cart-item-image">
@@ -77,7 +77,7 @@
                             <button class="btn btn-sm btn-danger" data-action="remove">Remove</button>
                         </div>
                     </div>
-                    
+
                     <!-- Item 3 (Rental) -->
                     <div class="cart-item">
                         <div class="cart-item-image">
@@ -95,14 +95,14 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Empty Cart State (initially hidden) -->
                 <div class="cart-empty" id="empty-cart" style="display: none;">
                     <h3>Your Cart is Empty</h3>
                     <p>Looks like you haven't added any items to your cart yet.</p>
                     <a href="products.php" class="btn btn-primary">Browse Products</a>
                 </div>
-                
+
                 <!-- Recently Viewed -->
                 <div class="recently-viewed mt-5">
                     <h3>Recently Viewed</h3>
@@ -116,7 +116,7 @@
                             <div class="rent-price">From $16.99/mo with Rent-to-Own</div>
                             <a href="product.php?id=3" class="btn btn-primary">View Details</a>
                         </div>
-                        
+
                         <!-- Product 2 -->
                         <div class="product-item">
                             <div class="condition-badge condition-fair">Fair</div>
@@ -129,32 +129,32 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="col-12 col-lg-4">
                 <!-- Cart Summary -->
                 <div class="cart-summary">
                     <h3>Order Summary</h3>
-                    
+
                     <div class="summary-row">
                         <span>Items (3):</span>
                         <span>$1,084.97</span>
                     </div>
-                    
+
                     <div class="summary-row">
                         <span>Shipping:</span>
                         <span>Free</span>
                     </div>
-                    
+
                     <div class="summary-row">
                         <span>Tax:</span>
                         <span>$89.51</span>
                     </div>
-                    
+
                     <div class="summary-total">
                         <span>Total:</span>
                         <span>$1,174.48</span>
                     </div>
-                    
+
                     <div class="summary-details">
                         <div class="summary-detail">
                             <span>One-time Payment:</span>
@@ -165,13 +165,13 @@
                             <span>$134.99/mo</span>
                         </div>
                     </div>
-                    
+
                     <div class="cart-actions">
                         <button class="btn btn-primary btn-block mb-2">Proceed to Checkout</button>
                         <a href="products.php" class="btn btn-outline-secondary btn-block">Continue Shopping</a>
                     </div>
                 </div>
-                
+
                 <!-- Promo Code -->
                 <div class="promo-code-container mt-4">
                     <h4>Promo Code</h4>
@@ -180,7 +180,7 @@
                         <button class="btn btn-outline-primary ml-2">Apply</button>
                     </div>
                 </div>
-                
+
                 <!-- Payment Options -->
                 <div class="payment-options mt-4">
                     <h4>We Accept</h4>
@@ -191,7 +191,7 @@
                         <img src="img/icons/paypal.svg" alt="PayPal">
                     </div>
                 </div>
-                
+
                 <!-- Help Section -->
                 <div class="help-section mt-4">
                     <h4>Need Help?</h4>
@@ -217,49 +217,49 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Quantity controls
             const quantityBtns = document.querySelectorAll('.quantity-btn');
-            
+
             quantityBtns.forEach(btn => {
                 btn.addEventListener('click', function() {
                     const action = this.dataset.action;
                     const input = this.parentElement.querySelector('.quantity-input');
                     const currentValue = parseInt(input.value);
-                    
+
                     if (action === 'decrease' && currentValue > 1) {
                         input.value = currentValue - 1;
                     } else if (action === 'increase' && currentValue < 10) {
                         input.value = currentValue + 1;
                     }
-                    
+
                     // Update cart total (in a real app, this would call an API)
                     updateCartSummary();
                 });
             });
-            
+
             // Remove item buttons
             const removeButtons = document.querySelectorAll('[data-action="remove"]');
-            
+
             removeButtons.forEach(button => {
                 button.addEventListener('click', function() {
                     const cartItem = this.closest('.cart-item');
-                    
+
                     // Animate removal
                     cartItem.style.opacity = '0';
                     setTimeout(() => {
                         cartItem.remove();
-                        
+
                         // Check if cart is empty
                         const remainingItems = document.querySelectorAll('.cart-item');
                         if (remainingItems.length === 0) {
                             document.getElementById('cart-items-container').style.display = 'none';
                             document.getElementById('empty-cart').style.display = 'block';
                         }
-                        
+
                         // Update cart total
                         updateCartSummary();
                     }, 300);
                 });
             });
-            
+
             // Function to update cart summary (simplified for demo)
             function updateCartSummary() {
                 console.log('Cart summary updated');
@@ -267,5 +267,8 @@
             }
         });
     </script>
+    <!-- Cart tracking for abandoned cart recovery -->
+    <script src="js/components/cart-tracker.js"></script>
+    <script src="js/cart-tracking.js"></script>
 </body>
 </html>

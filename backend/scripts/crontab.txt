@@ -1,0 +1,16 @@
+# GigGatek Cron Jobs
+# This file contains cron job configurations for the GigGatek platform.
+# To install these jobs, run: crontab crontab.txt
+
+# Environment variables
+API_URL=http://localhost:5000
+API_TOKEN=your_admin_api_token_here
+
+# Send abandoned cart recovery emails every hour
+0 * * * * cd /path/to/giggatek/backend/scripts && python send_abandoned_cart_emails.py --hours-threshold 1 --max-notifications 3 >> /path/to/giggatek/logs/abandoned_cart_emails.log 2>&1
+
+# Send abandoned cart recovery emails for carts abandoned for 24 hours (once a day)
+0 12 * * * cd /path/to/giggatek/backend/scripts && python send_abandoned_cart_emails.py --hours-threshold 24 --max-notifications 3 >> /path/to/giggatek/logs/abandoned_cart_emails.log 2>&1
+
+# Send abandoned cart recovery emails for carts abandoned for 72 hours (once a day)
+0 14 * * * cd /path/to/giggatek/backend/scripts && python send_abandoned_cart_emails.py --hours-threshold 72 --max-notifications 3 >> /path/to/giggatek/logs/abandoned_cart_emails.log 2>&1

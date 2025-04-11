@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predictive Analytics - Admin Dashboard</title>
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <div class="admin-container">
+        <nav class="admin-sidebar">
+            <div class="logo">
+                <img src="../img/logo.png" alt="GigGatek Logo">
+            </div>
+            <ul class="nav-links">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="products.html">Products</a></li>
+                <li><a href="orders.html">Orders</a></li>
+                <li><a href="customers.html">Customers</a></li>
+                <li><a href="abandoned-carts.html">Abandoned Carts</a></li>
+                <li><a href="customer-segments.html">Customer Segments</a></li>
+                <li><a href="segment-campaigns.html">Campaigns</a></li>
+                <li><a href="ab-testing.html">A/B Testing</a></li>
+                <li><a href="marketing-integrations.html">Marketing Integrations</a></li>
+                <li class="active"><a href="predictive-analytics.html">Predictive Analytics</a></li>
+                <li><a href="settings.html">Settings</a></li>
+            </ul>
+        </nav>
+        
+        <main class="admin-content">
+            <header class="admin-header">
+                <h1>Predictive Analytics</h1>
+                <div class="admin-actions">
+                    <button type="button" id="train-models-btn" class="btn btn-primary">Train Models</button>
+                </div>
+            </header>
+            
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <h3>Recovery Likelihood</h3>
+                    <div class="stat-value" id="avg-recovery-likelihood">--</div>
+                    <div class="stat-label">Average Score</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Recommendations</h3>
+                    <div class="stat-value" id="recommendation-count">--</div>
+                    <div class="stat-label">Generated</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Success Rate</h3>
+                    <div class="stat-value" id="success-rate">--</div>
+                    <div class="stat-label">Applied Recommendations</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Model Accuracy</h3>
+                    <div class="stat-value" id="model-accuracy">--</div>
+                    <div class="stat-label">Average</div>
+                </div>
+            </div>
+            
+            <div class="admin-section">
+                <h2>Recommended Actions</h2>
+                <div class="admin-filters">
+                    <div class="filter-group">
+                        <label for="action-filter">Action:</label>
+                        <select id="action-filter">
+                            <option value="all">All Actions</option>
+                            <option value="email">Email</option>
+                            <option value="discount">Discount</option>
+                            <option value="personalized">Personalized</option>
+                            <option value="wait">Wait</option>
+                            <option value="none">None</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="applied-filter">Status:</label>
+                        <select id="applied-filter">
+                            <option value="all">All</option>
+                            <option value="false" selected>Pending</option>
+                            <option value="true">Applied</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="admin-table-container">
+                    <table class="admin-table" id="recommendations-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Cart ID</th>
+                                <th>Email</th>
+                                <th>Cart Value</th>
+                                <th>Action</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recommendations-table-body">
+                            <tr>
+                                <td colspan="8" class="loading-message">Loading recommendations...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="../js/admin/predictive-analytics.js"></script>
+    
+    <style>
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .stat-card h3 {
+            margin-top: 0;
+            font-size: 16px;
+            color: #555;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: 600;
+            margin: 10px 0;
+            color: #333;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #777;
+        }
+        
+        .admin-section {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .admin-section h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 18px;
+            color: #333;
+        }
+    </style>
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A/B Testing - Admin Dashboard</title>
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <div class="admin-container">
+        <nav class="admin-sidebar">
+            <div class="logo">
+                <img src="../img/logo.png" alt="GigGatek Logo">
+            </div>
+            <ul class="nav-links">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="products.html">Products</a></li>
+                <li><a href="orders.html">Orders</a></li>
+                <li><a href="customers.html">Customers</a></li>
+                <li><a href="abandoned-carts.html">Abandoned Carts</a></li>
+                <li><a href="customer-segments.html">Customer Segments</a></li>
+                <li><a href="segment-campaigns.html">Campaigns</a></li>
+                <li class="active"><a href="ab-testing.html">A/B Testing</a></li>
+                <li><a href="marketing-integrations.html">Marketing Integrations</a></li>
+                <li><a href="predictive-analytics.html">Predictive Analytics</a></li>
+                <li><a href="settings.html">Settings</a></li>
+            </ul>
+        </nav>
+
+        <main class="admin-content">
+            <header class="admin-header">
+                <h1>A/B Testing</h1>
+                <div class="admin-actions">
+                    <button type="button" id="create-campaign-btn" class="btn btn-primary">Create Test Campaign</button>
+                </div>
+            </header>
+
+            <div class="admin-filters">
+                <div class="filter-group">
+                    <label for="status-filter">Status:</label>
+                    <select id="status-filter">
+                        <option value="all">All</option>
+                        <option value="draft">Draft</option>
+                        <option value="active" selected>Active</option>
+                        <option value="paused">Paused</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </div>
+                <div class="search-group">
+                    <input type="text" id="search-input" placeholder="Search campaigns...">
+                    <button type="button" id="search-btn">Search</button>
+                </div>
+            </div>
+
+            <div class="admin-table-container">
+                <table class="admin-table" id="campaigns-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Segment</th>
+                            <th>Variants</th>
+                            <th>Date Range</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="campaigns-table-body">
+                        <tr>
+                            <td colspan="7" class="loading-message">Loading campaigns...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal for creating/editing campaigns -->
+    <div class="modal" id="campaign-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 id="campaign-modal-title">Create A/B Test Campaign</h2>
+            <form id="campaign-form">
+                <input type="hidden" id="campaign-id">
+
+                <div class="form-group">
+                    <label for="campaign-name">Name:</label>
+                    <input type="text" id="campaign-name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="campaign-segment">Segment:</label>
+                    <select id="campaign-segment">
+                        <option value="">No segment (all users)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="campaign-description">Description:</label>
+                    <textarea id="campaign-description" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="campaign-start-date">Start Date:</label>
+                    <input type="datetime-local" id="campaign-start-date">
+                </div>
+
+                <div class="form-group">
+                    <label for="campaign-end-date">End Date:</label>
+                    <input type="datetime-local" id="campaign-end-date">
+                </div>
+
+                <div class="form-group">
+                    <label for="campaign-status">Status:</label>
+                    <select id="campaign-status" required>
+                        <option value="draft">Draft</option>
+                        <option value="active">Active</option>
+                        <option value="paused">Paused</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save Campaign</button>
+                    <button type="button" class="btn btn-secondary close-modal-btn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/admin/ab-testing.js"></script>
+
+    <style>
+        .badge {
+            display: inline-block;
+            padding: 0.25em 0.4em;
+            font-size: 75%;
+            font-weight: 700;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: 0.25rem;
+            text-transform: capitalize;
+        }
+
+        .badge-success {
+            color: #fff;
+            background-color: #28a745;
+        }
+
+        .badge-secondary {
+            color: #fff;
+            background-color: #6c757d;
+        }
+
+        .badge-warning {
+            color: #212529;
+            background-color: #ffc107;
+        }
+
+        .badge-info {
+            color: #fff;
+            background-color: #17a2b8;
+        }
+    </style>
+</body>
+</html>
