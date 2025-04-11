@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Integration Example - GigGatek</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/main.css">
+    <style>
+        body {
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .example-section {
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            margin-bottom: 15px;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #dee2e6;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            border-top-left-radius: 0.25rem;
+            border-top-right-radius: 0.25rem;
+            margin-bottom: -1px;
+        }
+
+        .tab.active {
+            color: #495057;
+            background-color: #fff;
+            border-color: #dee2e6 #dee2e6 #fff;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .product-list-component {
+            margin-bottom: 30px;
+        }
+
+        .product-list-filters {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 0.25rem;
+            margin-bottom: 20px;
+        }
+
+        .filters-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .price-range {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-actions {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+        }
+
+        .product-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .product-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .product-list.product-list-view {
+            display: block;
+        }
+
+        .product-card {
+            border: 1px solid #dee2e6;
+            border-radius: 0.25rem;
+            overflow: hidden;
+        }
+
+        .product-card-list {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .product-card-list .product-image {
+            flex: 0 0 200px;
+        }
+
+        .product-card-list .product-details {
+            flex: 1;
+            padding: 15px;
+        }
+
+        .product-card-grid .product-details {
+            padding: 15px;
+        }
+
+        .product-image {
+            position: relative;
+            padding-bottom: 75%;
+        }
+
+        .product-image img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-title {
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        .product-price {
+            margin-bottom: 15px;
+        }
+
+        .price-buy {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #0066cc;
+        }
+
+        .price-rent {
+            display: block;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .cart-items {
+            margin-bottom: 20px;
+        }
+
+        .cart-header {
+            display: grid;
+            grid-template-columns: 3fr 1fr 1fr 1fr 1fr;
+            gap: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            font-weight: bold;
+        }
+
+        .cart-item {
+            display: grid;
+            grid-template-columns: 3fr 1fr 1fr 1fr 1fr;
+            gap: 10px;
+            padding: 10px;
+            border-bottom: 1px solid #dee2e6;
+            align-items: center;
+        }
+
+        .cart-item-product {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .cart-item-image {
+            flex: 0 0 80px;
+            height: 80px;
+        }
+
+        .cart-item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 0.25rem;
+        }
+
+        .cart-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 0.25rem;
+        }
+
+        .cart-total {
+            font-size: 1.2rem;
+        }
+
+        .total-amount {
+            font-weight: bold;
+            color: #0066cc;
+        }
+
+        .cart-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+        }
+
+        .btn-quantity {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 0.25rem;
+            cursor: pointer;
+        }
+
+        .quantity-input {
+            width: 40px;
+            height: 30px;
+            text-align: center;
+            border: 1px solid #dee2e6;
+            margin: 0 5px;
+        }
+
+        .order-history-table th,
+        .order-history-table td {
+            padding: 10px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+        }
+
+        .status-pending {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .status-processing {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .status-shipped {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .status-delivered {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .status-cancelled {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1050;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-dialog {
+            width: 100%;
+            max-width: 600px;
+            margin: 1.75rem auto;
+        }
+
+        .modal-content {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            background-color: #fff;
+            border-radius: 0.3rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            padding: 1rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .modal-title {
+            margin: 0;
+            font-size: 1.25rem;
+        }
+
+        .close {
+            background: transparent;
+            border: 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1;
+            color: #000;
+            text-shadow: 0 1px 0 #fff;
+            opacity: 0.5;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            opacity: 1;
+        }
+
+        .modal-body {
+            position: relative;
+            flex: 1 1 auto;
+            padding: 1rem;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            padding: 1rem;
+            border-top: 1px solid #dee2e6;
+            gap: 10px;
+        }
+
+        .rating-input {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+        }
+
+        .rating-input input {
+            display: none;
+        }
+
+        .rating-input label {
+            font-size: 2rem;
+            color: #ddd;
+            cursor: pointer;
+        }
+
+        .rating-input label:hover,
+        .rating-input label:hover ~ label,
+        .rating-input input:checked ~ label {
+            color: #ffc107;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.375rem 0.75rem;
+            border-radius: 0.25rem;
+            font-size: 1rem;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            background-color: #0066cc;
+            color: white;
+            border: 1px solid transparent;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .form-control {
+            display: block;
+            width: 100%;
+            padding: 0.375rem 0.75rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #495057;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-form {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 0.25rem;
+        }
+
+        .auth-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .auth-toggle {
+            cursor: pointer;
+            color: #0066cc;
+        }
+
+        .auth-toggle:hover {
+            text-decoration: underline;
+        }
+
+        .auth-form.hidden {
+            display: none;
+        }
+
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+            border-radius: 0.25rem;
+        }
+
+        .alert-info {
+            color: #0c5460;
+            background-color: #d1ecf1;
+            border-color: #bee5eb;
+        }
+
+        .alert h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        .alert code {
+            background-color: rgba(0, 0, 0, 0.05);
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-to-content">Skip to main content</a>
+
+    <div class="container">
+        <main id="main-content">
+            <h1>API Integration Example</h1>
+
+        <div class="alert alert-info">
+            <h3>Mock API Server</h3>
+            <p>This example uses a mock API server for demonstration purposes. To use this example:</p>
+            <ol>
+                <li>Open a terminal in the <code>frontend/mock-api</code> directory</li>
+                <li>Run <code>npm install</code> to install dependencies</li>
+                <li>Run <code>npm start</code> to start the mock API server</li>
+                <li>The server will run on <code>http://localhost:3000</code></li>
+            </ol>
+            <p>Alternatively, you can run the <code>setup-mock-api.bat</code> or <code>setup-mock-api.ps1</code> script in the frontend directory.</p>
+            <p><strong>Test Users:</strong></p>
+            <ul>
+                <li>Customer: <code>john@example.com</code> / <code>password123</code></li>
+                <li>Admin: <code>admin@example.com</code> / <code>admin123</code></li>
+            </ul>
+        </div>
+
+            <div class="tabs">
+                <div class="tab active" data-tab="products">Products</div>
+                <div class="tab" data-tab="cart">Shopping Cart</div>
+                <div class="tab" data-tab="orders">Order History</div>
+                <div class="tab" data-tab="auth">Authentication</div>
+            </div>
+
+            <div class="tab-content active" id="products-tab">
+                <div id="product-list-container"></div>
+            </div>
+
+            <div class="tab-content" id="cart-tab">
+                <div id="shopping-cart-container"></div>
+            </div>
+
+            <div class="tab-content" id="orders-tab">
+                <div id="order-history-container"></div>
+            </div>
+
+            <div class="tab-content" id="auth-tab">
+                <div class="auth-container">
+                    <div id="login-form" class="auth-form">
+                        <h2>Login</h2>
+                        <div class="form-group">
+                            <label for="login-email">Email</label>
+                            <input type="email" id="login-email" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="login-password">Password</label>
+                            <input type="password" id="login-password" class="form-control" required>
+                        </div>
+                        <div class="auth-actions">
+                            <button type="button" id="login-button" class="btn btn-primary">Login</button>
+                            <span class="auth-toggle" id="show-register">Create an account</span>
+                        </div>
+                    </div>
+
+                    <div id="register-form" class="auth-form hidden">
+                        <h2>Register</h2>
+                        <div class="form-group">
+                            <label for="register-name">Name</label>
+                            <input type="text" id="register-name" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-email">Email</label>
+                            <input type="email" id="register-email" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-password">Password</label>
+                            <input type="password" id="register-password" class="form-control" required>
+                        </div>
+                        <div class="auth-actions">
+                            <button type="button" id="register-button" class="btn btn-primary">Register</button>
+                            <span class="auth-toggle" id="show-login">Already have an account</span>
+                        </div>
+                    </div>
+
+                    <div id="user-profile" class="auth-form hidden">
+                        <h2>User Profile</h2>
+                        <div id="profile-info"></div>
+                        <div class="auth-actions">
+                            <button type="button" id="logout-button" class="btn btn-secondary">Logout</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/accessibility.js"></script>
+    <script src="../js/notifications.js"></script>
+    <script src="../js/progressive-loading.js"></script>
+    <script src="../js/api-client.js"></script>
+    <script src="../js/state-manager.js"></script>
+    <script src="../js/error-handler.js"></script>
+    <script src="../js/data-service.js"></script>
+    <script src="../js/components/product-list.js"></script>
+    <script src="../js/components/shopping-cart.js"></script>
+    <script src="../js/components/order-history.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize components
+            initializeTabs();
+            initializeComponents();
+            initializeAuth();
+
+            // Check authentication status
+            checkAuthStatus();
+        });
+
+        // Initialize tabs
+        function initializeTabs() {
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Remove active class from all tabs
+                    tabs.forEach(t => t.classList.remove('active'));
+
+                    // Add active class to clicked tab
+                    tab.classList.add('active');
+
+                    // Hide all tab contents
+                    tabContents.forEach(content => content.classList.remove('active'));
+
+                    // Show corresponding tab content
+                    const tabId = tab.dataset.tab;
+                    document.getElementById(`${tabId}-tab`).classList.add('active');
+                });
+            });
+        }
+
+        // Initialize components
+        function initializeComponents() {
+            // Initialize product list
+            const productListContainer = document.getElementById('product-list-container');
+            if (productListContainer) {
+                window.productList = new ProductList(productListContainer, {
+                    perPage: 6,
+                    layout: 'grid',
+                    showFilters: true,
+                    showPagination: true,
+                    showSorting: true
+                });
+            }
+
+            // Initialize shopping cart
+            const shoppingCartContainer = document.getElementById('shopping-cart-container');
+            if (shoppingCartContainer) {
+                window.shoppingCart = new ShoppingCart(shoppingCartContainer, {
+                    showCheckoutButton: true,
+                    showContinueShopping: true
+                });
+            }
+
+            // Initialize order history
+            const orderHistoryContainer = document.getElementById('order-history-container');
+            if (orderHistoryContainer) {
+                window.orderHistory = new OrderHistory(orderHistoryContainer, {
+                    perPage: 5,
+                    showPagination: true
+                });
+            }
+        }
+
+        // Initialize authentication
+        function initializeAuth() {
+            // Show login form
+            const showLoginButton = document.getElementById('show-login');
+            if (showLoginButton) {
+                showLoginButton.addEventListener('click', () => {
+                    document.getElementById('register-form').classList.add('hidden');
+                    document.getElementById('login-form').classList.remove('hidden');
+                });
+            }
+
+            // Show register form
+            const showRegisterButton = document.getElementById('show-register');
+            if (showRegisterButton) {
+                showRegisterButton.addEventListener('click', () => {
+                    document.getElementById('login-form').classList.add('hidden');
+                    document.getElementById('register-form').classList.remove('hidden');
+                });
+            }
+
+            // Login button
+            const loginButton = document.getElementById('login-button');
+            if (loginButton) {
+                loginButton.addEventListener('click', async () => {
+                    const email = document.getElementById('login-email').value;
+                    const password = document.getElementById('login-password').value;
+
+                    if (!email || !password) {
+                        notifications.warning('Please enter email and password', 'Login Error');
+                        return;
+                    }
+
+                    try {
+                        // Show loading notification
+                        notifications.info('Logging in...', 'Please Wait');
+
+                        // Login
+                        await api.login(email, password);
+
+                        // Show success notification
+                        notifications.success('Logged in successfully', 'Login Success');
+
+                        // Update UI
+                        checkAuthStatus();
+                    } catch (error) {
+                        // Show error notification
+                        notifications.error(`Login failed: ${error.message}`, 'Login Error');
+
+                        // Log error
+                        console.error('Login error:', error);
+                    }
+                });
+            }
+
+            // Register button
+            const registerButton = document.getElementById('register-button');
+            if (registerButton) {
+                registerButton.addEventListener('click', async () => {
+                    const name = document.getElementById('register-name').value;
+                    const email = document.getElementById('register-email').value;
+                    const password = document.getElementById('register-password').value;
+
+                    if (!name || !email || !password) {
+                        notifications.warning('Please fill all fields', 'Registration Error');
+                        return;
+                    }
+
+                    try {
+                        // Show loading notification
+                        notifications.info('Registering...', 'Please Wait');
+
+                        // Register
+                        await api.register({
+                            name,
+                            email,
+                            password
+                        });
+
+                        // Show success notification
+                        notifications.success('Registered successfully. Please log in.', 'Registration Success');
+
+                        // Show login form
+                        document.getElementById('register-form').classList.add('hidden');
+                        document.getElementById('login-form').classList.remove('hidden');
+
+                        // Pre-fill email
+                        document.getElementById('login-email').value = email;
+                    } catch (error) {
+                        // Show error notification
+                        notifications.error(`Registration failed: ${error.message}`, 'Registration Error');
+
+                        // Log error
+                        console.error('Registration error:', error);
+                    }
+                });
+            }
+
+            // Logout button
+            const logoutButton = document.getElementById('logout-button');
+            if (logoutButton) {
+                logoutButton.addEventListener('click', async () => {
+                    try {
+                        // Show loading notification
+                        notifications.info('Logging out...', 'Please Wait');
+
+                        // Logout
+                        await api.logout();
+
+                        // Show success notification
+                        notifications.success('Logged out successfully', 'Logout Success');
+
+                        // Update UI
+                        checkAuthStatus();
+                    } catch (error) {
+                        // Show error notification
+                        notifications.error(`Logout failed: ${error.message}`, 'Logout Error');
+
+                        // Log error
+                        console.error('Logout error:', error);
+                    }
+                });
+            }
+
+            // Listen for authentication events
+            window.addEventListener('auth:expired', () => {
+                notifications.warning('Your session has expired. Please log in again.', 'Session Expired');
+                checkAuthStatus();
+            });
+
+            window.addEventListener('auth:logout', () => {
+                checkAuthStatus();
+            });
+        }
+
+        // Check authentication status
+        async function checkAuthStatus() {
+            const isAuthenticated = api.isAuthenticated();
+
+            // Update UI based on authentication status
+            if (isAuthenticated) {
+                try {
+                    // Get current user
+                    const user = await dataService.getCurrentUser();
+
+                    // Update profile info
+                    const profileInfo = document.getElementById('profile-info');
+                    if (profileInfo) {
+                        profileInfo.innerHTML = `
+                            <p><strong>Name:</strong> ${user.name}</p>
+                            <p><strong>Email:</strong> ${user.email}</p>
+                            <p><strong>Role:</strong> ${user.role}</p>
+                        `;
+                    }
+
+                    // Show user profile
+                    document.getElementById('login-form').classList.add('hidden');
+                    document.getElementById('register-form').classList.add('hidden');
+                    document.getElementById('user-profile').classList.remove('hidden');
+
+                    // Reload order history
+                    if (window.orderHistory) {
+                        window.orderHistory.loadOrders();
+                    }
+                } catch (error) {
+                    console.error('Error getting user profile:', error);
+
+                    // Clear authentication if error
+                    api.clearTokens();
+
+                    // Show login form
+                    document.getElementById('login-form').classList.remove('hidden');
+                    document.getElementById('register-form').classList.add('hidden');
+                    document.getElementById('user-profile').classList.add('hidden');
+                }
+            } else {
+                // Show login form
+                document.getElementById('login-form').classList.remove('hidden');
+                document.getElementById('register-form').classList.add('hidden');
+                document.getElementById('user-profile').classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
