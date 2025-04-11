@@ -1,0 +1,117 @@
+// Responsive breakpoint mixins
+@mixin respond-above($breakpoint) {
+  @if $breakpoint == xs {
+    @media (min-width: $breakpoint-xs) { @content; }
+  } @else if $breakpoint == sm {
+    @media (min-width: $breakpoint-sm) { @content; }
+  } @else if $breakpoint == md {
+    @media (min-width: $breakpoint-md) { @content; }
+  } @else if $breakpoint == lg {
+    @media (min-width: $breakpoint-lg) { @content; }
+  } @else if $breakpoint == xl {
+    @media (min-width: $breakpoint-xl) { @content; }
+  } @else if $breakpoint == xxl {
+    @media (min-width: $breakpoint-xxl) { @content; }
+  }
+}
+
+@mixin respond-below($breakpoint) {
+  @if $breakpoint == xs {
+    @media (max-width: $breakpoint-sm - 1) { @content; }
+  } @else if $breakpoint == sm {
+    @media (max-width: $breakpoint-md - 1) { @content; }
+  } @else if $breakpoint == md {
+    @media (max-width: $breakpoint-lg - 1) { @content; }
+  } @else if $breakpoint == lg {
+    @media (max-width: $breakpoint-xl - 1) { @content; }
+  } @else if $breakpoint == xl {
+    @media (max-width: $breakpoint-xxl - 1) { @content; }
+  }
+}
+
+@mixin respond-between($lower, $upper) {
+  @if $lower == xs and $upper == sm {
+    @media (max-width: $breakpoint-sm - 1) { @content; }
+  } @else if $lower == xs and $upper == md {
+    @media (max-width: $breakpoint-md - 1) { @content; }
+  } @else if $lower == xs and $upper == lg {
+    @media (max-width: $breakpoint-lg - 1) { @content; }
+  } @else if $lower == xs and $upper == xl {
+    @media (max-width: $breakpoint-xl - 1) { @content; }
+  } @else if $lower == sm and $upper == md {
+    @media (min-width: $breakpoint-sm) and (max-width: $breakpoint-md - 1) { @content; }
+  } @else if $lower == sm and $upper == lg {
+    @media (min-width: $breakpoint-sm) and (max-width: $breakpoint-lg - 1) { @content; }
+  } @else if $lower == sm and $upper == xl {
+    @media (min-width: $breakpoint-sm) and (max-width: $breakpoint-xl - 1) { @content; }
+  } @else if $lower == md and $upper == lg {
+    @media (min-width: $breakpoint-md) and (max-width: $breakpoint-lg - 1) { @content; }
+  } @else if $lower == md and $upper == xl {
+    @media (min-width: $breakpoint-md) and (max-width: $breakpoint-xl - 1) { @content; }
+  } @else if $lower == lg and $upper == xl {
+    @media (min-width: $breakpoint-lg) and (max-width: $breakpoint-xl - 1) { @content; }
+  }
+}
+
+// Accessibility mixins
+@mixin focus-outline {
+  outline: $focus-ring-width solid $focus-ring-color;
+  outline-offset: 2px;
+}
+
+@mixin visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+// Touch-friendly mixins
+@mixin touch-target($size: 44px) {
+  min-width: $size;
+  min-height: $size;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// Responsive table mixins
+@mixin responsive-table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  
+  @include respond-above(lg) {
+    display: table;
+    overflow-x: initial;
+  }
+}
+
+// High contrast mode mixins
+@mixin high-contrast-mode {
+  @media (forced-colors: active) {
+    @content;
+  }
+}
+
+// Progressive loading mixins
+@mixin skeleton-loading {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}

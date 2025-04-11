@@ -1,0 +1,241 @@
+@import 'variables';
+@import 'mixins';
+
+// Skeleton loading
+.skeleton {
+  @include skeleton-loading;
+  border-radius: 0.25rem;
+  
+  &.skeleton-text {
+    height: 1rem;
+    margin-bottom: 0.5rem;
+    width: 100%;
+    
+    &.skeleton-text-sm {
+      width: 60%;
+    }
+    
+    &.skeleton-text-lg {
+      height: 1.5rem;
+    }
+  }
+  
+  &.skeleton-circle {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    
+    &.skeleton-circle-sm {
+      width: 2rem;
+      height: 2rem;
+    }
+    
+    &.skeleton-circle-lg {
+      width: 5rem;
+      height: 5rem;
+    }
+  }
+  
+  &.skeleton-image {
+    width: 100%;
+    height: 0;
+    padding-bottom: 56.25%; // 16:9 aspect ratio
+    
+    &.skeleton-image-square {
+      padding-bottom: 100%;
+    }
+  }
+  
+  &.skeleton-button {
+    height: 2.5rem;
+    width: 6rem;
+  }
+}
+
+// Skeleton card
+.skeleton-card {
+  border-radius: 0.25rem;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  
+  .skeleton-card-img {
+    @include skeleton-loading;
+    width: 100%;
+    height: 0;
+    padding-bottom: 56.25%;
+  }
+  
+  .skeleton-card-body {
+    padding: 1rem;
+    background-color: $light-color;
+    border: 1px solid #dee2e6;
+    border-top: none;
+    
+    .skeleton-card-title {
+      @include skeleton-loading;
+      height: 1.5rem;
+      margin-bottom: 1rem;
+      width: 80%;
+    }
+    
+    .skeleton-card-text {
+      @include skeleton-loading;
+      height: 1rem;
+      margin-bottom: 0.5rem;
+      width: 100%;
+      
+      &:last-child {
+        width: 60%;
+      }
+    }
+  }
+}
+
+// Skeleton table
+.skeleton-table {
+  width: 100%;
+  margin-bottom: 1rem;
+  
+  .skeleton-table-head {
+    @include skeleton-loading;
+    height: 2.5rem;
+    margin-bottom: 0.5rem;
+    border-radius: 0.25rem;
+  }
+  
+  .skeleton-table-row {
+    @include skeleton-loading;
+    height: 2rem;
+    margin-bottom: 0.5rem;
+    border-radius: 0.25rem;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+// Lazy loading images
+.lazy-image-container {
+  position: relative;
+  overflow: hidden;
+  background-color: #f8f9fa;
+  
+  .lazy-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    
+    &.loaded {
+      opacity: 1;
+    }
+  }
+  
+  .lazy-image-placeholder {
+    @include skeleton-loading;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transition: opacity 0.3s ease;
+    
+    &.hidden {
+      opacity: 0;
+    }
+  }
+}
+
+// Infinite scroll loader
+.infinite-scroll-loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem 0;
+  
+  .loader-spinner {
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 0.25rem solid rgba(0, 0, 0, 0.1);
+    border-top-color: $primary-color;
+    border-radius: 50%;
+    animation: spinner 1s linear infinite;
+  }
+  
+  .loader-text {
+    margin-left: 1rem;
+    font-size: 1rem;
+    color: $secondary-color;
+  }
+}
+
+@keyframes spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Content placeholder
+.content-placeholder {
+  padding: 1.5rem;
+  background-color: $light-color;
+  border-radius: 0.25rem;
+  border: 1px solid #dee2e6;
+  text-align: center;
+  
+  .placeholder-icon {
+    font-size: 3rem;
+    color: $secondary-color;
+    margin-bottom: 1rem;
+  }
+  
+  .placeholder-text {
+    font-size: 1.25rem;
+    color: $secondary-color;
+    margin-bottom: 1.5rem;
+  }
+  
+  .placeholder-action {
+    .btn {
+      min-width: 8rem;
+    }
+  }
+}
+
+// Progressive image loading
+.progressive-image {
+  position: relative;
+  overflow: hidden;
+  
+  .progressive-image-thumbnail {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    filter: blur(10px);
+    transform: scale(1.1);
+    transition: opacity 0.3s ease;
+    opacity: 1;
+  }
+  
+  .progressive-image-full {
+    position: relative;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    
+    &.loaded {
+      opacity: 1;
+      
+      & + .progressive-image-thumbnail {
+        opacity: 0;
+      }
+    }
+  }
+}

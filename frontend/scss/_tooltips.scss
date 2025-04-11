@@ -1,0 +1,255 @@
+@import 'variables';
+@import 'mixins';
+
+// Tooltips
+.tooltip {
+  position: absolute;
+  z-index: $z-index-tooltip;
+  display: block;
+  margin: 0;
+  font-family: $font-family-base;
+  font-style: normal;
+  font-weight: $font-weight-normal;
+  line-height: $line-height-base;
+  text-align: left;
+  text-decoration: none;
+  text-shadow: none;
+  text-transform: none;
+  letter-spacing: normal;
+  word-break: normal;
+  word-spacing: normal;
+  white-space: normal;
+  line-break: auto;
+  font-size: 0.875rem;
+  word-wrap: break-word;
+  opacity: 0;
+  
+  &.show {
+    opacity: 0.9;
+  }
+  
+  .tooltip-arrow {
+    position: absolute;
+    display: block;
+    width: 0.8rem;
+    height: 0.4rem;
+    
+    &::before {
+      position: absolute;
+      content: "";
+      border-color: transparent;
+      border-style: solid;
+    }
+  }
+  
+  .tooltip-inner {
+    max-width: 200px;
+    padding: 0.25rem 0.5rem;
+    color: $light-color;
+    text-align: center;
+    background-color: $dark-color;
+    border-radius: 0.25rem;
+  }
+}
+
+.bs-tooltip-top {
+  padding: 0.4rem 0;
+  
+  .tooltip-arrow {
+    bottom: 0;
+    
+    &::before {
+      top: -1px;
+      border-width: 0.4rem 0.4rem 0;
+      border-top-color: $dark-color;
+    }
+  }
+}
+
+.bs-tooltip-end {
+  padding: 0 0.4rem;
+  
+  .tooltip-arrow {
+    left: 0;
+    width: 0.4rem;
+    height: 0.8rem;
+    
+    &::before {
+      right: -1px;
+      border-width: 0.4rem 0.4rem 0.4rem 0;
+      border-right-color: $dark-color;
+    }
+  }
+}
+
+.bs-tooltip-bottom {
+  padding: 0.4rem 0;
+  
+  .tooltip-arrow {
+    top: 0;
+    
+    &::before {
+      bottom: -1px;
+      border-width: 0 0.4rem 0.4rem;
+      border-bottom-color: $dark-color;
+    }
+  }
+}
+
+.bs-tooltip-start {
+  padding: 0 0.4rem;
+  
+  .tooltip-arrow {
+    right: 0;
+    width: 0.4rem;
+    height: 0.8rem;
+    
+    &::before {
+      left: -1px;
+      border-width: 0.4rem 0 0.4rem 0.4rem;
+      border-left-color: $dark-color;
+    }
+  }
+}
+
+// Help icon with tooltip
+.help-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  background-color: $info-color;
+  color: $light-color;
+  font-size: 0.75rem;
+  font-weight: $font-weight-bold;
+  margin-left: 0.25rem;
+  cursor: help;
+  
+  &:focus {
+    @include focus-outline;
+  }
+}
+
+// Contextual help panel
+.help-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 100%;
+  max-width: 350px;
+  height: 100%;
+  background-color: $light-color;
+  box-shadow: -0.25rem 0 0.5rem rgba(0, 0, 0, 0.1);
+  z-index: $z-index-fixed;
+  transform: translateX(100%);
+  transition: transform 0.3s ease-in-out;
+  overflow-y: auto;
+  
+  &.show {
+    transform: translateX(0);
+  }
+  
+  .help-panel-header {
+    padding: 1rem;
+    background-color: $primary-color;
+    color: $light-color;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    
+    h3 {
+      margin: 0;
+      font-size: 1.25rem;
+    }
+    
+    .help-panel-close {
+      background: none;
+      border: none;
+      color: $light-color;
+      font-size: 1.5rem;
+      line-height: 1;
+      padding: 0.25rem;
+      cursor: pointer;
+      
+      &:focus {
+        @include focus-outline;
+      }
+    }
+  }
+  
+  .help-panel-body {
+    padding: 1rem;
+    
+    .help-section {
+      margin-bottom: 1.5rem;
+      
+      h4 {
+        font-size: 1.1rem;
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #dee2e6;
+      }
+      
+      p {
+        margin-bottom: 1rem;
+      }
+      
+      ul {
+        padding-left: 1.5rem;
+        margin-bottom: 1rem;
+      }
+      
+      .help-image {
+        max-width: 100%;
+        height: auto;
+        margin-bottom: 1rem;
+        border-radius: 0.25rem;
+        border: 1px solid #dee2e6;
+      }
+    }
+  }
+  
+  .help-panel-footer {
+    padding: 1rem;
+    border-top: 1px solid #dee2e6;
+    
+    .help-feedback {
+      margin-bottom: 1rem;
+      
+      p {
+        margin-bottom: 0.5rem;
+      }
+      
+      .btn-group {
+        display: flex;
+        gap: 0.5rem;
+      }
+    }
+    
+    .help-links {
+      a {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: $primary-color;
+        text-decoration: none;
+        
+        &:hover {
+          text-decoration: underline;
+        }
+        
+        &:focus {
+          @include focus-outline;
+        }
+      }
+    }
+  }
+}
+
+// Field-level help text
+.form-text {
+  margin-top: 0.25rem;
+  font-size: 0.875em;
+  color: $secondary-color;
+}

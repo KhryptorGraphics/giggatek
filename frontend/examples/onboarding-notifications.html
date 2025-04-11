@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onboarding & Notifications Example - GigGatek</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/main.css">
+    <style>
+        body {
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        
+        .example-section {
+            margin-bottom: 40px;
+        }
+        
+        h1 {
+            margin-bottom: 20px;
+        }
+        
+        h2 {
+            margin-bottom: 15px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 0.375rem 0.75rem;
+            border-radius: 0.25rem;
+            font-size: 1rem;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            background-color: #0066cc;
+            color: white;
+            border: 1px solid transparent;
+            margin-right: 10px;
+        }
+        
+        .btn-success {
+            background-color: #28a745;
+        }
+        
+        .btn-info {
+            background-color: #17a2b8;
+        }
+        
+        .btn-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        
+        .btn-danger {
+            background-color: #dc3545;
+        }
+        
+        .demo-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .help-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.25rem;
+            height: 1.25rem;
+            border-radius: 50%;
+            background-color: #17a2b8;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-left: 0.25rem;
+            cursor: help;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        label {
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-control {
+            display: block;
+            width: 100%;
+            max-width: 300px;
+            padding: 0.375rem 0.75rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #495057;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        
+        .form-text {
+            display: block;
+            margin-top: 0.25rem;
+            font-size: 0.875em;
+            color: #6c757d;
+        }
+        
+        #product-catalog,
+        #orders-section,
+        #support-section {
+            padding: 20px;
+            border: 1px solid #dee2e6;
+            border-radius: 0.25rem;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-to-content">Skip to main content</a>
+    
+    <main id="main-content">
+        <h1>Onboarding & Notifications Example</h1>
+        
+        <div class="example-section">
+            <h2>Notifications</h2>
+            <p>Click the buttons below to show different types of notifications.</p>
+            
+            <div class="demo-container">
+                <button id="success-notification" class="btn btn-success">Success Notification</button>
+                <button id="info-notification" class="btn btn-info">Info Notification</button>
+                <button id="warning-notification" class="btn btn-warning">Warning Notification</button>
+                <button id="error-notification" class="btn btn-danger">Error Notification</button>
+                <button id="action-notification" class="btn">Notification with Actions</button>
+            </div>
+        </div>
+        
+        <div class="example-section">
+            <h2>Guided Onboarding</h2>
+            <p>Click the button below to start the guided onboarding tour.</p>
+            
+            <button id="start-onboarding" class="btn">Start Guided Tour</button>
+        </div>
+        
+        <div class="example-section">
+            <h2>Tooltips & Contextual Help</h2>
+            <p>Hover over the elements below to see tooltips and contextual help.</p>
+            
+            <div class="form-group">
+                <label for="username">Username <span class="help-icon" data-tooltip="Enter your username or email address">?</span></label>
+                <input type="text" id="username" class="form-control" placeholder="Enter username">
+                <small class="form-text">Your username must be 5-20 characters long.</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password <span class="help-icon" data-tooltip="Password must be at least 8 characters with at least one number and one special character">?</span></label>
+                <input type="password" id="password" class="form-control" placeholder="Enter password">
+                <small class="form-text">Your password must be 8-20 characters long, contain letters, numbers, and special characters.</small>
+            </div>
+        </div>
+        
+        <!-- Sections for onboarding -->
+        <div id="product-catalog">
+            <h3>Product Catalog</h3>
+            <p>Browse our wide range of professional equipment for rent or purchase.</p>
+            <div class="card-swipe-container">
+                <div class="card">
+                    <img src="https://via.placeholder.com/300x200" alt="Product 1">
+                    <div class="card-body">
+                        <h4>Professional Camera</h4>
+                        <p>$1,299.99</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <img src="https://via.placeholder.com/300x200" alt="Product 2">
+                    <div class="card-body">
+                        <h4>Wireless Microphone</h4>
+                        <p>$249.99</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <img src="https://via.placeholder.com/300x200" alt="Product 3">
+                    <div class="card-body">
+                        <h4>Lighting Kit</h4>
+                        <p>$599.99</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="orders-section">
+            <h3>Orders & Rentals</h3>
+            <p>Track your orders and rentals in one place.</p>
+            <button class="btn">View Orders</button>
+            <button class="btn">View Rentals</button>
+        </div>
+        
+        <div id="support-section">
+            <h3>Customer Support</h3>
+            <p>Need help? Our support team is available 24/7.</p>
+            <button class="btn">Contact Support</button>
+            <button class="btn">View FAQs</button>
+        </div>
+    </main>
+    
+    <script src="../js/accessibility.js"></script>
+    <script src="../js/notifications.js"></script>
+    <script src="../js/onboarding.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize tooltips
+            document.querySelectorAll('[data-tooltip]').forEach(element => {
+                element.addEventListener('mouseenter', (event) => {
+                    const tooltipText = element.getAttribute('data-tooltip');
+                    
+                    if (!tooltipText) {
+                        return;
+                    }
+                    
+                    // Create tooltip element
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'tooltip bs-tooltip-top show';
+                    tooltip.setAttribute('role', 'tooltip');
+                    
+                    // Create tooltip content
+                    tooltip.innerHTML = `
+                        <div class="tooltip-arrow"></div>
+                        <div class="tooltip-inner">${tooltipText}</div>
+                    `;
+                    
+                    // Position tooltip
+                    document.body.appendChild(tooltip);
+                    
+                    const targetRect = element.getBoundingClientRect();
+                    const tooltipRect = tooltip.getBoundingClientRect();
+                    
+                    const top = targetRect.top - tooltipRect.height - 10;
+                    const left = targetRect.left + (targetRect.width / 2) - (tooltipRect.width / 2);
+                    
+                    tooltip.style.top = `${top + window.scrollY}px`;
+                    tooltip.style.left = `${left + window.scrollX}px`;
+                    
+                    // Position arrow
+                    const arrow = tooltip.querySelector('.tooltip-arrow');
+                    if (arrow) {
+                        arrow.style.left = `${tooltipRect.width / 2}px`;
+                    }
+                    
+                    // Store tooltip reference
+                    element.tooltip = tooltip;
+                });
+                
+                element.addEventListener('mouseleave', (event) => {
+                    if (element.tooltip) {
+                        element.tooltip.remove();
+                        element.tooltip = null;
+                    }
+                });
+            });
+            
+            // Notification buttons
+            document.getElementById('success-notification').addEventListener('click', () => {
+                notifications.success('Your changes have been saved successfully!', 'Success');
+            });
+            
+            document.getElementById('info-notification').addEventListener('click', () => {
+                notifications.info('New features are available. Check them out!', 'Information');
+            });
+            
+            document.getElementById('warning-notification').addEventListener('click', () => {
+                notifications.warning('Your session will expire in 5 minutes.', 'Warning');
+            });
+            
+            document.getElementById('error-notification').addEventListener('click', () => {
+                notifications.error('An error occurred while processing your request.', 'Error');
+            });
+            
+            document.getElementById('action-notification').addEventListener('click', () => {
+                notifications.show({
+                    type: 'info',
+                    title: 'New Message',
+                    message: 'You have received a new message from support.',
+                    duration: 0,
+                    actions: [
+                        {
+                            text: 'View',
+                            callback: () => {
+                                alert('View message clicked!');
+                            }
+                        },
+                        {
+                            text: 'Dismiss',
+                            callback: () => {
+                                // Just close the notification
+                            }
+                        }
+                    ]
+                });
+            });
+            
+            // Onboarding
+            const steps = [
+                {
+                    title: 'Welcome to GigGatek',
+                    content: 'This quick tour will help you get started with our platform. We\'ll show you the main features and how to use them.',
+                    image: 'https://via.placeholder.com/400x200?text=Welcome+to+GigGatek',
+                    imageAlt: 'Welcome to GigGatek'
+                },
+                {
+                    title: 'Browse Products',
+                    content: 'Explore our wide range of professional equipment for rent or purchase. Use filters to find exactly what you need.',
+                    element: '#product-catalog',
+                    image: 'https://via.placeholder.com/400x200?text=Product+Catalog',
+                    imageAlt: 'Product catalog'
+                },
+                {
+                    title: 'Manage Orders',
+                    content: 'Track your orders and rentals in one place. View order history, check status, and manage returns.',
+                    element: '#orders-section',
+                    image: 'https://via.placeholder.com/400x200?text=Orders+and+Rentals',
+                    imageAlt: 'Order management'
+                },
+                {
+                    title: 'Get Support',
+                    content: 'Need help? Our support team is available 24/7. Contact us via chat, email, or phone.',
+                    element: '#support-section',
+                    image: 'https://via.placeholder.com/400x200?text=Customer+Support',
+                    imageAlt: 'Customer support'
+                },
+                {
+                    title: 'You\'re All Set!',
+                    content: 'You\'re now ready to use GigGatek. If you need help at any time, click the Help button in the top right corner.',
+                    image: 'https://via.placeholder.com/400x200?text=All+Set',
+                    imageAlt: 'Onboarding complete'
+                }
+            ];
+            
+            onboarding.initialize(steps, () => {
+                notifications.success('You\'ve completed the guided tour!', 'Welcome to GigGatek');
+            });
+            
+            document.getElementById('start-onboarding').addEventListener('click', () => {
+                onboarding.reset();
+                onboarding.start();
+            });
+        });
+    </script>
+</body>
+</html>

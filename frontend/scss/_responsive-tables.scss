@@ -1,0 +1,176 @@
+@import 'variables';
+@import 'mixins';
+
+// Responsive tables
+.table-responsive {
+  @include responsive-table;
+}
+
+// Card-based tables for mobile
+.table-card-view {
+  @include respond-below(md) {
+    thead {
+      display: none;
+    }
+    
+    tbody, tr, td {
+      display: block;
+      width: 100%;
+    }
+    
+    tr {
+      margin-bottom: $spacer * 2;
+      border: 1px solid #dee2e6;
+      border-radius: 0.25rem;
+      box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+    
+    td {
+      position: relative;
+      padding-left: 50%;
+      text-align: right;
+      border-bottom: 1px solid #dee2e6;
+      
+      &:last-child {
+        border-bottom: none;
+      }
+      
+      &::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 0.75rem;
+        width: 45%;
+        padding-right: 0.5rem;
+        text-align: left;
+        font-weight: bold;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+}
+
+// Order history table
+.order-history-table {
+  @extend .table-card-view;
+  
+  @include respond-below(md) {
+    td {
+      padding: 0.75rem;
+      
+      &.order-actions {
+        display: flex;
+        justify-content: space-around;
+        padding-left: 0.75rem;
+        text-align: center;
+        
+        &::before {
+          display: none;
+        }
+        
+        .btn {
+          @include touch-target(44px);
+          margin: 0.25rem;
+        }
+      }
+    }
+  }
+}
+
+// Rental history table
+.rental-history-table {
+  @extend .table-card-view;
+  
+  @include respond-below(md) {
+    td {
+      padding: 0.75rem;
+      
+      &.rental-status {
+        text-align: center;
+        padding-left: 0.75rem;
+        
+        &::before {
+          display: none;
+        }
+        
+        .status-badge {
+          display: inline-block;
+          width: 100%;
+          padding: 0.5rem;
+          border-radius: 0.25rem;
+        }
+      }
+      
+      &.rental-actions {
+        display: flex;
+        justify-content: space-around;
+        padding-left: 0.75rem;
+        text-align: center;
+        
+        &::before {
+          display: none;
+        }
+        
+        .btn {
+          @include touch-target(44px);
+          margin: 0.25rem;
+        }
+      }
+    }
+  }
+}
+
+// Cart table
+.cart-table {
+  @extend .table-card-view;
+  
+  @include respond-below(md) {
+    td {
+      &.product-image {
+        text-align: center;
+        padding-left: 0.75rem;
+        
+        &::before {
+          display: none;
+        }
+        
+        img {
+          max-width: 100px;
+          height: auto;
+        }
+      }
+      
+      &.product-quantity {
+        .quantity-control {
+          display: flex;
+          justify-content: flex-end;
+          align-items: center;
+          
+          button {
+            @include touch-target(40px);
+          }
+          
+          input {
+            width: 3rem;
+            text-align: center;
+            margin: 0 0.5rem;
+          }
+        }
+      }
+      
+      &.product-remove {
+        text-align: center;
+        padding-left: 0.75rem;
+        
+        &::before {
+          display: none;
+        }
+        
+        button {
+          @include touch-target(44px);
+        }
+      }
+    }
+  }
+}

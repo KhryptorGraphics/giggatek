@@ -1,0 +1,28 @@
+{
+  "name": "giggatek-frontend",
+  "version": "1.0.0",
+  "description": "GigGatek Frontend",
+  "scripts": {
+    "sass": "sass --watch scss:css",
+    "autoprefixer": "postcss -u autoprefixer -r css/*.css",
+    "lint:css": "stylelint css/*.css",
+    "lint:js": "eslint js/*.js",
+    "a11y": "axe --exit",
+    "build": "npm run sass && npm run autoprefixer",
+    "dev": "npm run sass"
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.0",
+    "chart.js": "^4.3.0",
+    "jquery": "^3.7.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.14",
+    "axe-core": "^4.7.0",
+    "eslint": "^8.43.0",
+    "postcss": "^8.4.24",
+    "postcss-cli": "^10.1.0",
+    "sass": "^1.63.6",
+    "stylelint": "^15.9.0"
+  }
+}

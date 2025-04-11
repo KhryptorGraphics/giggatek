@@ -1,0 +1,280 @@
+@import 'variables';
+@import 'mixins';
+
+// Notification container
+.notification-container {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  width: 100%;
+  max-width: 350px;
+  z-index: $z-index-fixed;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  pointer-events: none;
+  
+  @include respond-below(sm) {
+    left: 1rem;
+    right: 1rem;
+    max-width: none;
+  }
+}
+
+// Notification toast
+.notification {
+  position: relative;
+  background-color: $light-color;
+  border-radius: 0.25rem;
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  pointer-events: auto;
+  width: 100%;
+  animation: notification-slide-in 0.3s ease-out;
+  
+  &.notification-hiding {
+    animation: notification-slide-out 0.3s ease-in forwards;
+  }
+  
+  .notification-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background-color: rgba(0, 0, 0, 0.1);
+    width: 100%;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      background-color: $primary-color;
+      width: 100%;
+      animation: notification-progress 5s linear forwards;
+    }
+  }
+  
+  .notification-header {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    background-color: rgba(0, 0, 0, 0.03);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    
+    .notification-icon {
+      margin-right: 0.5rem;
+      font-size: 1.25rem;
+    }
+    
+    .notification-title {
+      flex-grow: 1;
+      font-weight: $font-weight-bold;
+      margin: 0;
+    }
+    
+    .notification-close {
+      background: none;
+      border: none;
+      font-size: 1.25rem;
+      line-height: 1;
+      padding: 0.25rem;
+      margin: -0.25rem -0.25rem -0.25rem 0.5rem;
+      cursor: pointer;
+      
+      &:focus {
+        @include focus-outline;
+      }
+    }
+  }
+  
+  .notification-body {
+    padding: 0.75rem;
+    
+    p {
+      margin: 0;
+    }
+  }
+  
+  .notification-actions {
+    display: flex;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    
+    button {
+      flex: 1;
+      background: none;
+      border: none;
+      padding: 0.5rem;
+      text-align: center;
+      cursor: pointer;
+      
+      &:not(:last-child) {
+        border-right: 1px solid rgba(0, 0, 0, 0.05);
+      }
+      
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.03);
+      }
+      
+      &:focus {
+        @include focus-outline;
+      }
+    }
+  }
+  
+  // Notification types
+  &.notification-success {
+    border-left: 4px solid $success-color;
+    
+    .notification-icon {
+      color: $success-color;
+    }
+    
+    .notification-progress::before {
+      background-color: $success-color;
+    }
+  }
+  
+  &.notification-info {
+    border-left: 4px solid $info-color;
+    
+    .notification-icon {
+      color: $info-color;
+    }
+    
+    .notification-progress::before {
+      background-color: $info-color;
+    }
+  }
+  
+  &.notification-warning {
+    border-left: 4px solid $warning-color;
+    
+    .notification-icon {
+      color: $warning-color;
+    }
+    
+    .notification-progress::before {
+      background-color: $warning-color;
+    }
+  }
+  
+  &.notification-danger {
+    border-left: 4px solid $danger-color;
+    
+    .notification-icon {
+      color: $danger-color;
+    }
+    
+    .notification-progress::before {
+      background-color: $danger-color;
+    }
+  }
+}
+
+// Inline alerts
+.alert {
+  position: relative;
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+  
+  .alert-heading {
+    color: inherit;
+    margin-top: 0;
+  }
+  
+  .alert-link {
+    font-weight: $font-weight-bold;
+  }
+  
+  .alert-close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0.75rem 1.25rem;
+    background: transparent;
+    border: 0;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    
+    &:focus {
+      @include focus-outline;
+    }
+  }
+  
+  &.alert-success {
+    color: darken($success-color, 30%);
+    background-color: lighten($success-color, 40%);
+    border-color: lighten($success-color, 35%);
+    
+    .alert-link {
+      color: darken($success-color, 40%);
+    }
+  }
+  
+  &.alert-info {
+    color: darken($info-color, 30%);
+    background-color: lighten($info-color, 40%);
+    border-color: lighten($info-color, 35%);
+    
+    .alert-link {
+      color: darken($info-color, 40%);
+    }
+  }
+  
+  &.alert-warning {
+    color: darken($warning-color, 30%);
+    background-color: lighten($warning-color, 40%);
+    border-color: lighten($warning-color, 35%);
+    
+    .alert-link {
+      color: darken($warning-color, 40%);
+    }
+  }
+  
+  &.alert-danger {
+    color: darken($danger-color, 30%);
+    background-color: lighten($danger-color, 40%);
+    border-color: lighten($danger-color, 35%);
+    
+    .alert-link {
+      color: darken($danger-color, 40%);
+    }
+  }
+}
+
+// Animations
+@keyframes notification-slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes notification-slide-out {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+@keyframes notification-progress {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0;
+  }
+}
