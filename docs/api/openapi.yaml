@@ -1,0 +1,850 @@
+openapi: 3.0.3
+info:
+  title: GigGatek API
+  description: |
+    API documentation for the GigGatek e-commerce platform.
+    
+    This API provides endpoints for managing products, orders, rentals, and payments.
+  version: 1.0.0
+  contact:
+    name: GigGatek API Support
+    email: api-support@giggatek.com
+    url: https://giggatek.com/api-support
+  license:
+    name: Proprietary
+    url: https://giggatek.com/terms
+
+servers:
+  - url: https://api.giggatek.com/v1
+    description: Production server
+  - url: https://staging-api.giggatek.com/v1
+    description: Staging server
+  - url: http://localhost:8000/api/v1
+    description: Local development server
+
+tags:
+  - name: Authentication
+    description: User authentication and authorization
+  - name: Products
+    description: Product catalog and management
+  - name: Orders
+    description: Order processing and management
+  - name: Rentals
+    description: Rental contract management
+  - name: Payments
+    description: Payment processing
+
+paths:
+  # Authentication Endpoints
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new user
+      description: Create a new user account
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - first_name
+                - last_name
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+                password:
+                  type: string
+                  format: password
+                  example: SecurePassword123!
+                first_name:
+                  type: string
+                  example: John
+                last_name:
+                  type: string
+                  example: Doe
+                phone:
+                  type: string
+                  example: 555-123-4567
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User registered successfully
+                  user:
+                    $ref: '#/components/schemas/User'
+                  token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  expires_in:
+                    type: integer
+                    example: 3600
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: Email already registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Login
+      description: Authenticate a user and get a JWT token
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+                password:
+                  type: string
+                  format: password
+                  example: SecurePassword123!
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Login successful
+                  user:
+                    $ref: '#/components/schemas/User'
+                  token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  expires_in:
+                    type: integer
+                    example: 3600
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  
+  /auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh Token
+      description: Refresh an authentication token before it expires
+      operationId: refreshToken
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Token refreshed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Token refreshed successfully
+                  token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  expires_in:
+                    type: integer
+                    example: 3600
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  
+  # Product Endpoints
+  /products:
+    get:
+      tags:
+        - Products
+      summary: Get all products
+      description: Get a list of products with optional filtering
+      operationId: getProducts
+      parameters:
+        - name: category
+          in: query
+          description: Filter by category
+          schema:
+            type: string
+        - name: condition
+          in: query
+          description: Filter by condition
+          schema:
+            type: string
+            enum: [new, refurbished, used_like_new, used_good, used_fair]
+        - name: min_price
+          in: query
+          description: Minimum price filter
+          schema:
+            type: number
+            format: float
+        - name: max_price
+          in: query
+          description: Maximum price filter
+          schema:
+            type: number
+            format: float
+        - name: search
+          in: query
+          description: Search term for product name or description
+          schema:
+            type: string
+        - name: sort
+          in: query
+          description: Sort field
+          schema:
+            type: string
+            enum: [price, name, created_at]
+        - name: order
+          in: query
+          description: Sort order
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: asc
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          description: Items per page
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+      responses:
+        '200':
+          description: List of products
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  products:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ProductSummary'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+  
+  /products/{productId}:
+    get:
+      tags:
+        - Products
+      summary: Get product details
+      description: Get detailed information about a specific product
+      operationId: getProductById
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          description: ID of the product
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Product details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  product:
+                    $ref: '#/components/schemas/Product'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  
+  # Order Endpoints
+  /orders:
+    get:
+      tags:
+        - Orders
+      summary: Get all orders
+      description: Get a list of orders for the authenticated user. Admins can see all orders.
+      operationId: getOrders
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          description: Filter by order status
+          schema:
+            type: string
+            enum: [pending, processing, shipped, delivered, cancelled, returned, refunded]
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          description: Items per page
+          schema:
+            type: integer
+            default: 10
+            maximum: 100
+      responses:
+        '200':
+          description: List of orders
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  orders:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/OrderSummary'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    
+    post:
+      tags:
+        - Orders
+      summary: Create order
+      description: Create a new order
+      operationId: createOrder
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderInput'
+      responses:
+        '201':
+          description: Order created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Order created successfully
+                  order:
+                    $ref: '#/components/schemas/OrderSummary'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  
+  # Rental Endpoints
+  /rentals:
+    get:
+      tags:
+        - Rentals
+      summary: Get all rentals
+      description: Get a list of rental contracts for the authenticated user. Admins can see all rentals.
+      operationId: getRentals
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          description: Filter by rental status
+          schema:
+            type: string
+            enum: [pending, active, completed, cancelled, defaulted]
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          description: Items per page
+          schema:
+            type: integer
+            default: 10
+            maximum: 100
+      responses:
+        '200':
+          description: List of rentals
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  rentals:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RentalSummary'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  
+  # Payment Endpoints
+  /payments/stripe/intent:
+    post:
+      tags:
+        - Payments
+      summary: Create Stripe payment intent
+      description: Create a Stripe payment intent for charging a customer
+      operationId: createStripePaymentIntent
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - amount
+              properties:
+                amount:
+                  type: number
+                  format: float
+                  example: 129.97
+                description:
+                  type: string
+                  example: GigGatek Order #123
+                metadata:
+                  type: object
+                  properties:
+                    order_id:
+                      type: string
+                      example: "123"
+                    customer_name:
+                      type: string
+                      example: John Doe
+                    customer_email:
+                      type: string
+                      example: john@example.com
+                    items_count:
+                      type: integer
+                      example: 2
+      responses:
+        '200':
+          description: Payment intent created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  client_secret:
+                    type: string
+                    example: pi_3NJkCpKXnVQrqQAZ1geFWXcR_secret_vPUjMsZRhJwRmkRPMPvYmJGtx
+                  payment_intent_id:
+                    type: string
+                    example: pi_3NJkCpKXnVQrqQAZ1geFWXcR
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /payments/paypal/order:
+    post:
+      tags:
+        - Payments
+      summary: Create PayPal order
+      description: Create a PayPal order for payment processing
+      operationId: createPayPalOrder
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - amount
+              properties:
+                amount:
+                  type: number
+                  format: float
+                  example: 129.97
+                description:
+                  type: string
+                  example: GigGatek Purchase
+                items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        example: Refurbished Laptop
+                      quantity:
+                        type: integer
+                        example: 1
+                      price:
+                        type: number
+                        format: float
+                        example: 99.99
+                metadata:
+                  type: object
+                  properties:
+                    order_id:
+                      type: string
+                      example: "123"
+                    customer_name:
+                      type: string
+                      example: John Doe
+                    customer_email:
+                      type: string
+                      example: john@example.com
+                    items_count:
+                      type: integer
+                      example: 2
+                return_url:
+                  type: string
+                  format: uri
+                  example: https://giggatek.com/checkout/success
+                cancel_url:
+                  type: string
+                  format: uri
+                  example: https://giggatek.com/checkout/cancel
+      responses:
+        '200':
+          description: PayPal order created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  payment_id:
+                    type: string
+                    example: PAYID-MJTL2LQ7Y5227465X4269034
+                  approval_url:
+                    type: string
+                    format: uri
+                    example: https://www.sandbox.paypal.com/checkoutnow?token=EC-5Y644243RX369735H
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  
+  schemas:
+    User:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          example: 123
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        first_name:
+          type: string
+          example: John
+        last_name:
+          type: string
+          example: Doe
+        role:
+          type: string
+          example: CUSTOMER
+    
+    ProductSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 101
+        name:
+          type: string
+          example: Refurbished Laptop
+        sku:
+          type: string
+          example: RL-101
+        price:
+          type: number
+          format: float
+          example: 99.99
+        rental_price:
+          type: number
+          format: float
+          example: 19.99
+        condition:
+          type: string
+          example: refurbished
+        condition_rating:
+          type: number
+          format: float
+          example: 4.5
+        category:
+          type: string
+          example: laptops
+        image_url:
+          type: string
+          format: uri
+          example: https://example.com/images/laptop.jpg
+        in_stock:
+          type: boolean
+          example: true
+    
+    Product:
+      allOf:
+        - $ref: '#/components/schemas/ProductSummary'
+        - type: object
+          properties:
+            description:
+              type: string
+              example: High-quality refurbished laptop with 1-year warranty. Intel Core i5, 8GB RAM, 256GB SSD.
+            specifications:
+              type: object
+              additionalProperties: true
+              example:
+                processor: Intel Core i5-10210U
+                ram: 8GB DDR4
+                storage: 256GB SSD
+                display: 15.6-inch Full HD
+            image_urls:
+              type: array
+              items:
+                type: string
+                format: uri
+              example:
+                - https://example.com/images/laptop_front.jpg
+                - https://example.com/images/laptop_side.jpg
+            inventory:
+              type: integer
+              example: 15
+            rental_available:
+              type: boolean
+              example: true
+            rental_terms:
+              type: array
+              items:
+                type: object
+                properties:
+                  months:
+                    type: integer
+                    example: 6
+                  monthly_price:
+                    type: number
+                    format: float
+                    example: 19.99
+                  buyout_price:
+                    type: number
+                    format: float
+                    example: 49.99
+            average_rating:
+              type: number
+              format: float
+              example: 4.7
+            review_count:
+              type: integer
+              example: 42
+            created_at:
+              type: string
+              format: date-time
+              example: 2025-01-15T10:30:00Z
+            updated_at:
+              type: string
+              format: date-time
+              example: 2025-04-05T14:45:00Z
+    
+    OrderSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 123
+        user_id:
+          type: integer
+          example: 456
+        status:
+          type: string
+          enum: [pending, processing, shipped, delivered, cancelled, returned, refunded]
+          example: processing
+        payment_status:
+          type: string
+          enum: [pending, paid, failed, refunded, partially_refunded]
+          example: paid
+        total:
+          type: number
+          format: float
+          example: 129.97
+        item_count:
+          type: integer
+          example: 2
+        created_at:
+          type: string
+          format: date-time
+          example: 2025-04-10T14:30:00Z
+    
+    OrderInput:
+      type: object
+      required:
+        - items
+        - shipping_address_id
+        - payment_method
+        - shipping_method
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            required:
+              - product_id
+              - quantity
+              - price
+            properties:
+              product_id:
+                type: integer
+                example: 101
+              quantity:
+                type: integer
+                minimum: 1
+                example: 1
+              price:
+                type: number
+                format: float
+                example: 99.99
+        shipping_address_id:
+          type: integer
+          example: 789
+        payment_method:
+          type: string
+          enum: [stripe, paypal]
+          example: stripe
+        shipping_method:
+          type: string
+          enum: [standard, express, overnight]
+          example: standard
+        notes:
+          type: string
+          example: Please leave package at the door
+    
+    RentalSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 123
+        user_id:
+          type: integer
+          example: 456
+        product_id:
+          type: integer
+          example: 789
+        product:
+          type: object
+          properties:
+            name:
+              type: string
+              example: Refurbished Gaming PC
+            image_url:
+              type: string
+              format: uri
+              example: https://example.com/images/gaming-pc.jpg
+        status:
+          type: string
+          enum: [pending, active, completed, cancelled, defaulted]
+          example: active
+        monthly_payment:
+          type: number
+          format: float
+          example: 49.99
+        payments_made:
+          type: integer
+          example: 3
+        remaining_payments:
+          type: integer
+          example: 9
+        next_payment_date:
+          type: string
+          format: date-time
+          example: 2025-05-10T00:00:00Z
+    
+    Pagination:
+      type: object
+      properties:
+        total:
+          type: integer
+          example: 150
+        per_page:
+          type: integer
+          example: 20
+        current_page:
+          type: integer
+          example: 1
+        total_pages:
+          type: integer
+          example: 8
+    
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Something went wrong
+  
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

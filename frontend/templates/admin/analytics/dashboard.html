@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GigGatek API Analytics Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.min.css">
+    <style>
+        .card {
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            text-align: center;
+            padding: 20px;
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        .stat-label {
+            font-size: 1rem;
+            color: #6c757d;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">GigGatek Admin</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/admin/analytics">API Analytics</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/users">Users</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/products">Products</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/orders">Orders</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/rentals">Rentals</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <div class="row mb-4">
+            <div class="col">
+                <h1>API Analytics Dashboard</h1>
+            </div>
+            <div class="col-auto">
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-outline-primary time-range-btn" data-range="15m">15m</button>
+                    <button type="button" class="btn btn-outline-primary time-range-btn" data-range="1h">1h</button>
+                    <button type="button" class="btn btn-outline-primary time-range-btn active" data-range="6h">6h</button>
+                    <button type="button" class="btn btn-outline-primary time-range-btn" data-range="24h">24h</button>
+                    <button type="button" class="btn btn-outline-primary time-range-btn" data-range="7d">7d</button>
+                    <button type="button" class="btn btn-outline-primary time-range-btn" data-range="30d">30d</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-3">
+                <div class="card stat-card">
+                    <div class="stat-value" id="total-requests">-</div>
+                    <div class="stat-label">Total Requests</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card">
+                    <div class="stat-value" id="requests-per-minute">-</div>
+                    <div class="stat-label">Requests per Minute</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card">
+                    <div class="stat-value" id="average-response-time">-</div>
+                    <div class="stat-label">Avg Response Time (ms)</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card">
+                    <div class="stat-value" id="error-rate">-</div>
+                    <div class="stat-label">Error Rate</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title">Requests Over Time</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="requests-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title">Status Code Distribution</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="status-codes-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title">Top Endpoints</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Endpoint</th>
+                                        <th>Requests</th>
+                                        <th>Avg Response Time</th>
+                                        <th>Error Rate</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="endpoints-table-body">
+                                    <tr>
+                                        <td colspan="4" class="text-center">Loading...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title">Recent Errors</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Time</th>
+                                        <th>Endpoint</th>
+                                        <th>Method</th>
+                                        <th>Error Type</th>
+                                        <th>Error Message</th>
+                                        <th>User ID</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="errors-table-body">
+                                    <tr>
+                                        <td colspan="6" class="text-center">Loading...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <div>
+                                <span id="errors-pagination-info">Showing 0-0 of 0</span>
+                            </div>
+                            <div>
+                                <button id="errors-prev-page" class="btn btn-sm btn-outline-secondary" disabled>Previous</button>
+                                <button id="errors-next-page" class="btn btn-sm btn-outline-secondary" disabled>Next</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
+    <script>
+        // Global variables
+        let currentTimeRange = '6h';
+        let errorsPage = 1;
+        let errorsLimit = 10;
+        let errorsTotalPages = 1;
+        
+        // Charts
+        let requestsChart;
+        let statusCodesChart;
+        
+        // Initialize the dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up time range buttons
+            document.querySelectorAll('.time-range-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    // Update active button
+                    document.querySelectorAll('.time-range-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                    
+                    // Update time range
+                    currentTimeRange = this.dataset.range;
+                    
+                    // Refresh data
+                    refreshDashboard();
+                });
+            });
+            
+            // Set up pagination buttons
+            document.getElementById('errors-prev-page').addEventListener('click', function() {
+                if (errorsPage > 1) {
+                    errorsPage--;
+                    loadErrors();
+                }
+            });
+            
+            document.getElementById('errors-next-page').addEventListener('click', function() {
+                if (errorsPage < errorsTotalPages) {
+                    errorsPage++;
+                    loadErrors();
+                }
+            });
+            
+            // Initial data load
+            refreshDashboard();
+            
+            // Set up auto-refresh
+            setInterval(refreshDashboard, 60000); // Refresh every minute
+        });
+        
+        // Refresh all dashboard data
+        function refreshDashboard() {
+            loadStats();
+            loadEndpoints();
+            loadErrors();
+        }
+        
+        // Load API stats
+        function loadStats() {
+            fetch(`/admin/analytics/api/stats?time_range=${currentTimeRange}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Update stat cards
+                    document.getElementById('total-requests').textContent = data.total_requests.toLocaleString();
+                    document.getElementById('requests-per-minute').textContent = data.requests_per_minute.toFixed(2);
+                    document.getElementById('average-response-time').textContent = data.average_response_time.toFixed(2);
+                    document.getElementById('error-rate').textContent = (data.error_rate * 100).toFixed(2) + '%';
+                    
+                    // Update charts
+                    updateRequestsChart(data);
+                    updateStatusCodesChart(data);
+                })
+                .catch(error => {
+                    console.error('Error loading stats:', error);
+                });
+        }
+        
+        // Load endpoint stats
+        function loadEndpoints() {
+            fetch(`/admin/analytics/api/endpoints?time_range=${currentTimeRange}`)
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.getElementById('endpoints-table-body');
+                    
+                    if (data.endpoints.length === 0) {
+                        tableBody.innerHTML = '<tr><td colspan="4" class="text-center">No data available</td></tr>';
+                        return;
+                    }
+                    
+                    let html = '';
+                    data.endpoints.forEach(endpoint => {
+                        html += `
+                            <tr>
+                                <td>${endpoint.endpoint}</td>
+                                <td>${endpoint.count.toLocaleString()}</td>
+                                <td>${endpoint.average_response_time} ms</td>
+                                <td>${endpoint.error_rate}%</td>
+                            </tr>
+                        `;
+                    });
+                    
+                    tableBody.innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Error loading endpoints:', error);
+                });
+        }
+        
+        // Load error data
+        function loadErrors() {
+            fetch(`/admin/analytics/api/errors?time_range=${currentTimeRange}&page=${errorsPage}&limit=${errorsLimit}`)
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.getElementById('errors-table-body');
+                    
+                    if (data.errors.length === 0) {
+                        tableBody.innerHTML = '<tr><td colspan="6" class="text-center">No errors found</td></tr>';
+                        return;
+                    }
+                    
+                    let html = '';
+                    data.errors.forEach(error => {
+                        const timestamp = new Date(error.timestamp);
+                        html += `
+                            <tr>
+                                <td>${timestamp.toLocaleString()}</td>
+                                <td>${error.endpoint}</td>
+                                <td>${error.method}</td>
+                                <td>${error.error_type}</td>
+                                <td>${error.error_message}</td>
+                                <td>${error.user_id || 'Anonymous'}</td>
+                            </tr>
+                        `;
+                    });
+                    
+                    tableBody.innerHTML = html;
+                    
+                    // Update pagination
+                    errorsTotalPages = data.total_pages;
+                    const start = (errorsPage - 1) * errorsLimit + 1;
+                    const end = Math.min(start + data.errors.length - 1, data.total);
+                    document.getElementById('errors-pagination-info').textContent = `Showing ${start}-${end} of ${data.total}`;
+                    
+                    // Update pagination buttons
+                    document.getElementById('errors-prev-page').disabled = errorsPage <= 1;
+                    document.getElementById('errors-next-page').disabled = errorsPage >= errorsTotalPages;
+                })
+                .catch(error => {
+                    console.error('Error loading errors:', error);
+                });
+        }
+        
+        // Update requests chart
+        function updateRequestsChart(data) {
+            // Generate mock time series data
+            const labels = [];
+            const values = [];
+            
+            // Generate time labels based on time range
+            const now = new Date();
+            let interval = 5; // 5 minutes
+            let count = 12; // 12 intervals
+            
+            if (currentTimeRange === '15m') {
+                interval = 1; // 1 minute
+                count = 15;
+            } else if (currentTimeRange === '1h') {
+                interval = 5; // 5 minutes
+                count = 12;
+            } else if (currentTimeRange === '6h') {
+                interval = 30; // 30 minutes
+                count = 12;
+            } else if (currentTimeRange === '24h') {
+                interval = 2 * 60; // 2 hours
+                count = 12;
+            } else if (currentTimeRange === '7d') {
+                interval = 12 * 60; // 12 hours
+                count = 14;
+            } else if (currentTimeRange === '30d') {
+                interval = 2.5 * 24 * 60; // 2.5 days
+                count = 12;
+            }
+            
+            // Generate mock data
+            for (let i = count - 1; i >= 0; i--) {
+                const time = new Date(now.getTime() - i * interval * 60 * 1000);
+                labels.push(time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+                
+                // Generate a random value around the average
+                const avgRequestsPerInterval = data.requests_per_minute * interval;
+                const randomFactor = 0.5 + Math.random();
+                values.push(Math.round(avgRequestsPerInterval * randomFactor));
+            }
+            
+            // Create or update chart
+            const ctx = document.getElementById('requests-chart').getContext('2d');
+            
+            if (requestsChart) {
+                requestsChart.data.labels = labels;
+                requestsChart.data.datasets[0].data = values;
+                requestsChart.update();
+            } else {
+                requestsChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Requests',
+                            data: values,
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        
+        // Update status codes chart
+        function updateStatusCodesChart(data) {
+            const statusCodes = data.status_code_distribution || {};
+            
+            // Group status codes by category
+            const categories = {
+                '2xx': 0,
+                '3xx': 0,
+                '4xx': 0,
+                '5xx': 0
+            };
+            
+            Object.entries(statusCodes).forEach(([code, count]) => {
+                const firstDigit = code.charAt(0);
+                if (firstDigit === '2') {
+                    categories['2xx'] += count;
+                } else if (firstDigit === '3') {
+                    categories['3xx'] += count;
+                } else if (firstDigit === '4') {
+                    categories['4xx'] += count;
+                } else if (firstDigit === '5') {
+                    categories['5xx'] += count;
+                }
+            });
+            
+            // Create or update chart
+            const ctx = document.getElementById('status-codes-chart').getContext('2d');
+            
+            if (statusCodesChart) {
+                statusCodesChart.data.datasets[0].data = Object.values(categories);
+                statusCodesChart.update();
+            } else {
+                statusCodesChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(categories),
+                        datasets: [{
+                            data: Object.values(categories),
+                            backgroundColor: [
+                                'rgba(75, 192, 192, 0.8)',
+                                'rgba(54, 162, 235, 0.8)',
+                                'rgba(255, 206, 86, 0.8)',
+                                'rgba(255, 99, 132, 0.8)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const label = context.label || '';
+                                        const value = context.raw || 0;
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = Math.round((value / total) * 100);
+                                        return `${label}: ${value} (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>

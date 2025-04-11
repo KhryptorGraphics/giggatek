@@ -10,7 +10,7 @@ jobs:
   # Backend tests
   test-backend:
     runs-on: ubuntu-latest
-    
+
     services:
       # MySQL service for testing
       mysql:
@@ -23,37 +23,37 @@ jobs:
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-        
+
       # Redis service for caching/session
       redis:
         image: redis:6.2-alpine
         ports:
           - 6379:6379
         options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=3
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
           cache: 'pip'
-      
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install pytest pytest-cov flake8
           if [ -f backend/requirements.txt ]; then pip install -r backend/requirements.txt; fi
-      
+
       - name: Lint with flake8
         run: |
           # stop the build if there are Python syntax errors or undefined names
           flake8 backend --count --select=E9,F63,F7,F82 --show-source --statistics
           # exit-zero treats all errors as warnings
           flake8 backend --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-      
+
       - name: Test with pytest
         run: |
           cd backend
@@ -66,7 +66,7 @@ jobs:
           DB_NAME: giggatek_test
           REDIS_HOST: localhost
           REDIS_PORT: 6379
-      
+
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
@@ -77,39 +77,39 @@ jobs:
   # Frontend tests
   test-frontend:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      
+
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.1'
           extensions: mbstring, mysqli, pdo_mysql, zip, gd
           coverage: xdebug
-      
+
       - name: Install dependencies
         run: |
           cd frontend
           if [ -f composer.json ]; then composer install; fi
-      
+
       - name: Run PHP lint
         run: |
           find frontend -name "*.php" -print0 | xargs -0 -n1 php -l
-      
+
       - name: Run PHP_CodeSniffer
         run: |
-          if [ -f frontend/vendor/bin/phpcs ]; then 
+          if [ -f frontend/vendor/bin/phpcs ]; then
             frontend/vendor/bin/phpcs --standard=PSR12 --ignore=*/vendor/* frontend
           fi
-      
+
       - name: Run tests
         run: |
           if [ -f frontend/vendor/bin/phpunit ]; then
             cd frontend && vendor/bin/phpunit --coverage-clover=coverage.xml
           fi
-      
+
       - name: Upload coverage to Codecov
         if: ${{ success() && hashFiles('./frontend/coverage.xml') != '' }}
         uses: codecov/codecov-action@v3
@@ -123,11 +123,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: [test-backend, test-frontend]
     if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      
+
       - name: Run OWASP Dependency-Check
         uses: dependency-check/Dependency-Check_Action@main
         with:
@@ -138,13 +138,13 @@ jobs:
           args: >
             --enableExperimental
             --suppression ./.github/dependency-check-suppressions.xml
-      
+
       - name: Run Bandit (Python Security Check)
         if: success() || failure()  # Run even if previous step fails
         run: |
           pip install bandit
           bandit -r ./backend -f json -o ./reports/bandit-report.json || true
-      
+
       - name: Upload security reports
         if: success() || failure()  # Run even if previous steps fail
         uses: actions/upload-artifact@v3
@@ -152,29 +152,63 @@ jobs:
           name: security-reports
           path: reports/
 
+  # API Documentation
+  build-api-docs:
+    runs-on: ubuntu-latest
+    needs: [test-backend, test-frontend]
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm install redoc-cli@latest swagger-ui-express@latest yaml@latest
+
+      - name: Validate OpenAPI specification
+        run: |
+          npx @stoplight/spectral-cli lint docs/api/openapi.yaml
+
+      - name: Build API documentation
+        run: |
+          npx redoc-cli bundle docs/api/openapi.yaml -o docs/api/index.html
+
+      - name: Upload API documentation
+        uses: actions/upload-artifact@v3
+        with:
+          name: api-docs
+          path: docs/api/index.html
+
   # Build and push Docker images (only on main/develop branches)
   build-and-push:
     runs-on: ubuntu-latest
     needs: [test-backend, test-frontend, security-scan]
     if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') && github.event_name == 'push'
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-      
+
       - name: Login to DockerHub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
-      
+
       - name: Extract branch name
         shell: bash
         run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
-      
+
       - name: Build and push frontend image
         uses: docker/build-push-action@v4
         with:
@@ -187,7 +221,7 @@ jobs:
             giggatek/frontend:${{ github.sha }}
           cache-from: type=registry,ref=giggatek/frontend:latest
           cache-to: type=inline
-      
+
       - name: Build and push backend image
         uses: docker/build-push-action@v4
         with:
@@ -206,7 +240,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build-and-push]
     if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
-    
+
     steps:
       - name: Deploy to staging server
         uses: appleboy/ssh-action@master
@@ -227,7 +261,7 @@ jobs:
     needs: [build-and-push]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     environment: production  # Requires manual approval
-    
+
     steps:
       - name: Deploy to production server
         uses: appleboy/ssh-action@master
@@ -241,3 +275,25 @@ jobs:
             docker-compose up -d
             docker image prune -f
             echo "Deployment to production completed at $(date)"
+
+  # Deploy API documentation to GitHub Pages
+  deploy-api-docs:
+    runs-on: ubuntu-latest
+    needs: [build-api-docs]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Download API documentation
+        uses: actions/download-artifact@v3
+        with:
+          name: api-docs
+          path: docs/api
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: docs/api
+          branch: gh-pages

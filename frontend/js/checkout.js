@@ -13,13 +13,13 @@ class Checkout {
             shippingMethod: 'standard',
             sameAsBilling: true
         };
-        
+
         // Reference to the cart
         this.cart = window.cart;
-        
+
         this.init();
     }
-    
+
     init() {
         // Check if cart exists and has items
         if (!this.cart || this.cart.cartItems.length === 0) {
@@ -27,27 +27,27 @@ class Checkout {
             window.location.href = 'cart.php';
             return;
         }
-        
+
         // Initialize the checkout UI
         this.updateOrderSummary();
         this.populateReviewItems();
-        
+
         // Initialize event listeners
         this.initEventListeners();
     }
-    
+
     updateOrderSummary() {
         if (!this.cart) return;
-        
+
         // Get cart totals
         const totals = this.cart.calculateCartTotals();
-        
+
         // Update summary values
         document.getElementById('summary-subtotal').textContent = `$${totals.subtotal.toFixed(2)}`;
         document.getElementById('summary-shipping').textContent = totals.shippingCost === 0 ? 'Free' : `$${totals.shippingCost.toFixed(2)}`;
         document.getElementById('summary-tax').textContent = `$${totals.taxAmount.toFixed(2)}`;
         document.getElementById('summary-total').textContent = `$${totals.grandTotal.toFixed(2)}`;
-        
+
         // Update one-time and monthly payments
         if (totals.oneTimeTotal > 0) {
             document.getElementById('summary-onetime').textContent = `$${totals.oneTimeTotal.toFixed(2)}`;
@@ -55,35 +55,35 @@ class Checkout {
         } else {
             document.getElementById('summary-onetime').parentElement.style.display = 'none';
         }
-        
+
         if (totals.monthlyTotal > 0) {
             document.getElementById('summary-monthly').textContent = `$${totals.monthlyTotal.toFixed(2)}/mo`;
             document.getElementById('summary-monthly').parentElement.style.display = 'flex';
         } else {
             document.getElementById('summary-monthly').parentElement.style.display = 'none';
         }
-        
+
         // Populate summary items
         this.populateSummaryItems();
     }
-    
+
     populateSummaryItems() {
         const summaryItemsContainer = document.getElementById('summary-items');
         if (!summaryItemsContainer || !this.cart) return;
-        
+
         // Clear existing items
         summaryItemsContainer.innerHTML = '';
-        
+
         // Add each cart item to the summary
         this.cart.cartItems.forEach(item => {
             const itemElement = document.createElement('div');
             itemElement.className = 'summary-item';
-            
+
             const purchaseType = item.purchase_type === 'rental' ? `${item.rental_term}-mo Rental` : 'Purchase';
-            const price = item.purchase_type === 'rental' ? 
-                `$${item.rental_price.toFixed(2)}/mo` : 
+            const price = item.purchase_type === 'rental' ?
+                `$${item.rental_price.toFixed(2)}/mo` :
                 `$${item.price.toFixed(2)}`;
-            
+
             itemElement.innerHTML = `
                 <div class="summary-item-name">
                     <div class="item-name">${item.name}</div>
@@ -94,35 +94,35 @@ class Checkout {
                     <div class="item-price">${price}</div>
                 </div>
             `;
-            
+
             summaryItemsContainer.appendChild(itemElement);
         });
     }
-    
+
     populateReviewItems() {
         const reviewItemsContainer = document.getElementById('review-items');
         if (!reviewItemsContainer || !this.cart) return;
-        
+
         // Clear existing items
         reviewItemsContainer.innerHTML = '';
-        
+
         // Add each cart item to the review
         this.cart.cartItems.forEach(item => {
             const itemElement = document.createElement('div');
             itemElement.className = 'review-item';
-            
-            const purchaseType = item.purchase_type === 'rental' ? 
-                `${item.rental_term}-month Rent-to-Own` : 
+
+            const purchaseType = item.purchase_type === 'rental' ?
+                `${item.rental_term}-month Rent-to-Own` :
                 'One-time Purchase';
-            
-            const price = item.purchase_type === 'rental' ? 
-                `$${item.rental_price.toFixed(2)}/month` : 
+
+            const price = item.purchase_type === 'rental' ?
+                `$${item.rental_price.toFixed(2)}/month` :
                 `$${item.price.toFixed(2)}`;
-            
-            const totalPrice = item.purchase_type === 'rental' ? 
-                `$${(item.rental_price * item.rental_term).toFixed(2)} total` : 
+
+            const totalPrice = item.purchase_type === 'rental' ?
+                `$${(item.rental_price * item.rental_term).toFixed(2)} total` :
                 `$${(item.price * item.quantity).toFixed(2)}`;
-            
+
             itemElement.innerHTML = `
                 <div class="review-item-image">
                     <img src="${item.image_url || 'img/placeholder-product.png'}" alt="${item.name}">
@@ -135,21 +135,21 @@ class Checkout {
                     <div class="badge badge-${item.condition_class || 'success'}">${item.condition || 'Excellent'} Condition</div>
                 </div>
             `;
-            
+
             reviewItemsContainer.appendChild(itemElement);
         });
     }
-    
+
     goToStep(step) {
         // Validate before proceeding
         if (step > this.currentStep && !this.validateCurrentStep()) {
             return false;
         }
-        
+
         // Update progress indicator
         document.querySelectorAll('.progress-step').forEach(el => {
             el.classList.remove('active', 'completed');
-            
+
             const stepNum = parseInt(el.dataset.step);
             if (stepNum < step) {
                 el.classList.add('completed');
@@ -157,31 +157,31 @@ class Checkout {
                 el.classList.add('active');
             }
         });
-        
+
         // Hide all steps and show the current one
         document.querySelectorAll('.checkout-step').forEach(el => {
             el.classList.remove('active');
         });
-        
+
         document.getElementById(`step-${step}`).classList.add('active');
-        
+
         // Update current step
         this.currentStep = step;
-        
+
         // Special handling for step 4 (confirmation)
         if (step === 4) {
             this.updateConfirmationPage();
         }
-        
+
         // Scroll to top of the checkout container
         document.querySelector('.checkout-container').scrollIntoView({
             behavior: 'smooth',
             block: 'start'
         });
-        
+
         return true;
     }
-    
+
     validateCurrentStep() {
         switch (this.currentStep) {
             case 1: // Shipping
@@ -194,29 +194,29 @@ class Checkout {
                 return true;
         }
     }
-    
+
     validateShippingStep() {
         // If using a saved address, it's already valid
-        if (document.querySelector('.address-card.selected') && 
+        if (document.querySelector('.address-card.selected') &&
             !document.querySelector('#shipping-form').classList.contains('active')) {
-            
+
             // Get the selected address data
             const selectedAddressId = document.querySelector('.address-card.selected').dataset.addressId;
             const addressText = document.querySelector(`.address-card[data-address-id="${selectedAddressId}"] .address-content`).textContent;
-            
+
             // Store shipping data
             this.checkoutData.shipping = {
                 addressId: selectedAddressId,
                 addressText: addressText.trim(),
                 shippingMethod: document.getElementById('shipping-method').value
             };
-            
+
             return true;
         }
-        
+
         // Otherwise validate the shipping form
         const form = document.getElementById('shipping-form');
-        
+
         // Use HTML5 validation API
         if (!form.checkValidity()) {
             // Trigger browser validation UI
@@ -224,49 +224,70 @@ class Checkout {
             submitButton.click();
             return false;
         }
-        
+
         // Get form data
         const formData = new FormData(form);
         const shippingData = {};
-        
+
         for (const [key, value] of formData.entries()) {
             shippingData[key] = value;
         }
-        
+
         // Store shipping data
         this.checkoutData.shipping = shippingData;
         this.checkoutData.shippingMethod = shippingData.shipping_method;
-        
+
         // Update the review step with this information
         this.updateReviewShippingAddress();
-        
+
         return true;
     }
-    
+
     validatePaymentStep() {
+        // Check which payment method tab is active
+        const paypalTabActive = document.querySelector('#paypal-tab').classList.contains('active');
+
+        // If PayPal is selected and payment is completed
+        if (paypalTabActive) {
+            // Check if PayPal payment was completed
+            if (this.checkoutData.payment &&
+                this.checkoutData.payment.paymentMethod === 'paypal' &&
+                this.checkoutData.payment.paypalPaymentId &&
+                this.checkoutData.payment.paypalTransactionId) {
+
+                // Payment is already validated
+                return true;
+            } else {
+                // Show error message
+                alert('Please complete the PayPal payment before proceeding.');
+                return false;
+            }
+        }
+
         // If using a saved payment method, it's already valid
         if (document.querySelector('.payment-card.selected') &&
             !document.querySelector('#payment-form').classList.contains('active')) {
-            
+
             // Get the selected payment data
             const selectedPaymentId = document.querySelector('.payment-card.selected').dataset.paymentId;
             const paymentText = document.querySelector(`.payment-card[data-payment-id="${selectedPaymentId}"] .payment-details`).textContent;
-            
+
             // Store payment data
             this.checkoutData.payment = {
+                paymentMethod: 'card',
                 paymentId: selectedPaymentId,
                 paymentText: paymentText.trim()
             };
-            
+
             // Get billing address setting
             this.checkoutData.sameAsBilling = document.getElementById('same-address').checked;
-            
+
             return true;
         }
-        
+
         // Otherwise validate the payment form
         const form = document.getElementById('payment-form');
-        
+
         // Use HTML5 validation API
         if (!form.checkValidity()) {
             // Trigger browser validation UI
@@ -274,34 +295,36 @@ class Checkout {
             submitButton.click();
             return false;
         }
-        
+
         // Get form data
         const formData = new FormData(form);
-        const paymentData = {};
-        
+        const paymentData = {
+            paymentMethod: 'card'
+        };
+
         for (const [key, value] of formData.entries()) {
             paymentData[key] = value;
         }
-        
+
         // Store payment data
         this.checkoutData.payment = paymentData;
-        
+
         // Get billing address setting
         this.checkoutData.sameAsBilling = document.getElementById('same-address').checked;
-        
+
         // Update the review step with this information
         this.updateReviewPayment();
-        
+
         return true;
     }
-    
+
     updateReviewShippingAddress() {
         const addressContainer = document.getElementById('review-shipping-address');
         if (!addressContainer) return;
-        
+
         // Format the address
         let addressHTML = '';
-        
+
         if (this.checkoutData.shipping.addressId) {
             // It's a saved address
             addressHTML = document.querySelector(`.address-card[data-address-id="${this.checkoutData.shipping.addressId}"] .address-content`).innerHTML;
@@ -317,35 +340,45 @@ class Checkout {
                 </p>
             `;
         }
-        
+
         // Add shipping method
         const shippingMethodMap = {
             'standard': 'Standard Shipping (3-5 business days)',
             'expedited': 'Expedited Shipping (2-3 business days)',
             'overnight': 'Overnight Shipping (1 business day)'
         };
-        
+
         const shippingMethodText = shippingMethodMap[this.checkoutData.shippingMethod] || 'Standard Shipping';
-        
+
         addressHTML += `<p><strong>Shipping Method:</strong> ${shippingMethodText}</p>`;
-        
+
         // Update the container
         addressContainer.innerHTML = addressHTML;
     }
-    
+
     updateReviewPayment() {
         const paymentContainer = document.getElementById('review-payment');
         if (!paymentContainer) return;
-        
+
         // Format the payment info
         let paymentHTML = '';
-        
-        if (this.checkoutData.payment.paymentId) {
+
+        // Check payment method
+        if (this.checkoutData.payment.paymentMethod === 'paypal') {
+            // It's a PayPal payment
+            paymentHTML = `
+                <div class="payment-icon paypal"></div>
+                <p>
+                    PayPal Payment<br>
+                    Transaction ID: ${this.checkoutData.payment.paypalTransactionId.substring(0, 8)}...
+                </p>
+            `;
+        } else if (this.checkoutData.payment.paymentId) {
             // It's a saved payment method
             const paymentCard = document.querySelector(`.payment-card[data-payment-id="${this.checkoutData.payment.paymentId}"]`);
             const iconClass = paymentCard.querySelector('.payment-icon').className;
             const details = paymentCard.querySelector('.payment-details').innerHTML;
-            
+
             paymentHTML = `
                 <div class="${iconClass}"></div>
                 ${details}
@@ -353,89 +386,95 @@ class Checkout {
         } else {
             // It's a new payment method
             // Determine card type based on first digit
-            const cardNumber = this.checkoutData.payment.card_number.replace(/\s/g, '');
+            const cardNumber = this.checkoutData.payment.card_number ? this.checkoutData.payment.card_number.replace(/\s/g, '') : '';
             let cardType = 'unknown';
-            
-            if (cardNumber.startsWith('4')) {
-                cardType = 'visa';
-            } else if (cardNumber.startsWith('5')) {
-                cardType = 'mastercard';
-            } else if (cardNumber.startsWith('3')) {
-                cardType = 'amex';
-            } else if (cardNumber.startsWith('6')) {
-                cardType = 'discover';
+
+            if (cardNumber) {
+                if (cardNumber.startsWith('4')) {
+                    cardType = 'visa';
+                } else if (cardNumber.startsWith('5')) {
+                    cardType = 'mastercard';
+                } else if (cardNumber.startsWith('3')) {
+                    cardType = 'amex';
+                } else if (cardNumber.startsWith('6')) {
+                    cardType = 'discover';
+                }
+
+                const last4 = cardNumber.slice(-4);
+
+                paymentHTML = `
+                    <div class="payment-icon ${cardType}"></div>
+                    <p>
+                        ${cardType.charAt(0).toUpperCase() + cardType.slice(1)} ending in ${last4}<br>
+                        Expires: ${this.checkoutData.payment.expiry_date || 'N/A'}
+                    </p>
+                `;
+            } else {
+                // Fallback for when card details aren't available yet
+                paymentHTML = `
+                    <div class="payment-icon card"></div>
+                    <p>Credit Card Payment</p>
+                `;
             }
-            
-            const last4 = cardNumber.slice(-4);
-            
-            paymentHTML = `
-                <div class="payment-icon ${cardType}"></div>
-                <p>
-                    ${cardType.charAt(0).toUpperCase() + cardType.slice(1)} ending in ${last4}<br>
-                    Expires: ${this.checkoutData.payment.expiry_date}
-                </p>
-            `;
         }
-        
+
         // Update the container
         paymentContainer.innerHTML = paymentHTML;
     }
-    
+
     updateConfirmationPage() {
         // Generate a random order number
         const orderNumber = 'GG-' + Math.floor(10000 + Math.random() * 90000);
-        
+
         // Get current date
         const orderDate = new Date().toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
             day: 'numeric'
         });
-        
+
         // Get total from cart
         const total = this.cart.calculateCartTotals().grandTotal.toFixed(2);
-        
+
         // Get email from shipping info
         const email = this.checkoutData.shipping.email || 'john.smith@example.com';
-        
+
         // Update confirmation page
         document.getElementById('order-number').textContent = orderNumber;
         document.getElementById('order-date').textContent = orderDate;
         document.getElementById('order-total').textContent = `$${total}`;
         document.getElementById('confirmation-email').textContent = email;
     }
-    
+
     placeOrder() {
         // Store order notes
         this.checkoutData.orderNotes = document.getElementById('order-notes').value;
-        
+
         // Show loading state
         const placeOrderButton = document.getElementById('place-order');
         const originalButtonText = placeOrderButton.textContent;
         placeOrderButton.textContent = 'Processing...';
         placeOrderButton.disabled = true;
-        
+
         // Get cart totals for payment amount
         const totals = this.cart.calculateCartTotals();
-        
-        // If using Stripe (new payment method) or selected card is one of the saved ones
-        if (document.querySelector('#payment-form').style.display !== 'none' || 
-            document.querySelector('.payment-card.selected')) {
-            
-            // Process using Stripe
-            this.processStripePayment(totals.grandTotal)
-                .then(paymentResult => {
-                    if (paymentResult.success) {
-                        // Proceed with order creation
-                        return this.cart.createOrder();
-                    } else {
-                        throw new Error(paymentResult.error || 'Payment failed');
-                    }
+
+        // Determine payment method
+        const paymentMethod = this.checkoutData.payment.paymentMethod || 'stripe';
+
+        if (paymentMethod === 'paypal') {
+            // PayPal payment is handled separately through the PayPal button
+            // This code path should only be reached if PayPal payment was already completed
+            if (this.checkoutData.payment.paypalPaymentId && this.checkoutData.payment.paypalTransactionId) {
+                // Proceed with order creation
+                this.cart.createOrder({
+                    paymentMethod: 'paypal',
+                    transactionId: this.checkoutData.payment.paypalTransactionId
                 })
                 .then(response => {
                     // Show confirmation page
                     this.goToStep(4);
-                    
+
                     // Update order number if provided by API
                     if (response.order_id) {
                         document.getElementById('order-number').textContent = response.order_id;
@@ -445,7 +484,46 @@ class Checkout {
                     // Show error message
                     console.error('Error processing order:', error);
                     alert(`Error processing order: ${error.message}`);
-                    
+
+                    // Reset button
+                    placeOrderButton.textContent = originalButtonText;
+                    placeOrderButton.disabled = false;
+                });
+            } else {
+                // PayPal payment not completed
+                alert('Please complete the PayPal payment first.');
+                placeOrderButton.textContent = originalButtonText;
+                placeOrderButton.disabled = false;
+            }
+        } else if (document.querySelector('#payment-form').style.display !== 'none' ||
+                   document.querySelector('.payment-card.selected')) {
+            // Process using Stripe
+            this.processStripePayment(totals.grandTotal)
+                .then(paymentResult => {
+                    if (paymentResult.success) {
+                        // Proceed with order creation
+                        return this.cart.createOrder({
+                            paymentMethod: 'stripe',
+                            transactionId: paymentResult.paymentIntentId
+                        });
+                    } else {
+                        throw new Error(paymentResult.error || 'Payment failed');
+                    }
+                })
+                .then(response => {
+                    // Show confirmation page
+                    this.goToStep(4);
+
+                    // Update order number if provided by API
+                    if (response.order_id) {
+                        document.getElementById('order-number').textContent = response.order_id;
+                    }
+                })
+                .catch(error => {
+                    // Show error message
+                    console.error('Error processing order:', error);
+                    alert(`Error processing order: ${error.message}`);
+
                     // Reset button
                     placeOrderButton.textContent = originalButtonText;
                     placeOrderButton.disabled = false;
@@ -458,7 +536,7 @@ class Checkout {
                     .then(response => {
                         // Show confirmation page
                         this.goToStep(4);
-                        
+
                         // Update order number if provided by API
                         if (response.order_id) {
                             document.getElementById('order-number').textContent = response.order_id;
@@ -467,7 +545,7 @@ class Checkout {
                     .catch(error => {
                         // Show error message
                         alert(`Error creating order: ${error.message}`);
-                        
+
                         // Reset button
                         placeOrderButton.textContent = originalButtonText;
                         placeOrderButton.disabled = false;
@@ -475,7 +553,55 @@ class Checkout {
             }, 1500);
         }
     }
-    
+
+    /**
+     * Handle successful PayPal payment
+     * @param {Object} paymentData - PayPal payment data
+     */
+    handlePayPalSuccess(paymentData) {
+        // Store PayPal payment information
+        this.checkoutData.payment = {
+            ...this.checkoutData.payment,
+            paymentMethod: 'paypal',
+            paypalPaymentId: paymentData.paymentId,
+            paypalTransactionId: paymentData.transactionId
+        };
+
+        // Enable the place order button
+        const placeOrderButton = document.getElementById('place-order');
+        placeOrderButton.disabled = false;
+
+        // Show success message
+        const paypalContainer = document.getElementById('paypal-button-container');
+        if (paypalContainer) {
+            paypalContainer.innerHTML = `
+                <div class="payment-success">
+                    <i class="fas fa-check-circle"></i>
+                    <p>PayPal payment completed successfully!</p>
+                    <p>Click "Place Order" to complete your purchase.</p>
+                </div>
+            `;
+        }
+
+        // Update the review step with payment information
+        this.updateReviewPayment();
+    }
+
+    /**
+     * Handle failed PayPal payment
+     * @param {Object} error - PayPal error data
+     */
+    handlePayPalFailure(error) {
+        // Show error message
+        const paypalErrors = document.getElementById('paypal-errors');
+        if (paypalErrors) {
+            paypalErrors.textContent = error.message || 'Payment failed. Please try again.';
+            paypalErrors.classList.add('visible');
+        } else {
+            alert(`Payment failed: ${error.message || 'Unknown error'}`);
+        }
+    }
+
     /**
      * Process payment through Stripe
      * @param {number} amount - Total amount to charge
@@ -491,10 +617,10 @@ class Checkout {
                     error: 'Payment system not available'
                 };
             }
-            
+
             // Get Stripe handler
             const stripeHandler = window.stripeHandler;
-            
+
             // Prepare order metadata
             const metadata = {
                 customer_name: `${this.checkoutData.shipping.first_name || ''} ${this.checkoutData.shipping.last_name || ''}`.trim(),
@@ -502,14 +628,14 @@ class Checkout {
                 order_notes: this.checkoutData.orderNotes || '',
                 items_count: this.cart.cartItems.length
             };
-            
+
             // Create payment intent
             await stripeHandler.createPaymentIntent(
                 amount,
                 'GigGatek Order',
                 metadata
             );
-            
+
             // Prepare billing details from shipping or billing address
             const billingDetails = {
                 name: this.checkoutData.payment.card_name || document.getElementById('card-name').value,
@@ -524,7 +650,7 @@ class Checkout {
                 email: this.checkoutData.shipping.email || '',
                 phone: this.checkoutData.shipping.phone || ''
             };
-            
+
             // Process the payment
             return await stripeHandler.processPayment(billingDetails);
         } catch (error) {
@@ -535,7 +661,7 @@ class Checkout {
             };
         }
     }
-    
+
     initEventListeners() {
         // Step navigation buttons
         document.addEventListener('click', event => {
@@ -543,26 +669,26 @@ class Checkout {
             if (event.target.matches('#continue-to-payment')) {
                 this.goToStep(2);
             }
-            
+
             // Continue to Review button
             if (event.target.matches('#continue-to-review')) {
                 this.goToStep(3);
             }
-            
+
             // Place Order button
             if (event.target.matches('#place-order')) {
                 this.placeOrder();
             }
-            
+
             // Back buttons
             if (event.target.matches('#back-to-shipping')) {
                 this.goToStep(1);
             }
-            
+
             if (event.target.matches('#back-to-payment')) {
                 this.goToStep(2);
             }
-            
+
             // Edit links in review step
             if (event.target.matches('.edit-link')) {
                 const step = parseInt(event.target.dataset.step);
@@ -570,105 +696,134 @@ class Checkout {
                     this.goToStep(step);
                 }
             }
-            
+
             // Select address
             if (event.target.matches('.select-address')) {
                 const addressId = event.target.dataset.addressId;
-                
+
                 // Remove selected class from all address cards
                 document.querySelectorAll('.address-card').forEach(card => {
                     card.classList.remove('selected');
                 });
-                
+
                 // Add selected class to the clicked address card
                 event.target.closest('.address-card').classList.add('selected');
-                
+
                 // Hide shipping form
                 document.getElementById('shipping-form').style.display = 'none';
-                
+
                 // Show continue button
                 document.querySelector('.shipping-actions').style.display = 'block';
-                
+
                 // Update billing address if "same as shipping" is checked
                 if (document.getElementById('same-address').checked) {
                     this.updateBillingAddress();
                 }
             }
-            
+
             // Add new address button
             if (event.target.matches('#show-new-address-form')) {
                 // Show shipping form
                 document.getElementById('shipping-form').style.display = 'block';
-                
+
                 // Hide continue button
                 document.querySelector('.shipping-actions').style.display = 'none';
-                
+
                 // Remove selected class from all address cards
                 document.querySelectorAll('.address-card').forEach(card => {
                     card.classList.remove('selected');
                 });
             }
-            
+
             // Back to saved addresses button
             if (event.target.matches('#back-to-saved-addresses')) {
                 // Hide shipping form
                 document.getElementById('shipping-form').style.display = 'none';
-                
+
                 // Show continue button
                 document.querySelector('.shipping-actions').style.display = 'block';
-                
+
                 // Select the first address card
                 const firstAddressCard = document.querySelector('.address-card:not(.new-address-card)');
                 if (firstAddressCard) {
                     firstAddressCard.classList.add('selected');
                 }
             }
-            
+
             // Select payment method
             if (event.target.matches('.select-payment')) {
                 const paymentId = event.target.dataset.paymentId;
-                
+
                 // Remove selected class from all payment cards
                 document.querySelectorAll('.payment-card').forEach(card => {
                     card.classList.remove('selected');
                 });
-                
+
                 // Add selected class to the clicked payment card
                 event.target.closest('.payment-card').classList.add('selected');
-                
+
                 // Hide payment form
                 document.getElementById('payment-form').style.display = 'none';
             }
-            
+
             // Add new payment method button
             if (event.target.matches('#show-new-payment-form')) {
                 // Show payment form
                 document.getElementById('payment-form').style.display = 'block';
-                
+
                 // Remove selected class from all payment cards
                 document.querySelectorAll('.payment-card').forEach(card => {
                     card.classList.remove('selected');
                 });
             }
-            
+
             // Back to saved payment methods button
             if (event.target.matches('#back-to-saved-payments')) {
                 // Hide payment form
                 document.getElementById('payment-form').style.display = 'none';
-                
+
                 // Select the first payment card
                 const firstPaymentCard = document.querySelector('.payment-card:not(.new-payment-card)');
                 if (firstPaymentCard) {
                     firstPaymentCard.classList.add('selected');
                 }
             }
-            
+
+            // Payment method tabs
+            if (event.target.matches('#card-tab')) {
+                // Update payment method
+                this.checkoutData.payment = this.checkoutData.payment || {};
+                this.checkoutData.payment.paymentMethod = 'card';
+
+                // Show card payment tab
+                document.getElementById('card-payment').classList.add('show', 'active');
+                document.getElementById('paypal-payment').classList.remove('show', 'active');
+
+                // Update tab state
+                document.getElementById('card-tab').classList.add('active');
+                document.getElementById('paypal-tab').classList.remove('active');
+            }
+
+            if (event.target.matches('#paypal-tab')) {
+                // Update payment method
+                this.checkoutData.payment = this.checkoutData.payment || {};
+                this.checkoutData.payment.paymentMethod = 'paypal';
+
+                // Show PayPal payment tab
+                document.getElementById('paypal-payment').classList.add('show', 'active');
+                document.getElementById('card-payment').classList.remove('show', 'active');
+
+                // Update tab state
+                document.getElementById('paypal-tab').classList.add('active');
+                document.getElementById('card-tab').classList.remove('active');
+            }
+
             // Change billing address button
             if (event.target.matches('#change-billing-address')) {
                 // In a real implementation, this would open a modal to change the billing address
                 alert('This would open a billing address form');
             }
-            
+
             // Apply promo code button
             if (event.target.matches('#apply-promo')) {
                 const promoCode = document.getElementById('promo-code').value;
@@ -680,7 +835,7 @@ class Checkout {
                 }
             }
         });
-        
+
         // Form submissions
         const shippingForm = document.getElementById('shipping-form');
         if (shippingForm) {
@@ -691,7 +846,7 @@ class Checkout {
                 }
             });
         }
-        
+
         const paymentForm = document.getElementById('payment-form');
         if (paymentForm) {
             paymentForm.addEventListener('submit', e => {
@@ -701,7 +856,7 @@ class Checkout {
                 }
             });
         }
-        
+
         // Same as shipping address checkbox
         const sameAddressCheckbox = document.getElementById('same-address');
         if (sameAddressCheckbox) {
@@ -709,13 +864,13 @@ class Checkout {
                 this.updateBillingAddress();
             });
         }
-        
+
         // Shipping method change
         const shippingMethodSelect = document.getElementById('shipping-method');
         if (shippingMethodSelect) {
             shippingMethodSelect.addEventListener('change', () => {
                 this.checkoutData.shippingMethod = shippingMethodSelect.value;
-                
+
                 // Update shipping cost in order summary
                 let shippingCost = 0;
                 switch (shippingMethodSelect.value) {
@@ -728,29 +883,29 @@ class Checkout {
                     default:
                         shippingCost = 0;
                 }
-                
+
                 // In a real implementation, this would update the cart totals with the new shipping cost
                 // For demo purposes, just update the displayed shipping cost
                 document.getElementById('summary-shipping').textContent = shippingCost === 0 ? 'Free' : `$${shippingCost.toFixed(2)}`;
-                
+
                 // Update the total
                 const subtotal = parseFloat(document.getElementById('summary-subtotal').textContent.replace('$', ''));
                 const tax = parseFloat(document.getElementById('summary-tax').textContent.replace('$', ''));
                 const total = subtotal + shippingCost + tax;
-                
+
                 document.getElementById('summary-total').textContent = `$${total.toFixed(2)}`;
             });
         }
     }
-    
+
     updateBillingAddress() {
         const billingAddressDetails = document.getElementById('billing-address-details');
         const sameAddress = document.getElementById('same-address').checked;
-        
+
         if (sameAddress) {
             // Get selected shipping address
             const selectedAddress = document.querySelector('.address-card.selected:not(.new-address-card)');
-            
+
             if (selectedAddress) {
                 // Copy the address content to billing
                 billingAddressDetails.innerHTML = selectedAddress.querySelector('.address-content').innerHTML;
@@ -775,6 +930,37 @@ class Checkout {
                 </p>
             `;
         }
+    }
+
+    /**
+     * Get the customer's full name
+     * @returns {string} The customer's full name
+     */
+    getCustomerName() {
+        if (!this.checkoutData.shipping) return '';
+
+        return `${this.checkoutData.shipping.first_name || ''} ${this.checkoutData.shipping.last_name || ''}`.trim();
+    }
+
+    /**
+     * Get the customer's email address
+     * @returns {string} The customer's email address
+     */
+    getCustomerEmail() {
+        if (!this.checkoutData.shipping) return '';
+
+        return this.checkoutData.shipping.email || '';
+    }
+
+    /**
+     * Get the total amount for the order
+     * @returns {number} The total amount
+     */
+    getTotalAmount() {
+        if (!this.cart) return 0;
+
+        const totals = this.cart.calculateCartTotals();
+        return totals.grandTotal;
     }
 }
 

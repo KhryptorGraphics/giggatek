@@ -1,0 +1,14 @@
+﻿{
+  "name": "giggatek-docs",
+  "version": "1.0.0",
+  "description": "GigGatek API Documentation",
+  "scripts": {
+    "docs:dev": "redoc-cli serve docs/api/openapi.yaml --watch",
+    "docs:build": "redoc-cli bundle docs/api/openapi.yaml -o docs/api/index.html"
+  },
+  "dependencies": {
+    "redoc-cli": "^0.13.0",
+    "swagger-ui-express": "^4.6.0",
+    "yaml": "^2.2.1"
+  }
+}
