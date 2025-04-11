@@ -6,7 +6,7 @@ Welcome to the GigGatek API documentation. This documentation provides informati
 
 All API endpoints are relative to the base URL:
 
-```
+```text
 https://api.giggatek.com/v1
 ```
 
@@ -14,11 +14,17 @@ https://api.giggatek.com/v1
 
 Most endpoints require authentication using a JWT token. Include the token in the `Authorization` header:
 
-```
+```http
 Authorization: Bearer <token>
 ```
 
 To obtain a token, use the [login endpoint](/auth.md#login).
+
+## Getting Started
+
+- [Quick Start Guide](quickstart.md) - Get up and running quickly
+- [API Examples](examples.md) - Code examples for common tasks
+- [Troubleshooting Guide](troubleshooting.md) - Solutions for common issues
 
 ## API Sections
 
@@ -91,18 +97,19 @@ Paginated responses include a `pagination` object with the following properties:
 
 The API implements rate limiting to prevent abuse. The current limits are:
 
-- 100 requests per minute for authenticated users
-- 20 requests per minute for unauthenticated users
+- Anonymous: 60 requests per minute
+- Authenticated users: 120 requests per minute
+- Admin users: 300 requests per minute
 
 Rate limit information is included in the response headers:
 
-```
-X-RateLimit-Limit: 100
-X-RateLimit-Remaining: 95
-X-RateLimit-Reset: 1681234567
+```http
+X-RateLimit-Limit: 120
+X-RateLimit-Remaining: 115
+X-RateLimit-Reset: 45
 ```
 
-If you exceed the rate limit, you will receive a 429 Too Many Requests response.
+If you exceed the rate limit, you will receive a 429 Too Many Requests response with a `Retry-After` header indicating how many seconds to wait before retrying.
 
 ## Versioning
 
@@ -110,4 +117,4 @@ The API is versioned using the URL path (e.g., `/v1/products`). The current vers
 
 ## Support
 
-If you have any questions or need assistance with the API, please contact our support team at api-support@giggatek.com.
+If you have any questions or need assistance with the API, please contact our support team at [api-support@giggatek.com](mailto:api-support@giggatek.com).
