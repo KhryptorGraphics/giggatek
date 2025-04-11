@@ -3,8 +3,34 @@ info:
   title: GigGatek API
   description: |
     API documentation for the GigGatek e-commerce platform.
-    
+
     This API provides endpoints for managing products, orders, rentals, and payments.
+
+    ## Rate Limiting
+
+    The API implements rate limiting to prevent abuse. The current limits are:
+
+    - Anonymous: 60 requests per minute
+    - Authenticated users: 120 requests per minute
+    - Admin users: 300 requests per minute
+
+    Rate limit information is included in the response headers:
+
+    ```
+    X-RateLimit-Limit: 120
+    X-RateLimit-Remaining: 115
+    X-RateLimit-Reset: 45
+    ```
+
+    If you exceed the rate limit, you will receive a 429 Too Many Requests response with a `Retry-After` header indicating how many seconds to wait before retrying.
+
+    ## Documentation
+
+    For more detailed documentation, examples, and guides, visit:
+
+    - [Quick Start Guide](./quickstart.md)
+    - [API Examples](./examples.md)
+    - [Troubleshooting Guide](./troubleshooting.md)
   version: 1.0.0
   contact:
     name: GigGatek API Support
@@ -99,7 +125,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  
+
   /auth/login:
     post:
       tags:
@@ -146,7 +172,9 @@ paths:
                     example: 3600
         '401':
           $ref: '#/components/responses/Unauthorized'
-  
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+
   /auth/refresh:
     post:
       tags:
@@ -175,7 +203,7 @@ paths:
                     example: 3600
         '401':
           $ref: '#/components/responses/Unauthorized'
-  
+
   # Product Endpoints
   /products:
     get:
@@ -253,7 +281,9 @@ paths:
                       $ref: '#/components/schemas/ProductSummary'
                   pagination:
                     $ref: '#/components/schemas/Pagination'
-  
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+
   /products/{productId}:
     get:
       tags:
@@ -280,7 +310,9 @@ paths:
                     $ref: '#/components/schemas/Product'
         '404':
           $ref: '#/components/responses/NotFound'
-  
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+
   # Order Endpoints
   /orders:
     get:
@@ -327,7 +359,7 @@ paths:
                     $ref: '#/components/schemas/Pagination'
         '401':
           $ref: '#/components/responses/Unauthorized'
-    
+
     post:
       tags:
         - Orders
@@ -359,7 +391,7 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
-  
+
   # Rental Endpoints
   /rentals:
     get:
@@ -406,7 +438,7 @@ paths:
                     $ref: '#/components/schemas/Pagination'
         '401':
           $ref: '#/components/responses/Unauthorized'
-  
+
   # Payment Endpoints
   /payments/stripe/intent:
     post:
@@ -562,7 +594,7 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-  
+
   schemas:
     User:
       type: object
@@ -583,7 +615,7 @@ components:
         role:
           type: string
           example: CUSTOMER
-    
+
     ProductSummary:
       type: object
       properties:
@@ -621,7 +653,7 @@ components:
         in_stock:
           type: boolean
           example: true
-    
+
     Product:
       allOf:
         - $ref: '#/components/schemas/ProductSummary'
@@ -683,7 +715,7 @@ components:
               type: string
               format: date-time
               example: 2025-04-05T14:45:00Z
-    
+
     OrderSummary:
       type: object
       properties:
@@ -712,7 +744,7 @@ components:
           type: string
           format: date-time
           example: 2025-04-10T14:30:00Z
-    
+
     OrderInput:
       type: object
       required:
@@ -755,7 +787,7 @@ components:
         notes:
           type: string
           example: Please leave package at the door
-    
+
     RentalSummary:
       type: object
       properties:
@@ -796,7 +828,7 @@ components:
           type: string
           format: date-time
           example: 2025-05-10T00:00:00Z
-    
+
     Pagination:
       type: object
       properties:
@@ -812,14 +844,14 @@ components:
         total_pages:
           type: integer
           example: 8
-    
+
     Error:
       type: object
       properties:
         error:
           type: string
           example: Something went wrong
-  
+
   responses:
     BadRequest:
       description: Bad request
@@ -827,24 +859,61 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    
+
     Unauthorized:
       description: Unauthorized
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    
+
     Forbidden:
       description: Forbidden
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    
+
     NotFound:
       description: Not found
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
+
+    TooManyRequests:
+      description: Too many requests - rate limit exceeded
+      headers:
+        X-RateLimit-Limit:
+          schema:
+            type: integer
+          description: The number of allowed requests in the current period
+        X-RateLimit-Remaining:
+          schema:
+            type: integer
+          description: The number of remaining requests in the current period
+        X-RateLimit-Reset:
+          schema:
+            type: integer
+          description: The number of seconds left in the current period
+        Retry-After:
+          schema:
+            type: integer
+          description: The number of seconds to wait before retrying
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: rate_limit_exceeded
+              message:
+                type: string
+                example: Rate limit exceeded. Try again in 60 seconds
+              status:
+                type: integer
+                example: 429
+              retry_after:
+                type: integer
+                example: 60
