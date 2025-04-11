@@ -535,6 +535,67 @@
             margin-top: 10px;
             font-size: 0.9rem;
         }
+
+        /* Settings styles */
+        .settings-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .settings-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 0.25rem;
+            border: 1px solid #dee2e6;
+        }
+
+        .settings-section h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .settings-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .settings-options label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .settings-options input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        .settings-options select {
+            margin-left: 10px;
+            padding: 5px;
+            border-radius: 0.25rem;
+            border: 1px solid #ced4da;
+        }
+
+        .settings-options input[type="range"] {
+            margin: 0 10px;
+            width: 200px;
+        }
+
+        #statistics {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 0.25rem;
+            border: 1px solid #dee2e6;
+            margin-bottom: 15px;
+        }
+
+        #statistics p {
+            margin: 5px 0;
+        }
     </style>
 </head>
 <body>
@@ -582,6 +643,7 @@
                 <div class="tab" data-tab="cart">Shopping Cart</div>
                 <div class="tab" data-tab="orders">Order History</div>
                 <div class="tab" data-tab="auth">Authentication</div>
+                <div class="tab" data-tab="settings">Settings</div>
             </div>
 
             <div class="tab-content active" id="products-tab">
@@ -643,6 +705,98 @@
                     </div>
                 </div>
             </div>
+
+            <div class="tab-content" id="settings-tab">
+                <div class="settings-container">
+                    <h2>Performance & Security Settings</h2>
+
+                    <div class="settings-section">
+                        <h3>Security Features</h3>
+                        <div class="settings-options">
+                            <label>
+                                <input type="checkbox" id="csrf-protection" checked> CSRF Protection
+                            </label>
+                            <label>
+                                <input type="checkbox" id="encryption"> Request/Response Encryption
+                            </label>
+                            <label>
+                                <input type="checkbox" id="rate-limiting" checked> Rate Limiting
+                            </label>
+                            <label>
+                                <input type="checkbox" id="security-headers" checked> Security Headers
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>Performance Features</h3>
+                        <div class="settings-options">
+                            <label>
+                                <input type="checkbox" id="request-batching" checked> Request Batching
+                            </label>
+                            <label>
+                                <input type="checkbox" id="request-prioritization" checked> Request Prioritization
+                            </label>
+                            <label>
+                                <input type="checkbox" id="advanced-caching" checked> Advanced Caching
+                            </label>
+                            <label>
+                                <input type="checkbox" id="offline-support" checked> Offline Support
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>Cache Settings</h3>
+                        <div class="settings-options">
+                            <label>
+                                Storage Type:
+                                <select id="cache-storage-type">
+                                    <option value="memory">Memory</option>
+                                    <option value="localStorage">Local Storage</option>
+                                    <option value="indexedDB">IndexedDB</option>
+                                </select>
+                            </label>
+                            <label>
+                                <input type="checkbox" id="stale-while-revalidate" checked> Stale-While-Revalidate
+                            </label>
+                            <label>
+                                <input type="checkbox" id="preload-related-data" checked> Preload Related Data
+                            </label>
+                            <button type="button" id="clear-cache" class="btn btn-secondary">Clear Cache</button>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>Network Simulation</h3>
+                        <div class="settings-options">
+                            <label>
+                                <input type="checkbox" id="simulate-offline"> Simulate Offline
+                            </label>
+                            <label>
+                                <input type="checkbox" id="simulate-slow-connection"> Simulate Slow Connection
+                            </label>
+                            <label>
+                                Latency (ms):
+                                <input type="range" id="simulated-latency" min="0" max="5000" step="100" value="0">
+                                <span id="latency-value">0</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>Statistics</h3>
+                        <div id="statistics">
+                            <p>Cache Hits: <span id="cache-hits">0</span></p>
+                            <p>Cache Misses: <span id="cache-misses">0</span></p>
+                            <p>Cache Hit Ratio: <span id="cache-ratio">0%</span></p>
+                            <p>Cache Size: <span id="cache-size">0</span> items</p>
+                            <p>Offline Queue Size: <span id="offline-queue-size">0</span> requests</p>
+                        </div>
+                        <button type="button" id="refresh-stats" class="btn btn-secondary">Refresh Statistics</button>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 
@@ -652,10 +806,24 @@
     <script src="../js/env.js"></script>
     <script src="../js/config.js"></script>
     <script src="../js/data-models-loader.js"></script>
+    <!-- Security modules -->
+    <script src="../js/security/csrf-protection.js"></script>
+    <script src="../js/security/encryption.js"></script>
+    <script src="../js/security/rate-limiter.js"></script>
+    <script src="../js/security/security-headers.js"></script>
+    <script src="../js/security/index.js"></script>
+    <!-- Performance modules -->
+    <script src="../js/performance/request-batcher.js"></script>
+    <script src="../js/performance/request-prioritizer.js"></script>
+    <script src="../js/performance/cache-manager.js"></script>
+    <script src="../js/performance/offline-manager.js"></script>
+    <script src="../js/performance/index.js"></script>
+    <!-- Core modules -->
     <script src="../js/api-client.js"></script>
     <script src="../js/state-manager.js"></script>
     <script src="../js/error-handler.js"></script>
     <script src="../js/data-service.js"></script>
+    <!-- Components -->
     <script src="../js/components/product-list.js"></script>
     <script src="../js/components/shopping-cart.js"></script>
     <script src="../js/components/order-history.js"></script>
@@ -668,6 +836,7 @@
             initializeTabs();
             initializeComponents();
             initializeAuth();
+            initializeSettings();
 
             // Check authentication status
             checkAuthStatus();
@@ -962,6 +1131,216 @@
                 document.getElementById('login-form').classList.remove('hidden');
                 document.getElementById('register-form').classList.add('hidden');
                 document.getElementById('user-profile').classList.add('hidden');
+            }
+        }
+
+        function initializeSettings() {
+            // Get settings elements
+            const csrfProtectionCheckbox = document.getElementById('csrf-protection');
+            const encryptionCheckbox = document.getElementById('encryption');
+            const rateLimitingCheckbox = document.getElementById('rate-limiting');
+            const securityHeadersCheckbox = document.getElementById('security-headers');
+
+            const requestBatchingCheckbox = document.getElementById('request-batching');
+            const requestPrioritizationCheckbox = document.getElementById('request-prioritization');
+            const advancedCachingCheckbox = document.getElementById('advanced-caching');
+            const offlineSupportCheckbox = document.getElementById('offline-support');
+
+            const cacheStorageTypeSelect = document.getElementById('cache-storage-type');
+            const staleWhileRevalidateCheckbox = document.getElementById('stale-while-revalidate');
+            const preloadRelatedDataCheckbox = document.getElementById('preload-related-data');
+            const clearCacheButton = document.getElementById('clear-cache');
+
+            const simulateOfflineCheckbox = document.getElementById('simulate-offline');
+            const simulateSlowConnectionCheckbox = document.getElementById('simulate-slow-connection');
+            const simulatedLatencyRange = document.getElementById('simulated-latency');
+            const latencyValueSpan = document.getElementById('latency-value');
+
+            const refreshStatsButton = document.getElementById('refresh-stats');
+
+            // Initialize settings
+            if (window.security) {
+                // CSRF Protection
+                csrfProtectionCheckbox.checked = window.security.csrfProtection !== null;
+                csrfProtectionCheckbox.addEventListener('change', () => {
+                    window.dispatchEvent(new CustomEvent('security:update', {
+                        detail: { csrfEnabled: csrfProtectionCheckbox.checked }
+                    }));
+                });
+
+                // Encryption
+                encryptionCheckbox.checked = window.security.encryptionService && window.security.encryptionService.isEnabled();
+                encryptionCheckbox.addEventListener('change', () => {
+                    window.dispatchEvent(new CustomEvent('security:update', {
+                        detail: { encryptionEnabled: encryptionCheckbox.checked }
+                    }));
+                });
+
+                // Rate Limiting
+                rateLimitingCheckbox.checked = window.security.rateLimiter !== null;
+                rateLimitingCheckbox.addEventListener('change', () => {
+                    window.dispatchEvent(new CustomEvent('security:update', {
+                        detail: { rateLimitingEnabled: rateLimitingCheckbox.checked }
+                    }));
+                });
+
+                // Security Headers
+                securityHeadersCheckbox.checked = window.security.securityHeaders !== null;
+                securityHeadersCheckbox.addEventListener('change', () => {
+                    window.dispatchEvent(new CustomEvent('security:update', {
+                        detail: { securityHeadersEnabled: securityHeadersCheckbox.checked }
+                    }));
+                });
+            }
+
+            if (window.performance) {
+                // Request Batching
+                requestBatchingCheckbox.checked = window.performance.requestBatcher !== null;
+                requestBatchingCheckbox.addEventListener('change', () => {
+                    window.dispatchEvent(new CustomEvent('performance:update', {
+                        detail: { batchingEnabled: requestBatchingCheckbox.checked }
+                    }));
+                });
+
+                // Request Prioritization
+                requestPrioritizationCheckbox.checked = window.performance.requestPrioritizer !== null;
+                requestPrioritizationCheckbox.addEventListener('change', () => {
+                    window.dispatchEvent(new CustomEvent('performance:update', {
+                        detail: { prioritizationEnabled: requestPrioritizationCheckbox.checked }
+                    }));
+                });
+
+                // Advanced Caching
+                advancedCachingCheckbox.checked = window.performance.cacheManager !== null;
+                advancedCachingCheckbox.addEventListener('change', () => {
+                    window.dispatchEvent(new CustomEvent('performance:update', {
+                        detail: { cachingEnabled: advancedCachingCheckbox.checked }
+                    }));
+                });
+
+                // Offline Support
+                offlineSupportCheckbox.checked = window.performance.offlineManager !== null;
+                offlineSupportCheckbox.addEventListener('change', () => {
+                    window.dispatchEvent(new CustomEvent('performance:update', {
+                        detail: { offlineEnabled: offlineSupportCheckbox.checked }
+                    }));
+                });
+
+                // Cache Storage Type
+                if (window.performance.cacheManager) {
+                    cacheStorageTypeSelect.value = window.performance.cacheManager.options.storageType;
+                    cacheStorageTypeSelect.addEventListener('change', () => {
+                        window.performance.cacheManager.options.storageType = cacheStorageTypeSelect.value;
+                        window.performance.cacheManager.initializeCache();
+                    });
+
+                    // Stale While Revalidate
+                    staleWhileRevalidateCheckbox.checked = window.performance.cacheManager.options.staleWhileRevalidate;
+                    staleWhileRevalidateCheckbox.addEventListener('change', () => {
+                        window.performance.cacheManager.options.staleWhileRevalidate = staleWhileRevalidateCheckbox.checked;
+                    });
+
+                    // Preload Related Data
+                    preloadRelatedDataCheckbox.checked = window.performance.cacheManager.options.preloadRelatedData;
+                    preloadRelatedDataCheckbox.addEventListener('change', () => {
+                        window.performance.cacheManager.options.preloadRelatedData = preloadRelatedDataCheckbox.checked;
+                    });
+
+                    // Clear Cache
+                    clearCacheButton.addEventListener('click', () => {
+                        window.performance.cacheManager.clearCache();
+                        updateStatistics();
+                        alert('Cache cleared successfully!');
+                    });
+                }
+
+                // Network Simulation
+                if (window.performance.offlineManager) {
+                    // Simulate Offline
+                    simulateOfflineCheckbox.checked = !window.performance.offlineManager.isOnline;
+                    simulateOfflineCheckbox.addEventListener('change', () => {
+                        if (simulateOfflineCheckbox.checked) {
+                            window.dispatchEvent(new Event('offline'));
+                        } else {
+                            window.dispatchEvent(new Event('online'));
+                        }
+                    });
+
+                    // Listen for online/offline events
+                    window.addEventListener('online', () => {
+                        simulateOfflineCheckbox.checked = false;
+                    });
+
+                    window.addEventListener('offline', () => {
+                        simulateOfflineCheckbox.checked = true;
+                    });
+                }
+
+                // Simulate Slow Connection
+                simulateSlowConnectionCheckbox.addEventListener('change', () => {
+                    simulatedLatencyRange.disabled = !simulateSlowConnectionCheckbox.checked;
+                    if (!simulateSlowConnectionCheckbox.checked) {
+                        // Reset latency
+                        window.setTimeout = window.originalSetTimeout || window.setTimeout;
+                    } else {
+                        // Apply latency
+                        applySimulatedLatency();
+                    }
+                });
+
+                // Simulated Latency
+                simulatedLatencyRange.addEventListener('input', () => {
+                    latencyValueSpan.textContent = simulatedLatencyRange.value;
+                    if (simulateSlowConnectionCheckbox.checked) {
+                        applySimulatedLatency();
+                    }
+                });
+
+                // Update latency value display
+                latencyValueSpan.textContent = simulatedLatencyRange.value;
+
+                // Refresh Statistics
+                refreshStatsButton.addEventListener('click', updateStatistics);
+
+                // Initial statistics update
+                updateStatistics();
+            }
+        }
+
+        function applySimulatedLatency() {
+            const latency = parseInt(document.getElementById('simulated-latency').value);
+
+            // Store original setTimeout if not already stored
+            if (!window.originalSetTimeout) {
+                window.originalSetTimeout = window.setTimeout;
+            }
+
+            // Override setTimeout to add latency
+            window.setTimeout = function(callback, timeout) {
+                // Add latency to API calls
+                if (timeout === 0 && typeof callback === 'function' && callback.toString().includes('fetch')) {
+                    return window.originalSetTimeout(callback, latency);
+                }
+
+                // Use original setTimeout for other calls
+                return window.originalSetTimeout(callback, timeout);
+            };
+        }
+
+        function updateStatistics() {
+            if (window.performance) {
+                const stats = window.performance.getStats();
+
+                if (stats.cache) {
+                    document.getElementById('cache-hits').textContent = stats.cache.hits;
+                    document.getElementById('cache-misses').textContent = stats.cache.misses;
+                    document.getElementById('cache-ratio').textContent = Math.round(stats.cache.ratio * 100) + '%';
+                    document.getElementById('cache-size').textContent = stats.cache.size;
+                }
+
+                if (stats.offline) {
+                    document.getElementById('offline-queue-size').textContent = stats.offline.queueSize;
+                }
             }
         }
     </script>

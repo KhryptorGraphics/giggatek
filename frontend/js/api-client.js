@@ -14,6 +14,15 @@ class ApiClient {
     this.tokenExpiry = null;
     this.refreshTimeout = null;
 
+    // Security and performance features
+    this.security = window.security || null;
+    this.performance = window.performance || null;
+
+    // Set API client reference in performance module
+    if (this.performance) {
+      this.performance.setApiClient(this);
+    }
+
     // Load token from storage if available
     this.loadTokenFromStorage();
 
@@ -189,6 +198,47 @@ class ApiClient {
    * @returns {Promise} Promise that resolves with response data
    */
   async request(method, endpoint, data = null, requireAuth = true, options = {}) {
+    // Create request function
+    const requestFn = () => {
+      return this._makeRequest(method, endpoint, data, requireAuth, options);
+    };
+
+    // Apply security features
+    let secureRequestFn = requestFn;
+
+    if (this.security && this.security.rateLimiter) {
+      const security = this.security;
+      secureRequestFn = () => {
+        return security.rateLimiter.limitRequest(endpoint, method, requestFn);
+      };
+    }
+
+    // Apply performance features
+    if (this.performance) {
+      return this.performance.handleRequest(
+        endpoint,
+        method,
+        data,
+        requireAuth,
+        options,
+        secureRequestFn
+      );
+    } else {
+      return secureRequestFn();
+    }
+  }
+
+  /**
+   * Make actual API request
+   *
+   * @param {string} method - HTTP method
+   * @param {string} endpoint - API endpoint
+   * @param {Object} data - Request data
+   * @param {boolean} requireAuth - Whether request requires authentication
+   * @param {Object} options - Additional options
+   * @returns {Promise} Promise that resolves with response data
+   */
+  async _makeRequest(method, endpoint, data = null, requireAuth = true, options = {}) {
     // Check if authentication is required
     if (requireAuth && !this.isAuthenticated()) {
       // Try to refresh token if available
@@ -203,7 +253,7 @@ class ApiClient {
     const url = `${this.baseUrl}${endpoint}`;
 
     // Build request options
-    const requestOptions = {
+    let requestOptions = {
       method,
       headers: {
         'Content-Type': 'application/json',
@@ -213,6 +263,11 @@ class ApiClient {
       credentials: 'include'
     };
 
+    // Apply security features if available
+    if (this.security) {
+      requestOptions = this.security.applyToRequest(requestOptions, method, endpoint);
+    }
+
     // Add authentication header if required
     if (requireAuth && this.token) {
       requestOptions.headers['Authorization'] = `Bearer ${this.token}`;
@@ -220,7 +275,16 @@ class ApiClient {
 
     // Add request body if needed
     if (data && ['POST', 'PUT', 'PATCH'].includes(method)) {
-      requestOptions.body = JSON.stringify(data);
+      // Encrypt data if encryption is enabled
+      if (this.security && this.security.encryptionService && this.security.encryptionService.isEnabled()) {
+        const encryptedData = await this.security.encryptionService.encrypt(data);
+        requestOptions.body = JSON.stringify(encryptedData);
+
+        // Add encryption header
+        requestOptions.headers['X-Encryption-Enabled'] = 'true';
+      } else {
+        requestOptions.body = JSON.stringify(data);
+      }
     }
 
     // Make request
@@ -235,12 +299,25 @@ class ApiClient {
         });
       }
 
+      // Process response for security features
+      if (this.security) {
+        this.security.processResponse(response);
+      }
+
       // Parse response
       let responseData;
       const contentType = response.headers.get('Content-Type');
+      const isEncrypted = response.headers.get('X-Encryption-Enabled') === 'true';
 
       if (contentType && contentType.includes('application/json')) {
-        responseData = await response.json();
+        const jsonData = await response.json();
+
+        // Decrypt response if encrypted and encryption is enabled
+        if (isEncrypted && this.security && this.security.encryptionService && this.security.encryptionService.isEnabled()) {
+          responseData = await this.security.encryptionService.decrypt(jsonData);
+        } else {
+          responseData = jsonData;
+        }
       } else {
         responseData = await response.text();
       }
