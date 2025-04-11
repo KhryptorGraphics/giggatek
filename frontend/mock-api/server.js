@@ -266,6 +266,13 @@ app.get('/api/v1/products', (req, res) => {
   const maxPrice = parseFloat(req.query.max_price) || Number.MAX_SAFE_INTEGER;
   const sort = req.query.sort || 'name:asc';
 
+  // Get advanced filter parameters
+  const condition = req.query.condition ? req.query.condition.split(',') : [];
+  const brand = req.query.brand ? req.query.brand.split(',') : [];
+  const features = req.query.features ? req.query.features.split(',') : [];
+  const inStock = req.query.in_stock === 'true';
+  const minRating = parseFloat(req.query.min_rating) || 0;
+
   // Filter products
   let filteredProducts = [...products];
 
@@ -289,6 +296,41 @@ app.get('/api/v1/products', (req, res) => {
   filteredProducts = filteredProducts.filter(product =>
     product.price >= minPrice && product.price <= maxPrice
   );
+
+  // Apply condition filter
+  if (condition.length > 0) {
+    filteredProducts = filteredProducts.filter(product =>
+      condition.includes(product.condition)
+    );
+  }
+
+  // Apply brand filter
+  if (brand.length > 0) {
+    filteredProducts = filteredProducts.filter(product =>
+      brand.includes(product.brand)
+    );
+  }
+
+  // Apply features filter
+  if (features.length > 0) {
+    filteredProducts = filteredProducts.filter(product =>
+      features.some(feature => product.features && product.features.includes(feature))
+    );
+  }
+
+  // Apply in-stock filter
+  if (inStock) {
+    filteredProducts = filteredProducts.filter(product =>
+      product.stock > 0
+    );
+  }
+
+  // Apply rating filter
+  if (minRating > 0) {
+    filteredProducts = filteredProducts.filter(product =>
+      product.rating >= minRating
+    );
+  };
 
   // Apply sorting
   const [sortField, sortDirection] = sort.split(':');
