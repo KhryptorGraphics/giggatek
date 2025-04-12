@@ -76,6 +76,35 @@ This document provides instructions for deploying the GigGatek application in va
 
 The application uses SQLite for simplicity in development. For production, consider migrating to a more robust database like MySQL or PostgreSQL.
 
+## Redis Caching
+
+The application now uses Redis for caching to improve API performance, particularly for rental operations.
+
+1. Make sure Redis is installed and running:
+   ```bash
+   # Check if Redis is running
+   systemctl status redis-server
+   
+   # Install Redis if needed
+   apt-get install redis-server
+   systemctl enable redis-server
+   systemctl start redis-server
+   ```
+
+2. Configure Redis environment variables in your `.env` file:
+   ```
+   REDIS_HOST=localhost
+   REDIS_PORT=6379
+   REDIS_DB=0
+   REDIS_PASSWORD=your_redis_password  # Optional
+   REDIS_ENABLED=true
+   ```
+
+3. To disable caching during development or troubleshooting, set:
+   ```
+   REDIS_ENABLED=false
+   ```
+
 ## Monitoring
 
 The application includes monitoring setup with Prometheus and Grafana. Access the monitoring dashboards:

@@ -222,6 +222,44 @@ install_aws_cli() {
     fi
 }
 
+# Function to install Redis
+install_redis() {
+    echo "Installing Redis..."
+    
+    if [ "$OS" == "linux" ]; then
+        if [ "$DISTRO" == "debian" ]; then
+            sudo apt-get update
+            sudo apt-get install -y redis-server
+            # Enable Redis to start on boot
+            sudo systemctl enable redis-server
+            # Start Redis service
+            sudo systemctl start redis-server
+        elif [ "$DISTRO" == "redhat" ]; then
+            sudo yum install -y redis
+            # Enable Redis to start on boot
+            sudo systemctl enable redis
+            # Start Redis service
+            sudo systemctl start redis
+        else
+            echo "Unsupported Linux distribution. Please install Redis manually."
+        fi
+    elif [ "$OS" == "macos" ]; then
+        if command_exists brew; then
+            brew install redis
+            # Start Redis service
+            brew services start redis
+        else
+            echo "Homebrew not found. Please install Redis manually."
+        fi
+    elif [ "$OS" == "windows" ]; then
+        echo "Redis doesn't run natively on Windows. Consider using WSL (Windows Subsystem for Linux)."
+        echo "Or you can use the Redis Docker image (which is what our docker-compose.yml uses)."
+        echo "docker run --name redis -p 6379:6379 -d redis:7-alpine"
+    else
+        echo "Unsupported OS. Please install Redis manually."
+    fi
+}
+
 # Function to install GitHub CLI
 install_github_cli() {
     echo "Installing GitHub CLI..."
@@ -318,6 +356,13 @@ if ! command_exists gh; then
     install_github_cli
 else
     echo "GitHub CLI is already installed."
+fi
+
+# Install Redis
+if ! command_exists redis-server && ! command_exists redis-cli; then
+    install_redis
+else
+    echo "Redis is already installed."
 fi
 
 # Create project directories
