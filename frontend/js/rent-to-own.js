@@ -1,559 +1,451 @@
 /**
- * GigGatek - Rent-to-Own Calculator and Management Interface
+ * GigGatek Rent-to-Own Calculator
  * 
- * This script handles the rent-to-own functionality, including:
- * - Payment calculator
- * - Rental term selection
- * - Buyout price calculation
- * - Rental management dashboard
+ * This script powers the interactive rental calculator on the rent-to-own page,
+ * allowing users to visualize payment options and total costs based on 
+ * product selection and rental term.
  */
 
-// Global variables
+// Import utility modules
+import { formatCurrency, formatPercentage } from './modules/formatters.js';
+
+// Global state variables
 let currentProduct = null;
-let selectedTerm = 12; // Default to 12 months
+let selectedTerm = 12; // Default term in months
+let chartModuleLoaded = false;
+
+// DOM elements
+const elements = {
+    productSelect: document.getElementById('product-select'),
+    productImage: document.getElementById('product-image'),
+    productName: document.getElementById('product-name'),
+    productDescription: document.getElementById('product-description'),
+    productDetails: document.getElementById('product-details'),
+    productSpecifications: document.getElementById('product-specifications'),
+    conditionRating: document.getElementById('condition-rating'),
+    termOptions: document.querySelectorAll('.term-option'),
+    termSlider: document.getElementById('term-slider'),
+    selectedTermDisplay: document.getElementById('selected-term'),
+    monthlyPayment: document.getElementById('monthly-payment'),
+    purchasePrice: document.getElementById('purchase-price'),
+    totalCost: document.getElementById('total-cost'),
+    rentalPremium: document.getElementById('rental-premium'),
+    buyout3months: document.getElementById('buyout-3months'),
+    buyout6months: document.getElementById('buyout-6months'),
+    buyout9months: document.getElementById('buyout-9months'),
+    comparisonChart: document.getElementById('comparison-chart')
+};
 
 /**
- * Initialize the rent-to-own functionality
+ * Calculate the monthly rate for a product
+ * 
+ * @param {number} price - Product purchase price
+ * @param {number} term - Rental term in months
+ * @returns {number} - Monthly payment
  */
-function initRentToOwn() {
-    // Set up event listeners for term selection
-    document.querySelectorAll('.term-option').forEach(option => {
-        option.addEventListener('click', function() {
-            selectedTerm = parseInt(this.dataset.term);
-            updateCalculator();
-            
-            // Update active state
-            document.querySelectorAll('.term-option').forEach(el => el.classList.remove('active'));
-            this.classList.add('active');
-        });
-    });
-
-    // Set up product selection change listener if on product page
-    const productSelect = document.getElementById('product-select');
-    if (productSelect) {
-        productSelect.addEventListener('change', function() {
-            loadProductDetails(this.value);
-        });
-        
-        // Load initial product if selected
-        if (productSelect.value) {
-            loadProductDetails(productSelect.value);
-        }
-    } else {
-        // Check if we're on a product detail page with data-product-id
-        const productDetail = document.querySelector('[data-product-id]');
-        if (productDetail) {
-            loadProductDetails(productDetail.dataset.productId);
-        }
-    }
-
-    // Initialize slider if present
-    initPaymentSlider();
+function calculateMonthlyRate(price, term) {
+    // Interest rate factor (higher for shorter terms)
+    let interestFactor;
     
-    // Load user rentals if on dashboard
-    if (document.getElementById('user-rentals')) {
-        loadUserRentals();
+    switch (true) {
+        case (term <= 3):
+            interestFactor = 0.05; // 5% markup for 3 month terms
+            break;
+        case (term <= 6):
+            interestFactor = 0.10; // 10% markup for 6 month terms
+            break;
+        case (term <= 12):
+            interestFactor = 0.15; // 15% markup for 12 month terms
+            break;
+        default:
+            interestFactor = 0.20; // 20% markup for longer terms
     }
+    
+    // Calculate total amount to be financed with interest markup
+    const totalFinanced = price * (1 + interestFactor);
+    
+    // Calculate monthly payment
+    return totalFinanced / term;
 }
 
 /**
- * Load product details for rent-to-own calculation
- * @param {number} productId - The ID of the product
+ * Calculate buyout amount at a specific month
+ * 
+ * @param {number} price - Product purchase price
+ * @param {number} monthlyRate - Monthly payment amount
+ * @param {number} term - Total rental term
+ * @param {number} month - Current month
+ * @returns {number} - Buyout amount
  */
-function loadProductDetails(productId) {
-    if (!productId) return;
+function calculateBuyoutAmount(price, monthlyRate, term, month) {
+    if (month >= term) {
+        return 0; // Fully paid
+    }
     
-    fetch(`/api/products/${productId}`)
-        .then(response => response.json())
-        .then(product => {
-            currentProduct = product;
-            updateCalculator();
-            updateProductDisplay();
-        })
-        .catch(error => {
-            console.error('Error loading product details:', error);
-            showError('Unable to load product details. Please try again later.');
-        });
+    // Total amount to be paid over the rental period
+    const totalRental = monthlyRate * term;
+    
+    // Amount paid so far
+    const amountPaid = monthlyRate * month;
+    
+    // Remaining amount
+    return totalRental - amountPaid;
 }
 
 /**
- * Update the product display with current product details
- */
-function updateProductDisplay() {
-    if (!currentProduct) return;
-    
-    // Update product image
-    const productImage = document.getElementById('product-image');
-    if (productImage && currentProduct.primary_image) {
-        productImage.src = currentProduct.primary_image;
-        productImage.alt = currentProduct.name;
-    }
-    
-    // Update product name and description
-    const productName = document.getElementById('product-name');
-    if (productName) productName.textContent = currentProduct.name;
-    
-    const productDesc = document.getElementById('product-description');
-    if (productDesc) productDesc.textContent = currentProduct.description;
-    
-    // Update condition rating
-    const conditionRating = document.getElementById('condition-rating');
-    if (conditionRating) {
-        conditionRating.textContent = currentProduct.condition_rating || 'Good';
-        
-        // Add appropriate class for condition visual indication
-        conditionRating.className = ''; // Reset classes
-        conditionRating.classList.add('condition-badge');
-        
-        if (currentProduct.condition_rating) {
-            const ratingClass = currentProduct.condition_rating.toLowerCase().replace(' ', '-');
-            conditionRating.classList.add(ratingClass);
-        }
-    }
-    
-    // Update specifications if they exist
-    const specsContainer = document.getElementById('product-specifications');
-    if (specsContainer && currentProduct.specifications) {
-        specsContainer.innerHTML = '';
-        
-        for (const [key, value] of Object.entries(currentProduct.specifications)) {
-            const specRow = document.createElement('div');
-            specRow.className = 'spec-row';
-            
-            const specName = document.createElement('span');
-            specName.className = 'spec-name';
-            specName.textContent = key;
-            
-            const specValue = document.createElement('span');
-            specValue.className = 'spec-value';
-            specValue.textContent = value;
-            
-            specRow.appendChild(specName);
-            specRow.appendChild(specValue);
-            specsContainer.appendChild(specRow);
-        }
-    }
-}
-
-/**
- * Initialize the payment slider for term selection
- */
-function initPaymentSlider() {
-    const slider = document.getElementById('term-slider');
-    if (!slider) return;
-    
-    // Initialize the slider with noUiSlider if available
-    if (window.noUiSlider) {
-        noUiSlider.create(slider, {
-            start: [12],
-            connect: 'lower',
-            step: 3,
-            range: {
-                'min': [3],
-                'max': [24]
-            },
-            pips: {
-                mode: 'values',
-                values: [3, 6, 12, 18, 24],
-                density: 10
-            }
-        });
-        
-        slider.noUiSlider.on('update', function(values, handle) {
-            selectedTerm = Math.round(values[handle]);
-            updateCalculator();
-            
-            // Update term display
-            document.getElementById('selected-term').textContent = selectedTerm;
-        });
-    } else {
-        // Fallback for regular range input
-        slider.type = 'range';
-        slider.min = 3;
-        slider.max = 24;
-        slider.step = 3;
-        slider.value = 12;
-        
-        slider.addEventListener('input', function() {
-            selectedTerm = parseInt(this.value);
-            document.getElementById('selected-term').textContent = selectedTerm;
-            updateCalculator();
-        });
-    }
-}
-
-/**
- * Update the rent-to-own calculator with current values
+ * Update the calculator UI with new values
  */
 function updateCalculator() {
-    if (!currentProduct) return;
-    
-    // Get price based on selected term
-    let monthlyPrice;
-    switch(selectedTerm) {
-        case 3:
-            monthlyPrice = currentProduct.rental_price_3m || (currentProduct.purchase_price / 2.5 / 3);
-            break;
-        case 6:
-            monthlyPrice = currentProduct.rental_price_6m || (currentProduct.purchase_price / 2.2 / 6);
-            break;
-        case 12:
-        default:
-            monthlyPrice = currentProduct.rental_price_12m || (currentProduct.purchase_price / 2 / 12);
-            break;
+    if (!currentProduct) {
+        return;
     }
     
-    // Calculate total cost
-    const totalCost = (monthlyPrice * selectedTerm).toFixed(2);
-    const purchasePrice = currentProduct.purchase_price.toFixed(2);
-    const premiumPercentage = (((totalCost - purchasePrice) / purchasePrice) * 100).toFixed(1);
+    const price = currentProduct.price;
+    const monthlyRate = calculateMonthlyRate(price, selectedTerm);
+    const totalRental = monthlyRate * selectedTerm;
+    const premium = totalRental - price;
+    const premiumPercentage = (premium / price) * 100;
     
-    // Calculate buyout prices at different terms
-    const remainingAtThreeMonths = (totalCost - (monthlyPrice * 3)).toFixed(2);
-    const remainingAtSixMonths = (totalCost - (monthlyPrice * 6)).toFixed(2);
-    const remainingAtNineMonths = (totalCost - (monthlyPrice * 9)).toFixed(2);
+    // Update UI
+    elements.monthlyPayment.textContent = formatCurrency(monthlyRate);
+    elements.purchasePrice.textContent = formatCurrency(price);
+    elements.totalCost.textContent = formatCurrency(totalRental);
+    elements.rentalPremium.textContent = formatPercentage(premiumPercentage);
     
-    // Update UI elements with calculated values
-    const elements = {
-        'monthly-payment': `$${monthlyPrice.toFixed(2)}`,
-        'total-cost': `$${totalCost}`,
-        'purchase-price': `$${purchasePrice}`,
-        'rental-premium': `${premiumPercentage}%`,
-        'buyout-3months': `$${remainingAtThreeMonths}`,
-        'buyout-6months': `$${remainingAtSixMonths}`,
-        'buyout-9months': `$${remainingAtNineMonths}`
-    };
+    // Update buyout options
+    elements.buyout3months.textContent = formatCurrency(calculateBuyoutAmount(price, monthlyRate, selectedTerm, 3));
+    elements.buyout6months.textContent = formatCurrency(calculateBuyoutAmount(price, monthlyRate, selectedTerm, 6));
+    elements.buyout9months.textContent = formatCurrency(calculateBuyoutAmount(price, monthlyRate, selectedTerm, 9));
     
-    for (const [id, value] of Object.entries(elements)) {
-        const element = document.getElementById(id);
-        if (element) element.textContent = value;
-    }
-    
-    // Update comparison chart if it exists
-    updateComparisonChart(purchasePrice, totalCost, monthlyPrice);
+    // Generate chart
+    generateComparisonChart(price, totalRental, monthlyRate, selectedTerm);
 }
 
 /**
- * Update the buy vs. rent comparison chart
+ * Generate the comparison chart
+ * 
+ * @param {number} price - Product purchase price
+ * @param {number} totalRental - Total rental cost
+ * @param {number} monthlyRate - Monthly payment
+ * @param {number} term - Rental term
  */
-function updateComparisonChart(purchasePrice, totalCost, monthlyPayment) {
-    const chartContainer = document.getElementById('comparison-chart');
-    if (!chartContainer) return;
-    
-    if (window.Chart) {
-        // Clear previous chart
-        while (chartContainer.firstChild) {
-            chartContainer.removeChild(chartContainer.firstChild);
-        }
-        
-        // Create canvas for chart
-        const canvas = document.createElement('canvas');
-        chartContainer.appendChild(canvas);
-        
-        // Create the chart
-        new Chart(canvas, {
-            type: 'bar',
-            data: {
-                labels: ['Upfront Purchase', 'Rent-to-Own'],
-                datasets: [
-                    {
-                        label: 'Initial Payment',
-                        data: [purchasePrice, monthlyPayment],
-                        backgroundColor: '#4a7feb'
-                    },
-                    {
-                        label: 'Total Cost',
-                        data: [purchasePrice, totalCost],
-                        backgroundColor: '#6c757d'
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Cost ($)'
-                        }
-                    }
-                }
-            }
-        });
-    } else {
-        // Simple fallback if Chart.js is not available
-        chartContainer.innerHTML = `
-            <div class="comparison-table">
-                <div class="comparison-row header">
-                    <div class="comparison-cell"></div>
-                    <div class="comparison-cell">Upfront Purchase</div>
-                    <div class="comparison-cell">Rent-to-Own</div>
-                </div>
-                <div class="comparison-row">
-                    <div class="comparison-cell">Initial Payment</div>
-                    <div class="comparison-cell">$${purchasePrice}</div>
-                    <div class="comparison-cell">$${monthlyPayment.toFixed(2)}</div>
-                </div>
-                <div class="comparison-row">
-                    <div class="comparison-cell">Total Cost</div>
-                    <div class="comparison-cell">$${purchasePrice}</div>
-                    <div class="comparison-cell">$${totalCost}</div>
-                </div>
-            </div>
-        `;
-    }
-}
-
-/**
- * Load current user's rentals for the dashboard
- */
-function loadUserRentals() {
-    const rentalsContainer = document.getElementById('user-rentals');
-    if (!rentalsContainer) return;
-    
-    // Display loading state
-    rentalsContainer.innerHTML = '<div class="loading">Loading your rentals...</div>';
-    
-    fetch('/api/rentals')
-        .then(response => {
-            if (!response.ok) {
-                if (response.status === 401) {
-                    // Not logged in
-                    redirectToLogin();
-                    throw new Error('Please log in to view your rentals');
-                }
-                throw new Error('Failed to load rentals');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (!data.rentals || data.rentals.length === 0) {
-                rentalsContainer.innerHTML = `
-                    <div class="no-rentals">
-                        <p>You don't have any active rentals yet.</p>
-                        <a href="/products.php" class="btn btn-primary">Browse Products</a>
-                    </div>
-                `;
-                return;
-            }
+async function generateComparisonChart(price, totalRental, monthlyRate, term) {
+    // Only load chart.js and the chart generator module if needed
+    if (!chartModuleLoaded) {
+        try {
+            // Load Chart.js first
+            await loadScript('https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js');
             
-            // Display the rentals
-            renderRentals(data.rentals, rentalsContainer);
-        })
-        .catch(error => {
-            console.error('Error loading rentals:', error);
-            rentalsContainer.innerHTML = `
-                <div class="error-message">
-                    <p>${error.message || 'An error occurred while loading your rentals.'}</p>
-                    <button onclick="loadUserRentals()" class="btn btn-secondary">Try Again</button>
-                </div>
-            `;
+            // Then load our chart generator module
+            chartModuleLoaded = true;
+        } catch (error) {
+            console.error('Failed to load chart libraries:', error);
+            elements.comparisonChart.innerHTML = '<p class="error">Failed to load visualization charts. Please try again later.</p>';
+            return;
+        }
+    }
+    
+    try {
+        // Dynamically import the chart module
+        const chartModule = await import('./modules/chart-generator.js');
+        
+        // Generate the chart
+        await chartModule.generateComparisonChart({
+            container: elements.comparisonChart,
+            purchasePrice: price,
+            totalRental: totalRental,
+            term: term,
+            monthlyRate: monthlyRate
         });
+        
+        // Optionally generate additional charts
+        const breakdownContainer = document.createElement('div');
+        breakdownContainer.className = 'chart-section cost-breakdown';
+        elements.comparisonChart.appendChild(breakdownContainer);
+        
+        await chartModule.generateCostBreakdownChart({
+            container: breakdownContainer,
+            purchasePrice: price,
+            totalRental: totalRental
+        });
+        
+        const scheduleContainer = document.createElement('div');
+        scheduleContainer.className = 'chart-section amortization';
+        elements.comparisonChart.appendChild(scheduleContainer);
+        
+        await chartModule.generateAmortizationChart({
+            container: scheduleContainer,
+            monthlyRate: monthlyRate,
+            term: term
+        });
+        
+    } catch (error) {
+        console.error('Error generating chart:', error);
+        elements.comparisonChart.innerHTML = '<p class="error">Failed to generate comparison chart. Please try again later.</p>';
+    }
 }
 
 /**
- * Render rentals in the dashboard
- * @param {Array} rentals - The list of rental objects
- * @param {HTMLElement} container - The container element
+ * Utility function to load external scripts
+ * 
+ * @param {string} src - Script URL
+ * @returns {Promise<void>}
  */
-function renderRentals(rentals, container) {
-    container.innerHTML = '';
-    
-    // Create header/title
-    const header = document.createElement('h2');
-    header.className = 'section-title';
-    header.textContent = 'Your Rentals';
-    container.appendChild(header);
-    
-    // Create rentals grid
-    const grid = document.createElement('div');
-    grid.className = 'rentals-grid';
-    
-    rentals.forEach(rental => {
-        const rentalCard = document.createElement('div');
-        rentalCard.className = 'rental-card';
-        rentalCard.dataset.rentalId = rental.rental_id;
-        
-        // Add status indicator
-        const statusClass = rental.status.toLowerCase().replace('_', '-');
-        rentalCard.classList.add(`status-${statusClass}`);
-        
-        // Create card content
-        const imageContainer = document.createElement('div');
-        imageContainer.className = 'rental-image';
-        
-        const img = document.createElement('img');
-        img.src = rental.primary_image || '/assets/placeholder-product.jpg';
-        img.alt = rental.product_name;
-        imageContainer.appendChild(img);
-        
-        const statusBadge = document.createElement('span');
-        statusBadge.className = 'status-badge';
-        statusBadge.textContent = rental.status.charAt(0).toUpperCase() + rental.status.slice(1).replace('_', ' ');
-        imageContainer.appendChild(statusBadge);
-        
-        // Card details
-        const details = document.createElement('div');
-        details.className = 'rental-details';
-        
-        details.innerHTML = `
-            <h3 class="rental-product-name">${rental.product_name}</h3>
-            <div class="rental-period">
-                <span class="rental-dates">${formatDate(rental.start_date)} - ${formatDate(rental.end_date)}</span>
-            </div>
-            <div class="rental-payment">
-                <span class="rental-rate">$${rental.monthly_rate}/month</span>
-            </div>
-            <div class="rental-progress">
-                <div class="progress-bar">
-                    <div class="progress-filled" style="width: ${rental.progress_percentage}%"></div>
-                </div>
-                <div class="progress-text">
-                    <span class="progress-percent">${Math.round(rental.progress_percentage)}% Complete</span>
-                    <span class="progress-fraction">${rental.paid_payments} / ${rental.total_payments} Payments</span>
-                </div>
-            </div>
-        `;
-        
-        // Actions
-        const actions = document.createElement('div');
-        actions.className = 'rental-actions';
-        
-        const viewButton = document.createElement('button');
-        viewButton.className = 'btn btn-outline';
-        viewButton.textContent = 'View Details';
-        viewButton.addEventListener('click', () => viewRentalDetails(rental.rental_id));
-        actions.appendChild(viewButton);
-        
-        // Only show buyout button for active rentals
-        if (rental.status === 'active' && rental.buyout_price > 0) {
-            const buyoutButton = document.createElement('button');
-            buyoutButton.className = 'btn btn-primary';
-            buyoutButton.textContent = `Buyout ($${rental.buyout_price})`;
-            buyoutButton.addEventListener('click', () => initiateRentalBuyout(rental.rental_id, rental.buyout_price));
-            actions.appendChild(buyoutButton);
+function loadScript(src) {
+    return new Promise((resolve, reject) => {
+        // Check if script is already loaded
+        if (document.querySelector(`script[src="${src}"]`)) {
+            resolve();
+            return;
         }
         
-        // Assemble card
-        rentalCard.appendChild(imageContainer);
-        rentalCard.appendChild(details);
-        rentalCard.appendChild(actions);
-        
-        grid.appendChild(rentalCard);
+        const script = document.createElement('script');
+        script.src = src;
+        script.onload = () => resolve();
+        script.onerror = (e) => reject(e);
+        document.head.appendChild(script);
     });
-    
-    container.appendChild(grid);
 }
 
 /**
- * View detailed information about a specific rental
- * @param {number} rentalId - The ID of the rental to view
+ * Fetch product details from API
+ * 
+ * @param {number} productId - Product ID
+ * @returns {Promise<Object>} - Product details
  */
-function viewRentalDetails(rentalId) {
-    // Redirect to rental details page or open modal
-    window.location.href = `/dashboard.php?view=rental&id=${rentalId}`;
-}
-
-/**
- * Initiate the buyout process for a rental
- * @param {number} rentalId - The ID of the rental to buy out
- * @param {number} buyoutAmount - The amount required to buy out the rental
- */
-function initiateRentalBuyout(rentalId, buyoutAmount) {
-    // Could open a modal to confirm buyout
-    if (confirm(`Are you sure you want to buy out this rental for $${buyoutAmount}?`)) {
-        // Show loading indicator
-        showLoadingOverlay('Processing buyout...');
+async function fetchProductDetails(productId) {
+    try {
+        const response = await fetch(`/api/products/detail.php?id=${productId}&format=json`);
         
-        // Redirect to checkout with buyout parameter
-        window.location.href = `/checkout.php?type=buyout&rental_id=${rentalId}`;
+        if (!response.ok) {
+            throw new Error(`Failed to fetch product: ${response.status}`);
+        }
+        
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching product details:', error);
+        return null;
     }
 }
 
 /**
- * Format a date string into a readable format
- * @param {string} dateString - The date string to format
- * @returns {string} The formatted date string
+ * Load rental products for the dropdown
+ * 
+ * @returns {Promise<void>}
  */
-function formatDate(dateString) {
-    if (!dateString) return '';
-    
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-    });
+async function loadRentalProducts() {
+    try {
+        const response = await fetch('/api/products/rental-products.php?format=json');
+        
+        if (!response.ok) {
+            throw new Error(`Failed to fetch rental products: ${response.status}`);
+        }
+        
+        const products = await response.json();
+        
+        // Clear current options except the placeholder
+        while (elements.productSelect.options.length > 1) {
+            elements.productSelect.remove(1);
+        }
+        
+        // Add new options
+        products.forEach(product => {
+            const option = document.createElement('option');
+            option.value = product.id;
+            option.dataset.price = product.price;
+            option.textContent = `${product.name} (${formatCurrency(product.price)})`;
+            elements.productSelect.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error loading rental products:', error);
+        elements.productSelect.innerHTML = '<option value="">Error loading products</option>';
+    }
 }
 
 /**
- * Show an error message
- * @param {string} message - The error message to display
+ * Display product details in the UI
+ * 
+ * @param {Object} product - Product details
  */
-function showError(message) {
-    const errorContainer = document.getElementById('error-container') || createErrorContainer();
+function displayProductDetails(product) {
+    if (!product) {
+        elements.productDetails.classList.add('empty');
+        return;
+    }
     
-    errorContainer.textContent = message;
-    errorContainer.style.display = 'block';
+    // Update UI elements
+    elements.productDetails.classList.remove('empty');
+    elements.productName.textContent = product.name;
+    elements.productDescription.textContent = product.description;
     
-    // Auto-hide after a delay
-    setTimeout(() => {
-        errorContainer.style.display = 'none';
-    }, 5000);
-}
-
-/**
- * Create an error container element if it doesn't exist
- * @returns {HTMLElement} The error container element
- */
-function createErrorContainer() {
-    const container = document.createElement('div');
-    container.id = 'error-container';
-    container.className = 'error-message';
+    // Update condition badge
+    elements.conditionRating.textContent = product.condition || 'Good';
+    elements.conditionRating.className = 'condition-badge ' + (product.condition || 'good').toLowerCase();
     
-    document.body.appendChild(container);
-    return container;
-}
-
-/**
- * Show a loading overlay during async operations
- * @param {string} message - The loading message to display
- */
-function showLoadingOverlay(message = 'Loading...') {
-    let overlay = document.getElementById('loading-overlay');
-    
-    if (!overlay) {
-        overlay = document.createElement('div');
-        overlay.id = 'loading-overlay';
-        overlay.innerHTML = `
-            <div class="loading-spinner"></div>
-            <div class="loading-message">${message}</div>
-        `;
-        document.body.appendChild(overlay);
+    // Set product image
+    if (product.image_url) {
+        elements.productImage.src = product.image_url;
+        elements.productImage.alt = product.name;
     } else {
-        overlay.querySelector('.loading-message').textContent = message;
-        overlay.style.display = 'flex';
+        elements.productImage.src = '/img/placeholder-product.jpg';
+        elements.productImage.alt = 'Product image placeholder';
+    }
+    
+    // Display specifications
+    if (product.specifications) {
+        let specHtml = '<h4>Specifications</h4><ul>';
+        
+        if (typeof product.specifications === 'string') {
+            try {
+                // Try to parse JSON if it's a string
+                product.specifications = JSON.parse(product.specifications);
+            } catch (e) {
+                // If it's not valid JSON, just show as plain text
+                specHtml += `<li>${product.specifications}</li>`;
+            }
+        }
+        
+        if (typeof product.specifications === 'object') {
+            for (const [key, value] of Object.entries(product.specifications)) {
+                specHtml += `<li><strong>${key}:</strong> ${value}</li>`;
+            }
+        }
+        
+        specHtml += '</ul>';
+        elements.productSpecifications.innerHTML = specHtml;
+    } else {
+        elements.productSpecifications.innerHTML = '';
     }
 }
 
 /**
- * Hide the loading overlay
+ * Initialize sliders and interactive elements
  */
-function hideLoadingOverlay() {
-    const overlay = document.getElementById('loading-overlay');
-    if (overlay) {
-        overlay.style.display = 'none';
+function initializeUI() {
+    // Slider for term selection
+    if (elements.termSlider) {
+        noUiSlider.create(elements.termSlider, {
+            start: [selectedTerm],
+            connect: true,
+            step: 1,
+            range: {
+                'min': 3,
+                'max': 24
+            },
+            format: {
+                to: value => Math.round(value),
+                from: value => parseInt(value)
+            }
+        });
+        
+        elements.termSlider.noUiSlider.on('update', (values) => {
+            const term = parseInt(values[0]);
+            selectedTerm = term;
+            elements.selectedTermDisplay.textContent = term;
+            
+            // Update active term option
+            elements.termOptions.forEach(option => {
+                const optionTerm = parseInt(option.dataset.term);
+                option.classList.toggle('active', optionTerm === term);
+            });
+            
+            updateCalculator();
+        });
     }
+    
+    // Term option buttons
+    elements.termOptions.forEach(option => {
+        option.addEventListener('click', () => {
+            const term = parseInt(option.dataset.term);
+            selectedTerm = term;
+            
+            // Update UI
+            elements.termOptions.forEach(opt => opt.classList.remove('active'));
+            option.classList.add('active');
+            
+            // Update slider if it exists
+            if (elements.termSlider && elements.termSlider.noUiSlider) {
+                elements.termSlider.noUiSlider.set(term);
+            } else {
+                // If slider doesn't exist, update the display manually
+                elements.selectedTermDisplay.textContent = term;
+                updateCalculator();
+            }
+        });
+    });
+    
+    // Product selection
+    elements.productSelect.addEventListener('change', async () => {
+        const productId = elements.productSelect.value;
+        
+        if (!productId) {
+            currentProduct = null;
+            displayProductDetails(null);
+            updateCalculator();
+            return;
+        }
+        
+        // Get initial price from the select option
+        const initialPrice = parseFloat(elements.productSelect.options[elements.productSelect.selectedIndex].dataset.price);
+        
+        // Create a temporary product object with the initial price
+        currentProduct = {
+            id: productId,
+            name: elements.productSelect.options[elements.productSelect.selectedIndex].textContent.split(' (')[0],
+            price: initialPrice
+        };
+        
+        // Update calculator with this basic info first for immediate feedback
+        updateCalculator();
+        
+        // Then fetch full product details
+        const product = await fetchProductDetails(productId);
+        
+        if (product) {
+            currentProduct = {
+                ...product,
+                price: parseFloat(product.price || initialPrice)
+            };
+            
+            displayProductDetails(currentProduct);
+            updateCalculator();
+        }
+    });
 }
 
 /**
- * Redirect to login page
+ * Main initialization function
  */
-function redirectToLogin() {
-    const currentPath = encodeURIComponent(window.location.pathname + window.location.search);
-    window.location.href = `/login.php?redirect=${currentPath}`;
+async function init() {
+    try {
+        // Load noUiSlider for the term slider
+        await loadScript('https://cdn.jsdelivr.net/npm/nouislider@14.6.3/distribute/nouislider.min.js');
+        
+        // Add the noUiSlider CSS
+        const sliderStyles = document.createElement('link');
+        sliderStyles.rel = 'stylesheet';
+        sliderStyles.href = 'https://cdn.jsdelivr.net/npm/nouislider@14.6.3/distribute/nouislider.min.css';
+        document.head.appendChild(sliderStyles);
+        
+        // Initialize UI elements
+        initializeUI();
+        
+        // Load rental products
+        await loadRentalProducts();
+        
+        // If there's a product param in the URL, select it
+        const urlParams = new URLSearchParams(window.location.search);
+        const productParam = urlParams.get('product');
+        
+        if (productParam) {
+            elements.productSelect.value = productParam;
+            elements.productSelect.dispatchEvent(new Event('change'));
+        }
+        
+    } catch (error) {
+        console.error('Initialization error:', error);
+    }
 }
 
-// Initialize the rent-to-own functionality when the DOM is ready
-document.addEventListener('DOMContentLoaded', initRentToOwn);
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', init);

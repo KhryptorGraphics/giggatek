@@ -3,6 +3,11 @@ from datetime import datetime, timedelta
 import calendar
 from ..utils.db import get_db_connection
 from ..auth.routes import token_required
+from ..utils.cache import (
+    cache_get, cache_set, cache_delete, 
+    invalidate_user_rentals_cache, invalidate_rental_cache,
+    RENTAL_DETAILS_TTL, RENTAL_LIST_TTL
+)
 
 rentals_bp = Blueprint('rentals', __name__)
 
@@ -16,6 +21,14 @@ def get_user_rentals():
     status = request.args.get('status')
     page = int(request.args.get('page', 1))
     per_page = min(int(request.args.get('per_page', 10)), 50)  # Limit to 50 max
+    
+    # Generate cache key
+    cache_key = f"rental:user:{request.user_id}:list:status:{status or 'all'}:page:{page}:per_page:{per_page}"
+    
+    # Try to get from cache
+    cached_result = cache_get(cache_key)
+    if cached_result:
+        return jsonify(cached_result), 200
     
     # Calculate offset for pagination
     offset = (page - 1) * per_page
@@ -90,7 +103,8 @@ def get_user_rentals():
         # Calculate pagination metadata
         total_pages = (total_count + per_page - 1) // per_page  # Ceiling division
         
-        return jsonify({
+        # Prepare response
+        response = {
             'rentals': rentals,
             'pagination': {
                 'total': total_count,
@@ -98,7 +112,12 @@ def get_user_rentals():
                 'per_page': per_page,
                 'total_pages': total_pages
             }
-        }), 200
+        }
+        
+        # Cache the result
+        cache_set(cache_key, response, RENTAL_LIST_TTL)
+        
+        return jsonify(response), 200
     
     except Exception as e:
         cursor.close()
@@ -111,6 +130,14 @@ def get_rental_details(rental_id):
     """
     Get detailed information for a specific rental
     """
+    # Generate cache key
+    cache_key = f"rental:user:{request.user_id}:id:{rental_id}:details"
+    
+    # Try to get from cache
+    cached_result = cache_get(cache_key)
+    if cached_result:
+        return jsonify(cached_result), 200
+    
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     
@@ -227,7 +254,11 @@ def get_rental_details(rental_id):
         cursor.close()
         conn.close()
         
-        return jsonify({'rental': rental}), 200
+        # Cache the result
+        response = {'rental': rental}
+        cache_set(cache_key, response, RENTAL_DETAILS_TTL)
+        
+        return jsonify(response), 200
     
     except Exception as e:
         cursor.close()
@@ -436,6 +467,9 @@ def create_rental():
         cursor.close()
         conn.close()
         
+        # Invalidate user rentals cache
+        invalidate_user_rentals_cache(request.user_id)
+        
         return jsonify({
             'message': 'Rental contract created successfully',
             'rental': new_rental
@@ -514,6 +548,10 @@ def cancel_rental(rental_id):
         
         cursor.close()
         conn.close()
+        
+        # Invalidate caches
+        invalidate_rental_cache(rental_id)
+        invalidate_user_rentals_cache(request.user_id)
         
         return jsonify({
             'message': f"Rental for {rental['product_name']} cancelled successfully"
@@ -648,6 +686,10 @@ def make_rental_payment(rental_id):
         cursor.close()
         conn.close()
         
+        # Invalidate caches
+        invalidate_rental_cache(rental_id)
+        invalidate_user_rentals_cache(request.user_id)
+        
         return jsonify({
             'message': 'Payment processed successfully',
             'rental': updated_rental
@@ -762,6 +804,10 @@ def buyout_rental(rental_id):
         cursor.close()
         conn.close()
         
+        # Invalidate caches
+        invalidate_rental_cache(rental_id)
+        invalidate_user_rentals_cache(request.user_id)
+        
         return jsonify({
             'message': f"Rental for {rental['product_name']} has been successfully bought out",
             'amount_paid': remaining_balance
@@ -849,6 +895,10 @@ def sign_rental_contract(rental_id):
         cursor.close()
         conn.close()
         
+        # Invalidate caches
+        invalidate_rental_cache(rental_id)
+        invalidate_user_rentals_cache(request.user_id)
+        
         return jsonify({
             'message': 'Rental contract signed successfully',
             'signed_at': datetime.now().isoformat()
@@ -866,6 +916,14 @@ def get_rental_stats():
     """
     Get rental statistics for the authenticated user
     """
+    # Generate cache key
+    cache_key = f"rental:user:{request.user_id}:stats"
+    
+    # Try to get from cache
+    cached_result = cache_get(cache_key)
+    if cached_result:
+        return jsonify(cached_result), 200
+    
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     
@@ -926,6 +984,9 @@ def get_rental_stats():
         
         cursor.close()
         conn.close()
+        
+        # Cache the result
+        cache_set(cache_key, stats, RENTAL_LIST_TTL)
         
         return jsonify(stats), 200
     
