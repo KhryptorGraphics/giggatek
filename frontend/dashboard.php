@@ -12,14 +12,15 @@ include 'components/dashboard/header.php';
 ?>
 
 <main class="container">
-    <?php 
+    <?php
     // Include navigation component
     include 'components/dashboard/navigation.php';
-    
+
     // Include all tab components
     include 'components/dashboard/overview.php';
     include 'components/dashboard/orders.php';
     include 'components/dashboard/rentals.php';
+    include 'components/dashboard/analytics.php';
     include 'components/dashboard/profile.php';
     include 'components/dashboard/addresses.php';
     include 'components/dashboard/payment_methods.php';

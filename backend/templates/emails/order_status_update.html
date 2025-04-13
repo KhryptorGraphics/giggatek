@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Order Status Update - GigGatek</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f7f7f7; color: #222; margin: 0; padding: 0; }
+    .container { max-width: 480px; margin: 40px auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); padding: 32px; }
+    h2 { color: #2a7ae2; }
+    .button { display: inline-block; background: #2a7ae2; color: #fff; padding: 12px 24px; border-radius: 4px; text-decoration: none; font-weight: bold; margin-top: 24px; }
+    .footer { margin-top: 32px; font-size: 12px; color: #888; }
+    .details { margin: 20px 0; padding: 16px; background: #f5f9ff; border-radius: 4px; }
+    .status { display: inline-block; padding: 6px 12px; border-radius: 4px; font-weight: bold; }
+    .status-pending { background: #fff3cd; color: #856404; }
+    .status-processing { background: #d1ecf1; color: #0c5460; }
+    .status-shipped { background: #d4edda; color: #155724; }
+    .status-delivered { background: #d4edda; color: #155724; }
+    .status-cancelled { background: #f8d7da; color: #721c24; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Order Status Update</h2>
+    <p>Hello {{ user_name }},</p>
+    <p>The status of your order <strong>#{{ order.id }}</strong> has been updated.</p>
+    
+    <div class="details">
+      <p>Your order status has changed from 
+        <span class="status status-{{ old_status }}">{{ old_status|title }}</span> 
+        to 
+        <span class="status status-{{ new_status }}">{{ new_status|title }}</span>
+      </p>
+      
+      {% if new_status == 'processing' %}
+      <p>We're currently preparing your items for shipment. You'll receive another notification when your order ships.</p>
+      {% elif new_status == 'shipped' %}
+      <p>Your order is on its way! You'll receive a shipping confirmation email with tracking information shortly.</p>
+      {% elif new_status == 'delivered' %}
+      <p>Your order has been delivered. We hope you enjoy your purchase!</p>
+      {% elif new_status == 'cancelled' %}
+      <p>Your order has been cancelled. If you have any questions, please contact our customer support team.</p>
+      {% endif %}
+    </div>
+    
+    <p>
+      <a href="https://giggatek.com/account/orders/{{ order.id }}" class="button">View Order Details</a>
+    </p>
+    
+    <div class="footer">
+      If you have any questions about your order, please contact our support team.<br>
+      &copy; {{ current_year }} GigGatek. All rights reserved.
+    </div>
+  </div>
+</body>
+</html>
