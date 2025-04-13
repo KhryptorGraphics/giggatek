@@ -21,7 +21,9 @@ module.exports = {
     notifications: './js/notifications.js',
     'stripe-integration': './js/stripe-integration.js',
     pwa: './js/pwa.js',
-    i18n: './js/i18n.js'
+    i18n: './js/i18n.js',
+    'form-validation': './js/form-validation.js',
+    app: './js/app.js'
   },
 
   // Output configuration

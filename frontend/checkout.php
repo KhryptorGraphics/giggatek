@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout - GigGatek</title>
     <meta name="description" content="Complete your purchase of quality refurbished computer hardware at GigGatek.">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">family=Montserrat:wght@400;500;600;700;800<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">family=Roboto:wght@400;500;700<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/framework.css">
+    <link rel="stylesheet" href="css/modern-update.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/stripe-elements.css">
     <link rel="stylesheet" href="css/notifications.css">
@@ -480,5 +481,34 @@
     <script src="js/stripe-integration.js"></script>
     <!-- Finally include the checkout.js file -->
     <script src="js/checkout.js"></script>
+    <script>
+        // Animation on scroll
+        function animateOnScroll() {
+            const elements = document.querySelectorAll(".animate-on-scroll");
+            elements.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                const elementVisible = 150;
+                if (elementTop < window.innerHeight - elementVisible) {
+                    element.classList.add("animated");
+                }
+            });
+        }
+
+        // Run on page load
+        document.addEventListener("DOMContentLoaded", animateOnScroll);
+
+        // Run on scroll
+        window.addEventListener("scroll", animateOnScroll);
+
+        // Header scroll effect
+        window.addEventListener("scroll", function() {
+            const header = document.querySelector("header");
+            if (window.scrollY > 50) {
+                header.classList.add("scrolled");
+            } else {
+                header.classList.remove("scrolled");
+            }
+        });
+    </script>
 </body>
 </html>
