@@ -10,8 +10,11 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/orders.css">
     <link rel="stylesheet" href="css/rentals.css">
+    <link rel="stylesheet" href="css/dashboard-rentals.css">
+    <link rel="stylesheet" href="css/dashboard-analytics.css">
     <link rel="stylesheet" href="css/wishlist.css">
     <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body data-require-auth="true">
     <header>

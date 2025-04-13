@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Rental Confirmation - GigGatek</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f7f7f7; color: #222; margin: 0; padding: 0; }
+    .container { max-width: 480px; margin: 40px auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); padding: 32px; }
+    h2 { color: #2a7ae2; }
+    .button { display: inline-block; background: #2a7ae2; color: #fff; padding: 12px 24px; border-radius: 4px; text-decoration: none; font-weight: bold; margin-top: 24px; }
+    .footer { margin-top: 32px; font-size: 12px; color: #888; }
+    .details { margin: 20px 0; padding: 16px; background: #f5f9ff; border-radius: 4px; }
+    .product-image { max-width: 100%; height: auto; margin: 10px 0; border-radius: 4px; }
+    .payment-schedule { margin: 20px 0; }
+    .payment-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
+    .payment-header { font-weight: bold; border-bottom: 2px solid #ddd; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Rental Confirmation</h2>
+    <p>Hello {{ user_name }},</p>
+    <p>Thank you for choosing GigGatek's rent-to-own program! Your rental contract has been confirmed.</p>
+    
+    <div class="details">
+      <h3>Rental Details</h3>
+      <p><strong>Rental ID:</strong> #{{ rental.id }}</p>
+      <p><strong>Product:</strong> {{ rental.product_name }}</p>
+      <p><strong>Rental Period:</strong> {{ rental.start_date }} to {{ rental.end_date }}</p>
+      <p><strong>Monthly Payment:</strong> ${{ rental.monthly_rate|float|round(2) }}</p>
+      <p><strong>Total Payments:</strong> {{ rental.total_payments }}</p>
+      <p><strong>Buyout Price at End of Term:</strong> ${{ rental.buyout_price|float|round(2) }}</p>
+      
+      {% if rental.product_image %}
+      <img src="{{ rental.product_image }}" alt="{{ rental.product_name }}" class="product-image">
+      {% endif %}
+    </div>
+    
+    <div class="payment-schedule">
+      <h3>Payment Schedule</h3>
+      <div class="payment-row payment-header">
+        <span>Payment Date</span>
+        <span>Amount</span>
+      </div>
+      {% for payment in rental.payment_schedule %}
+      <div class="payment-row">
+        <span>{{ payment.date }}</span>
+        <span>${{ payment.amount|float|round(2) }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    
+    <p>Your first payment has been processed. Future payments will be automatically charged to your payment method on the scheduled dates.</p>
+    
+    <p>
+      <a href="https://giggatek.com/account/rentals/{{ rental.id }}" class="button">View Rental Details</a>
+    </p>
+    
+    <div class="footer">
+      If you have any questions about your rental contract, please contact our support team.<br>
+      &copy; {{ current_year }} GigGatek. All rights reserved.
+    </div>
+  </div>
+</body>
+</html>

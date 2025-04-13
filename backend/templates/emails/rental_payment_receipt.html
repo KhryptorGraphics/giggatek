@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Payment Receipt - GigGatek</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f7f7f7; color: #222; margin: 0; padding: 0; }
+    .container { max-width: 480px; margin: 40px auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); padding: 32px; }
+    h2 { color: #2a7ae2; }
+    .button { display: inline-block; background: #2a7ae2; color: #fff; padding: 12px 24px; border-radius: 4px; text-decoration: none; font-weight: bold; margin-top: 24px; }
+    .footer { margin-top: 32px; font-size: 12px; color: #888; }
+    .receipt { margin: 20px 0; padding: 16px; background: #f5f9ff; border-radius: 4px; }
+    .receipt-header { border-bottom: 1px solid #ddd; padding-bottom: 10px; margin-bottom: 10px; }
+    .receipt-row { display: flex; justify-content: space-between; margin: 8px 0; }
+    .receipt-total { font-weight: bold; border-top: 1px solid #ddd; padding-top: 10px; margin-top: 10px; }
+    .payment-method { display: inline-block; padding: 4px 8px; background: #e9ecef; border-radius: 4px; font-size: 12px; }
+    .progress { margin: 20px 0; }
+    .progress-bar { height: 20px; background: #e9ecef; border-radius: 10px; overflow: hidden; }
+    .progress-fill { height: 100%; background: #2a7ae2; }
+    .progress-text { font-size: 12px; margin-top: 4px; text-align: right; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Payment Receipt</h2>
+    <p>Hello {{ user_name }},</p>
+    <p>Thank you for your payment on your rental contract. Here's your receipt:</p>
+    
+    <div class="receipt">
+      <div class="receipt-header">
+        <h3>Payment Details</h3>
+        <p>Transaction ID: {{ payment.transaction_id }}</p>
+        <p>Date: {{ payment.payment_date }}</p>
+      </div>
+      
+      <div class="receipt-row">
+        <span>Rental Contract:</span>
+        <span>#{{ rental.id }}</span>
+      </div>
+      <div class="receipt-row">
+        <span>Product:</span>
+        <span>{{ rental.product_name }}</span>
+      </div>
+      <div class="receipt-row">
+        <span>Payment Method:</span>
+        <span class="payment-method">{{ payment.payment_method|title }}</span>
+      </div>
+      <div class="receipt-row receipt-total">
+        <span>Amount Paid:</span>
+        <span>${{ payment.amount|float|round(2) }}</span>
+      </div>
+    </div>
+    
+    <div class="progress">
+      <p>Payment Progress:</p>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: {{ rental.payment_progress }}%;"></div>
+      </div>
+      <div class="progress-text">
+        {{ rental.payments_made }} of {{ rental.total_payments }} payments ({{ rental.payment_progress }}%)
+      </div>
+    </div>
+    
+    <p>Your next payment of ${{ rental.monthly_rate|float|round(2) }} is scheduled for {{ rental.next_payment_date }}.</p>
+    
+    <p>
+      <a href="https://giggatek.com/account/rentals/{{ rental.id }}" class="button">View Rental Details</a>
+    </p>
+    
+    <div class="footer">
+      If you have any questions about your rental or payment, please contact our support team.<br>
+      &copy; {{ current_year }} GigGatek. All rights reserved.
+    </div>
+  </div>
+</body>
+</html>
